@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #083CCC;
+  --color-secondary: #FFFFFF;
+    --ant-primary-color: #6366f1; /* indigo-500 */
+}

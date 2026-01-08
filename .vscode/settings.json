@@ -1,0 +1,10 @@
+{
+  "sonarlint.analyzerProperties": {
+    "sonar.javascript.node.maxspace": "4096"
+  },
+  "editor.formatOnSave": true,
+  "eslint.format.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always"
+  }
+}
