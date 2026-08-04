@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 export default function Help() {
   return (
@@ -9,21 +9,21 @@ export default function Help() {
         <div>
           <h2 className="text-xl font-semibold text-blue-900 mb-2">How do I merge PDFs?</h2>
           <p>
-            Go to <Link to="/merge-pdf" className="text-red-500 hover:underline">Merge PDF</Link>, upload two or more PDF files, then click &quot;Merge & Preview&quot;. You can remove or rotate files, then download the merged PDF.
+            Go to <Link href="/merge-pdf" className="text-red-500 hover:underline">Merge PDF</Link>, upload two or more PDF files, then click &quot;Merge & Preview&quot;. You can remove or rotate files, then download the merged PDF.
           </p>
         </div>
 
         <div>
           <h2 className="text-xl font-semibold text-blue-900 mb-2">How do I compress a PDF?</h2>
           <p>
-            Go to <Link to="/compress-pdf" className="text-red-500 hover:underline">Compress PDF</Link>, select your PDF file, and click &quot;Compress PDF&quot;. The compressed file will download automatically.
+            Go to <Link href="/compress-pdf" className="text-red-500 hover:underline">Compress PDF</Link>, select your PDF file, and click &quot;Compress PDF&quot;. The compressed file will download automatically.
           </p>
         </div>
 
         <div>
           <h2 className="text-xl font-semibold text-blue-900 mb-2">How do I convert PDF to images?</h2>
           <p>
-            Go to <Link to="/pdf-to-image" className="text-red-500 hover:underline">PDF to Image</Link>, upload your PDF, and click &quot;Convert to Images&quot;. You can download each page as a PNG image.
+            Go to <Link href="/pdf-to-image" className="text-red-500 hover:underline">PDF to Image</Link>, upload your PDF, and click &quot;Convert to Images&quot;. You can download each page as a PNG image.
           </p>
         </div>
 
@@ -37,7 +37,7 @@ export default function Help() {
         <div>
           <h2 className="text-xl font-semibold text-blue-900 mb-2">Still need help?</h2>
           <p>
-            <Link to="/contact" className="text-red-500 hover:underline">Contact us</Link> and we&apos;ll get back to you as soon as possible.
+            <Link href="/contact" className="text-red-500 hover:underline">Contact us</Link> and we&apos;ll get back to you as soon as possible.
           </p>
         </div>
       </section>

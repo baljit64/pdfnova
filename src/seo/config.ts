@@ -3,9 +3,7 @@
  * Use keywords naturally for better Google ranking (e.g. "free PDF merger", "online PDF tools").
  * Replace SITE_URL with your production domain before deploy.
  */
-const SITE_URL =
-  (typeof import.meta !== "undefined" && (import.meta as unknown as { env?: { VITE_SITE_URL?: string } }).env?.VITE_SITE_URL) ||
-  "https://pdfnova.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://pdfnova.com";
 
 export { SITE_URL };
 

@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+ "use client";
+
+import Link from "next/link";
 import { Button } from "antd";
 
 interface ComingSoonProps {
@@ -14,7 +16,7 @@ export default function ComingSoon({ title, description }: ComingSoonProps) {
       <p className="text-gray-500 text-sm mb-8">
         This tool requires server-side processing. We&apos;re working on bringing it to you soon.
       </p>
-      <Link to="/">
+      <Link href="/">
         <Button type="primary" danger>Back to all tools</Button>
       </Link>
     </div>

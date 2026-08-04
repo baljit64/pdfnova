@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 export default function About() {
   return (
@@ -13,12 +13,12 @@ export default function About() {
           We believe in keeping things simple and secure. Your files are processed locally whenever possible, so you stay in control of your data.
         </p>
         <p>
-          PDFNova was built by Baljit Singh. We&apos;re constantly improving our tools—if you have feedback or feature requests, please <Link to="/contact" className="text-red-500 hover:underline">get in touch</Link>.
+          PDFNova was built by Baljit Singh. We&apos;re constantly improving our tools—if you have feedback or feature requests, please <Link href="/contact" className="text-red-500 hover:underline">get in touch</Link>.
         </p>
       </div>
 
       <div className="mt-12">
-        <Link to="/" className="text-red-500 font-medium hover:underline">← Back to home</Link>
+        <Link href="/" className="text-red-500 font-medium hover:underline">← Back to home</Link>
       </div>
     </div>
   );

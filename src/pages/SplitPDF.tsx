@@ -1,5 +1,7 @@
+ "use client";
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Button, Card } from "antd";
 import { splitPDF } from "../utils/pdfUtils";
 
@@ -31,7 +33,7 @@ export default function SplitPDF() {
 
   return (
     <div className="max-w-2xl mx-auto px-6 py-12">
-      <Link to="/" className="text-red-500 font-medium hover:underline mb-6 inline-block">← Back to home</Link>
+      <Link href="/" className="text-red-500 font-medium hover:underline mb-6 inline-block">← Back to home</Link>
       <h1 className="text-3xl font-bold text-blue-900 mb-2">Split PDF</h1>
       <p className="text-gray-600 mb-8">Separate one page or a whole set for easy conversion into independent PDF files.</p>
       <Card className="shadow-lg rounded-xl">

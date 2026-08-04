@@ -1,5 +1,7 @@
+ "use client";
+
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { usePathname } from "next/navigation";
 import { SITE_URL, ROUTE_META } from "./config";
 
 /**
@@ -7,7 +9,7 @@ import { SITE_URL, ROUTE_META } from "./config";
  * Helps search engines understand the site and tools (SoftwareApplication).
  */
 export default function JsonLd() {
-  const { pathname } = useLocation();
+  const pathname = usePathname() || "/";
 
   useEffect(() => {
     const path = pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;

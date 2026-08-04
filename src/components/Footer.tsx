@@ -1,14 +1,14 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 export default function Footer() {
   return (
     <footer className="bg-[#0b2a4a] text-white py-10 mt-auto">
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex flex-wrap justify-center gap-6 text-sm">
-          <Link to="/about" className="text-white/90 hover:text-white no-underline">About</Link>
-          <Link to="/privacy" className="text-white/90 hover:text-white no-underline">Privacy</Link>
-          <Link to="/terms" className="text-white/90 hover:text-white no-underline">Terms</Link>
-          <Link to="/contact" className="text-white/90 hover:text-white no-underline">Contact</Link>
+          <Link href="/about" className="text-white/90 hover:text-white no-underline">About</Link>
+          <Link href="/privacy" className="text-white/90 hover:text-white no-underline">Privacy</Link>
+          <Link href="/terms" className="text-white/90 hover:text-white no-underline">Terms</Link>
+          <Link href="/contact" className="text-white/90 hover:text-white no-underline">Contact</Link>
         </div>
 
         <p className="text-sm text-gray-300 text-center md:text-left">

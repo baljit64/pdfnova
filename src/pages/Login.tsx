@@ -1,11 +1,13 @@
+ "use client";
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Button, Input, Form } from "antd";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
 
-  const onFinish = (_values: { email: string; password: string }) => {
+  const onFinish = () => {
     setLoading(true);
     // Placeholder: replace with real auth (e.g. Supabase)
     setTimeout(() => {
@@ -42,7 +44,7 @@ export default function Login() {
       </Form>
 
       <p className="text-center text-gray-600 text-sm">
-        Don&apos;t have an account? <Link to="/" className="text-red-500 hover:underline">Get started for free</Link>
+        Don&apos;t have an account? <Link href="/" className="text-red-500 hover:underline">Get started for free</Link>
       </p>
     </div>
   );

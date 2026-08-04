@@ -1,5 +1,7 @@
+ "use client";
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import * as pdfjsLib from "pdfjs-dist";
 import { Button, Card } from "antd";
 
@@ -40,7 +42,7 @@ export default function PDFToJpg() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
-      <Link to="/" className="text-red-500 font-medium hover:underline mb-6 inline-block">← Back to home</Link>
+      <Link href="/" className="text-red-500 font-medium hover:underline mb-6 inline-block">← Back to home</Link>
       <h1 className="text-3xl font-bold text-blue-900 mb-2">PDF to JPG</h1>
       <p className="text-gray-600 mb-8">Convert each PDF page into a JPG or extract all images contained in a PDF.</p>
       <Card className="shadow-lg rounded-xl mb-8">

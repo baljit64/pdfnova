@@ -1,5 +1,7 @@
-import { useState, useCallback, useEffect } from "react";
-import { Link } from "react-router-dom";
+ "use client";
+
+import { useState, useCallback, useEffect, useRef } from "react";
+import Link from "next/link";
 import { Button, Card } from "antd";
 import { DeleteOutlined, RotateRightOutlined, DownloadOutlined, UndoOutlined } from "@ant-design/icons";
 import PDFUploader from "../components/PDFUploader";
@@ -13,6 +15,7 @@ export default function MergePDF() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [excludedIndices, setExcludedIndices] = useState<Set<number>>(new Set());
   const [rotations, setRotations] = useState<number[]>([]);
+  const lastMergeKey = useRef<string>("");
 
   const buildMerge = useCallback(async () => {
     if (files.length === 0) return null;
@@ -89,6 +92,14 @@ export default function MergePDF() {
 
   useEffect(() => {
     if (!previewUrl || files.length === 0) return;
+    const mergeKey = JSON.stringify({
+      excluded: Array.from(excludedIndices).sort(),
+      rotations,
+      count: files.length,
+    });
+    if (mergeKey === lastMergeKey.current) return;
+    lastMergeKey.current = mergeKey;
+
     let cancelled = false;
     buildMerge().then((blob) => {
       if (cancelled || !blob) return;
@@ -100,7 +111,7 @@ export default function MergePDF() {
     return () => {
       cancelled = true;
     };
-  }, [excludedIndices, rotations, buildMerge, files.length]);
+  }, [excludedIndices, rotations, buildMerge, files.length, previewUrl]);
 
   useEffect(() => {
     return () => {
@@ -114,7 +125,7 @@ export default function MergePDF() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
-      <Link to="/" className="text-red-500 font-medium hover:underline mb-6 inline-block">← Back to home</Link>
+      <Link href="/" className="text-red-500 font-medium hover:underline mb-6 inline-block">← Back to home</Link>
 
       <h1 className="text-3xl font-bold text-blue-900 mb-2">Merge PDF</h1>
       <p className="text-gray-600 mb-8">Combine multiple PDF files into one.</p>

@@ -1,9 +1,11 @@
-import { useNavigate } from "react-router-dom";
+ "use client";
+
+import { useRouter } from "next/navigation";
 import { Button, Card } from "antd";
 import { PictureOutlined } from "@ant-design/icons";
 
 export default function ConvertPDF() {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
@@ -15,19 +17,19 @@ export default function ConvertPDF() {
           <div className="text-4xl text-blue-600 mb-4"><PictureOutlined /></div>
           <h2 className="text-xl font-semibold text-blue-900 mb-2">PDF to Image</h2>
           <p className="text-gray-600 mb-4">Convert PDF pages to PNG images.</p>
-          <Button type="primary" danger onClick={() => navigate("/pdf-to-image")}>PDF to Image</Button>
+          <Button type="primary" danger onClick={() => router.push("/pdf-to-image")}>PDF to Image</Button>
         </Card>
         <Card className="shadow-lg rounded-xl text-center hover:shadow-xl transition-shadow">
           <div className="text-4xl text-blue-600 mb-4"><PictureOutlined /></div>
           <h2 className="text-xl font-semibold text-blue-900 mb-2">PDF to JPG</h2>
           <p className="text-gray-600 mb-4">Convert each PDF page into a JPG.</p>
-          <Button type="primary" danger onClick={() => navigate("/pdf-to-jpg")}>PDF to JPG</Button>
+          <Button type="primary" danger onClick={() => router.push("/pdf-to-jpg")}>PDF to JPG</Button>
         </Card>
         <Card className="shadow-lg rounded-xl text-center hover:shadow-xl transition-shadow">
           <div className="text-4xl text-blue-600 mb-4"><PictureOutlined /></div>
           <h2 className="text-xl font-semibold text-blue-900 mb-2">JPG to PDF</h2>
           <p className="text-gray-600 mb-4">Convert JPG images to PDF in seconds.</p>
-          <Button type="primary" danger onClick={() => navigate("/jpg-to-pdf")}>JPG to PDF</Button>
+          <Button type="primary" danger onClick={() => router.push("/jpg-to-pdf")}>JPG to PDF</Button>
         </Card>
       </div>
     </div>

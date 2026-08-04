@@ -1,4 +1,4 @@
-import { mergePDFs } from "../utils/pdfUtils.ts";
+import { mergePDFs } from "../utils/pdfUtils";
 
 export function usePDFMerge() {
   return { mergePDFs };

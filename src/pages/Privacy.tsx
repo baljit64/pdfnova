@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 export default function Privacy() {
   return (
@@ -22,13 +22,13 @@ export default function Privacy() {
         <section>
           <h2 className="text-xl font-semibold text-blue-900">Contact</h2>
           <p>
-            For privacy-related questions, please <Link to="/contact" className="text-red-500 hover:underline">contact us</Link>.
+            For privacy-related questions, please <Link href="/contact" className="text-red-500 hover:underline">contact us</Link>.
           </p>
         </section>
       </div>
 
       <div className="mt-12">
-        <Link to="/" className="text-red-500 font-medium hover:underline">← Back to home</Link>
+        <Link href="/" className="text-red-500 font-medium hover:underline">← Back to home</Link>
       </div>
     </div>
   );

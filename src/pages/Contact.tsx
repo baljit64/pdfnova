@@ -1,6 +1,8 @@
+ "use client";
+
 import { useState } from "react";
 import { Button, Input, Form } from "antd";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const { TextArea } = Input;
 
@@ -22,7 +24,7 @@ export default function Contact() {
       <div className="max-w-md mx-auto px-6 py-16 text-center">
         <h1 className="text-3xl font-bold text-blue-900 mb-4">Message sent</h1>
         <p className="text-gray-600 mb-6">Thanks for reaching out. We&apos;ll get back to you soon.</p>
-        <Link to="/">
+        <Link href="/">
           <Button type="primary" danger>Back to home</Button>
         </Link>
       </div>
@@ -64,7 +66,7 @@ export default function Contact() {
       </Form>
 
       <p className="text-center text-gray-500 text-sm mt-6">
-        <Link to="/" className="text-red-500 hover:underline">← Back to home</Link>
+        <Link href="/" className="text-red-500 hover:underline">← Back to home</Link>
       </p>
     </div>
   );

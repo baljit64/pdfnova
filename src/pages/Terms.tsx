@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 export default function Terms() {
   return (
@@ -28,13 +28,13 @@ export default function Terms() {
         <section>
           <h2 className="text-xl font-semibold text-blue-900">Contact</h2>
           <p>
-            For questions about these terms, please <Link to="/contact" className="text-red-500 hover:underline">contact us</Link>.
+            For questions about these terms, please <Link href="/contact" className="text-red-500 hover:underline">contact us</Link>.
           </p>
         </section>
       </div>
 
       <div className="mt-12">
-        <Link to="/" className="text-red-500 font-medium hover:underline">← Back to home</Link>
+        <Link href="/" className="text-red-500 font-medium hover:underline">← Back to home</Link>
       </div>
     </div>
   );

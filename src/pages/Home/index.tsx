@@ -1,3 +1,5 @@
+ "use client";
+
 import { Button, Card } from "antd";
 import {
   MergeOutlined,
@@ -16,7 +18,7 @@ import {
   CheckCircleOutlined,
   MobileOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 const TOOLS = [
   {
@@ -128,7 +130,7 @@ const TOOLS = [
 ];
 
 export default function Home() {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <>
@@ -142,7 +144,7 @@ export default function Home() {
               Merge, Compress & Convert PDFs with Ease.
             </p>
             <div className="mt-8 flex gap-4">
-              <Button type="primary" size="large" danger onClick={() => navigate("/merge-pdf")}>
+              <Button type="primary" size="large" danger onClick={() => router.push("/merge-pdf")}>
                 Get Started
               </Button>
               <Button size="large">Watch Demo</Button>
@@ -171,7 +173,7 @@ export default function Home() {
                 <div className="text-4xl text-blue-600 mb-4">{tool.icon}</div>
                 <h3 className="text-lg font-semibold text-blue-900">{tool.title}</h3>
                 <p className="text-gray-600 text-sm mt-2 line-clamp-3">{tool.desc}</p>
-                <Button danger className="mt-4" onClick={() => navigate(tool.path)}>
+                <Button danger className="mt-4" onClick={() => router.push(tool.path)}>
                   {tool.btn}
                 </Button>
               </Card>
@@ -194,7 +196,7 @@ export default function Home() {
 
       <section className="py-20 bg-gradient-to-b from-white to-[#eef5ff] text-center">
         <h2 className="text-3xl font-bold text-blue-900">Start Using Our Free PDF Tools Today!</h2>
-        <Button type="primary" danger size="large" className="mt-6" onClick={() => navigate("/merge-pdf")}>
+        <Button type="primary" danger size="large" className="mt-6" onClick={() => router.push("/merge-pdf")}>
           Get Started
         </Button>
       </section>
