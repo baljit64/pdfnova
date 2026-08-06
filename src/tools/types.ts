@@ -92,6 +92,12 @@ export interface ToolDefinition {
   actionLabel: string;
   /** One-line summary shown under the H1. */
   tagline: string;
+  /**
+   * A short clause (aim for under 50 characters) used inside generated meta
+   * descriptions. The tagline is a full sentence and overruns the ~155 character
+   * budget once a variation's own wording is prepended to it.
+   */
+  blurb: string;
   /** `accept` attribute for the file input. */
   accept: string;
   /** Human-readable list of accepted formats, e.g. "PDF". */

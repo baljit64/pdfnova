@@ -49,7 +49,7 @@ const online: VariationDefinition = {
   h1: (t) => `${t.name} Online`,
   titlePrefix: (t) => `${t.name} Online Free`,
   description: (t) =>
-    `${t.name} online with no software to install. ${t.tagline} Free, no signup, works in any modern browser.`,
+    `${t.name} online with no software to install. ${t.blurb} Free, no signup, works in any modern browser.`,
   lead: (t) => [
     `Doing this online means there is nothing to install, nothing to update and nothing to uninstall afterwards. Open this page, add your ${t.acceptLabel} file, and the ${lower(t)} tool is ready — the same tool, with the same options, that powers every other ${lower(t)} page on this site.`,
     `That matters more than it sounds. Desktop PDF software tends to arrive as a large download, ask for administrator rights, install a background updater and then propose a subscription. For a job you might do twice a month, that is a poor trade. An online tool has none of that overhead and is available from whichever computer you happen to be sitting at.`,
@@ -104,7 +104,7 @@ const free: VariationDefinition = {
   h1: (t) => `${t.name} — Free, No Card Required`,
   titlePrefix: (t) => `Free ${t.name} — No Signup, No Watermark`,
   description: (t) =>
-    `${t.name} completely free. ${t.tagline} No trial, no card, no watermark on the output, no daily limit.`,
+    `${t.name} completely free. ${t.blurb} No trial, no card, no watermark, no daily limit.`,
   lead: (t) => [
     `Free here means free: no card, no trial that expires, no free tier that stops at three files a day, and no watermark stamped across your ${t.outputNoun} to push you towards an upgrade. Add your file, ${t.verb} it, download it, close the tab.`,
     `It is worth being specific, because the word gets abused. Plenty of sites advertise a free ${lower(t)} and then ask for an email before the download, or hand back a file with a logo across every page, or cap you at two files and then show a pricing table. None of that happens here.`,
@@ -160,7 +160,7 @@ const withoutSignup: VariationDefinition = {
   h1: (t) => `${t.name} Without Signing Up`,
   titlePrefix: (t) => `${t.name} — No Signup or Account Needed`,
   description: (t) =>
-    `${t.name} without creating an account. No email, no password, no verification. ${t.tagline}`,
+    `${t.name} without creating an account. No email, no password, no verification. ${t.blurb}`,
   lead: (t) => [
     `There is no account on this page. No email address, no password to invent, no verification link to go and find, and no marketing list you are quietly added to. Add your ${t.acceptLabel} file and use the tool.`,
     `Registration walls exist to capture your details, not to make the tool work better. Nothing about ${lower(t)} requires knowing who you are — the operation is the same whether the site has your email or not, so asking for it would only slow you down.`,
@@ -215,7 +215,7 @@ const unlimited: VariationDefinition = {
   h1: (t) => `Unlimited ${t.name}`,
   titlePrefix: (t) => `Unlimited ${t.name} — No Daily Limit`,
   description: (t) =>
-    `${t.name} with no daily limit and no queue. Process as many files as you need, one after another. ${t.tagline}`,
+    `${t.name} with no daily limit and no queue. ${t.blurb} Process as many files as you need.`,
   lead: (t) => [
     `There is no counter on this page. Run the ${lower(t)} tool once, or run it thirty times this afternoon, and the thirtieth run behaves exactly like the first — same speed, same options, same output.`,
     `Daily caps exist on other sites for a straightforward reason: their processing happens on servers that cost money per file, so usage has to be metered. This tool runs on your own device, which means the marginal cost of your next file is zero and there is nothing to meter.`,
@@ -330,7 +330,7 @@ const secure: VariationDefinition = {
   h1: (t) => `Secure ${t.name}`,
   titlePrefix: (t) => `Secure ${t.name} — Files Never Leave Your Device`,
   description: (t) =>
-    `${t.name} with your files staying on your own device. No upload, no server storage, nothing retained. ${t.tagline}`,
+    `${t.name} with your files staying on your device. No upload, nothing retained. ${t.blurb}`,
   lead: (t) => [
     `The most secure way to handle a confidential document is not to send it anywhere. This tool is built that way: your ${t.acceptLabel} file is read into the browser tab in front of you, processed there by your own device, and never transmitted.`,
     `That is a meaningfully different security model from "we encrypt uploads and delete files after an hour". Both are reasonable, but one requires you to trust a retention policy you cannot inspect, and the other removes the need to trust anything, because there is no server-side copy to protect in the first place.`,
@@ -751,7 +751,7 @@ function platformVariation(spec: PlatformSpec): VariationDefinition {
     h1: (t) => `${t.name} on ${spec.display}`,
     titlePrefix: (t) => `${t.name} on ${spec.display} — Free, No Install`,
     description: (t) =>
-      `${t.name} on ${spec.display} with nothing to install. ${t.tagline} Works in your browser, free.`,
+      `${t.name} on ${spec.display} with nothing to install. ${t.blurb} Works in your browser, free.`,
     lead: (t) => [
       `If you are on ${spec.article} and need to ${t.verb} a ${t.acceptLabel} file, this page is the whole solution. Nothing to install, nothing to buy, and no account — add your file and the tool is ready.`,
       spec.nativeStory,
@@ -802,7 +802,7 @@ const mobile: VariationDefinition = {
   h1: (t) => `${t.name} on Mobile`,
   titlePrefix: (t) => `${t.name} on Mobile — Phone and Tablet`,
   description: (t) =>
-    `${t.name} on your phone or tablet with no app to install. ${t.tagline} Works in any mobile browser.`,
+    `${t.name} on your phone or tablet with no app to install. ${t.blurb} Works in any mobile browser.`,
   lead: () => [
     `Documents arrive on phones now. An attachment comes in, it needs handling, and you are nowhere near a computer. This page works properly on a phone or tablet — not a cut-down version of the tool, but the same one with the same options.`,
     `There is no app to install. That avoids the usual mobile PDF experience, where a Play Store or App Store search returns a wall of advertising-supported apps that want broad storage permissions and quietly upload your documents to process them.`,
@@ -858,7 +858,7 @@ const desktop: VariationDefinition = {
   h1: (t) => `${t.name} on Desktop`,
   titlePrefix: (t) => `${t.name} on Desktop — No Software to Install`,
   description: (t) =>
-    `${t.name} on your desktop or laptop without installing software. ${t.tagline} Full keyboard support, drag and drop.`,
+    `${t.name} on desktop without installing software. ${t.blurb} Full keyboard support and drag and drop.`,
   lead: () => [
     `A desktop or laptop is the best place to run this. More memory means larger documents, a faster processor means quicker work on operations that re-render pages, and drag and drop from a file manager makes adding files immediate.`,
     `None of that requires installing anything. The tool runs in whichever browser you already use, so there is no software to download, no licence tied to this particular machine and nothing to reinstall the next time you change computers.`,
@@ -921,7 +921,7 @@ function compressTarget(kb: number, label: string, slug: string): VariationDefin
     h1: () => `Compress PDF to Under ${display}`,
     titlePrefix: () => `Compress PDF Under ${display} — Free Online`,
     description: () =>
-      `Compress a PDF to under ${display} online free. The tool tries progressively stronger settings until your file fits the limit, and tells you the result.`,
+      `Compress a PDF to under ${display} online free. The tool tries stronger settings until your file fits, then reports the result.`,
     lead: () => [
       `Upload limits are the reason most people compress a PDF, and ${display} is one of the common ones. This page opens the compressor with a ${display} target already in mind: choose the Target size level, set the value to ${kb} KB, and it will keep trying until the file fits or it runs out of settings that still leave the document readable.`,
       `The tool does not compress once and hope. It works through six progressively stronger combinations of render resolution and image quality, checking the size after each one, and stops at the first that meets your number. That is the difference between a tool that gets you to ${display} and one that gets you to "smaller, probably".`,

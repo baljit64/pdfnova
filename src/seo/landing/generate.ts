@@ -172,7 +172,7 @@ function buildCanonicalPage(tool: ToolDefinition, slugsForTool: string[]): Landi
     isCanonical: true,
     targetKeyword: tool.keywords[0],
     title: withBrand(`${tool.name} Online Free — ${tool.acceptLabel} Tool`),
-    description: `${tool.tagline} Free, no signup, no watermark. ${tool.serverSide ? "Converted securely and returned in seconds." : "Runs entirely in your browser — your files never leave your device."}`,
+    description: `${tool.blurb} Free, no signup, no watermark. ${tool.serverSide ? "Converted securely and returned in seconds." : "Runs in your browser — files never leave your device."}`,
     h1: tool.name,
     intro: content.intro,
     sections: [
