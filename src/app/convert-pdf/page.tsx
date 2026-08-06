@@ -1,4 +1,4 @@
-import ConvertPDF from "../../pages/ConvertPDF";
+import ConvertPDF from "../../views/ConvertPDF";
 import { buildMetadata } from "../../seo/nextMetadata";
 
 export const metadata = buildMetadata("/convert-pdf");

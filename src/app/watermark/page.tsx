@@ -1,8 +1,7 @@
-import Watermark from "../../pages/Watermark";
-import { buildMetadata } from "../../seo/nextMetadata";
+import CanonicalToolPage, { canonicalMetadata } from "../../components/landing/CanonicalToolPage";
 
-export const metadata = buildMetadata("/watermark");
+export const metadata = canonicalMetadata("watermark");
 
 export default function Page() {
-  return <Watermark />;
+  return <CanonicalToolPage slug="watermark" />;
 }

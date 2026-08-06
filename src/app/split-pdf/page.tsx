@@ -1,8 +1,7 @@
-import SplitPDF from "../../pages/SplitPDF";
-import { buildMetadata } from "../../seo/nextMetadata";
+import CanonicalToolPage, { canonicalMetadata } from "../../components/landing/CanonicalToolPage";
 
-export const metadata = buildMetadata("/split-pdf");
+export const metadata = canonicalMetadata("split-pdf");
 
 export default function Page() {
-  return <SplitPDF />;
+  return <CanonicalToolPage slug="split-pdf" />;
 }

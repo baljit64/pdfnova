@@ -1,8 +1,7 @@
-import JpgToPDF from "../../pages/JpgToPDF";
-import { buildMetadata } from "../../seo/nextMetadata";
+import CanonicalToolPage, { canonicalMetadata } from "../../components/landing/CanonicalToolPage";
 
-export const metadata = buildMetadata("/jpg-to-pdf");
+export const metadata = canonicalMetadata("jpg-to-pdf");
 
 export default function Page() {
-  return <JpgToPDF />;
+  return <CanonicalToolPage slug="jpg-to-pdf" />;
 }

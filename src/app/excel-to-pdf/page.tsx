@@ -1,8 +1,7 @@
-import ExcelToPDF from "../../pages/ExcelToPDF";
-import { buildMetadata } from "../../seo/nextMetadata";
+import CanonicalToolPage, { canonicalMetadata } from "../../components/landing/CanonicalToolPage";
 
-export const metadata = buildMetadata("/excel-to-pdf");
+export const metadata = canonicalMetadata("excel-to-pdf");
 
 export default function Page() {
-  return <ExcelToPDF />;
+  return <CanonicalToolPage slug="excel-to-pdf" />;
 }

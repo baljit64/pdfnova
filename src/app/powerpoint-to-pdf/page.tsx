@@ -1,4 +1,4 @@
-import PowerPointToPDF from "../../pages/PowerPointToPDF";
+import PowerPointToPDF from "../../views/PowerPointToPDF";
 import { buildMetadata } from "../../seo/nextMetadata";
 
 export const metadata = buildMetadata("/powerpoint-to-pdf");

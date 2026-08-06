@@ -1,8 +1,7 @@
-import RotatePDF from "../../pages/RotatePDF";
-import { buildMetadata } from "../../seo/nextMetadata";
+import CanonicalToolPage, { canonicalMetadata } from "../../components/landing/CanonicalToolPage";
 
-export const metadata = buildMetadata("/rotate-pdf");
+export const metadata = canonicalMetadata("rotate-pdf");
 
 export default function Page() {
-  return <RotatePDF />;
+  return <CanonicalToolPage slug="rotate-pdf" />;
 }

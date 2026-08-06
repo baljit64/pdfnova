@@ -1,8 +1,7 @@
-import WordToPDF from "../../pages/WordToPDF";
-import { buildMetadata } from "../../seo/nextMetadata";
+import CanonicalToolPage, { canonicalMetadata } from "../../components/landing/CanonicalToolPage";
 
-export const metadata = buildMetadata("/word-to-pdf");
+export const metadata = canonicalMetadata("word-to-pdf");
 
 export default function Page() {
-  return <WordToPDF />;
+  return <CanonicalToolPage slug="word-to-pdf" />;
 }

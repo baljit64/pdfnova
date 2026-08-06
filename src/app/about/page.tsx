@@ -1,4 +1,4 @@
-import About from "../../pages/About";
+import About from "../../views/About";
 import { buildMetadata } from "../../seo/nextMetadata";
 
 export const metadata = buildMetadata("/about");

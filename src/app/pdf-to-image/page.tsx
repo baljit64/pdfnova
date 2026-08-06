@@ -1,8 +1,7 @@
-import PDFToImage from "../../pages/PDFToImage";
-import { buildMetadata } from "../../seo/nextMetadata";
+import CanonicalToolPage, { canonicalMetadata } from "../../components/landing/CanonicalToolPage";
 
-export const metadata = buildMetadata("/pdf-to-image");
+export const metadata = canonicalMetadata("pdf-to-image");
 
 export default function Page() {
-  return <PDFToImage />;
+  return <CanonicalToolPage slug="pdf-to-image" />;
 }

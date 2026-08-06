@@ -1,4 +1,4 @@
-import Login from "../../pages/Login";
+import Login from "../../views/Login";
 import { buildMetadata } from "../../seo/nextMetadata";
 
 export const metadata = buildMetadata("/login");

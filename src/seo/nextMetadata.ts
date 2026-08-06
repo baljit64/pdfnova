@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SITE_URL, DEFAULT_DESCRIPTION, DEFAULT_TITLE, ROUTE_META } from "./config";
+import type { LandingPage } from "./landing/types";
 
 const OG_IMAGE = `${SITE_URL}/assets/hero.png`;
 
@@ -30,6 +31,41 @@ export function buildMetadata(path: string): Metadata {
       description: meta.description,
       images: [OG_IMAGE],
     },
+    metadataBase: new URL(SITE_URL),
+  };
+}
+
+/**
+ * Metadata for a generated landing page.
+ *
+ * Every page is self-canonical: each targets a distinct long-tail phrase with
+ * its own copy, so pointing them all at the parent tool would tell Google not to
+ * rank the very pages that were written to rank.
+ */
+export function buildLandingMetadata(page: LandingPage): Metadata {
+  const url = `${SITE_URL}${page.path}`;
+
+  return {
+    title: page.title,
+    description: page.description,
+    keywords: [page.targetKeyword],
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      title: page.title,
+      description: page.description,
+      url,
+      siteName: "PDFNova",
+      images: [{ url: OG_IMAGE, alt: page.h1 }],
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: page.title,
+      description: page.description,
+      images: [OG_IMAGE],
+    },
+    robots: { index: true, follow: true },
     metadataBase: new URL(SITE_URL),
   };
 }

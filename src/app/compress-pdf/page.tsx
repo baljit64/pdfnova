@@ -1,8 +1,7 @@
-import CompressPDF from "../../pages/CompressPDF";
-import { buildMetadata } from "../../seo/nextMetadata";
+import CanonicalToolPage, { canonicalMetadata } from "../../components/landing/CanonicalToolPage";
 
-export const metadata = buildMetadata("/compress-pdf");
+export const metadata = canonicalMetadata("compress-pdf");
 
 export default function Page() {
-  return <CompressPDF />;
+  return <CanonicalToolPage slug="compress-pdf" />;
 }

@@ -1,4 +1,4 @@
-import Terms from "../../pages/Terms";
+import Terms from "../../views/Terms";
 import { buildMetadata } from "../../seo/nextMetadata";
 
 export const metadata = buildMetadata("/terms");

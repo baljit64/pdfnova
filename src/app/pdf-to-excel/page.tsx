@@ -1,4 +1,4 @@
-import PDFToExcel from "../../pages/PDFToExcel";
+import PDFToExcel from "../../views/PDFToExcel";
 import { buildMetadata } from "../../seo/nextMetadata";
 
 export const metadata = buildMetadata("/pdf-to-excel");

@@ -1,8 +1,7 @@
-import SignPDF from "../../pages/SignPDF";
-import { buildMetadata } from "../../seo/nextMetadata";
+import CanonicalToolPage, { canonicalMetadata } from "../../components/landing/CanonicalToolPage";
 
-export const metadata = buildMetadata("/sign-pdf");
+export const metadata = canonicalMetadata("sign-pdf");
 
 export default function Page() {
-  return <SignPDF />;
+  return <CanonicalToolPage slug="sign-pdf" />;
 }

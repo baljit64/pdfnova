@@ -1,8 +1,7 @@
-import EditPDF from "../../pages/EditPDF";
-import { buildMetadata } from "../../seo/nextMetadata";
+import CanonicalToolPage, { canonicalMetadata } from "../../components/landing/CanonicalToolPage";
 
-export const metadata = buildMetadata("/edit-pdf");
+export const metadata = canonicalMetadata("edit-pdf");
 
 export default function Page() {
-  return <EditPDF />;
+  return <CanonicalToolPage slug="edit-pdf" />;
 }

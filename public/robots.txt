@@ -1,9 +1,0 @@
-# Allow all crawlers. Replace https://pdfnova.com with your production URL.
-User-agent: *
-Allow: /
-
-# Sitemap location (update domain to your production URL)
-Sitemap: https://pdfnova.com/sitemap.xml
-
-# Optional: disallow login/account pages from indexing if you prefer
-# Disallow: /login
