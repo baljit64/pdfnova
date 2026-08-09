@@ -356,6 +356,330 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "convert-pdf-to-word-without-formatting-problems",
+    title: "How to convert PDF to Word without creating a formatting mess",
+    excerpt:
+      "Learn what converts cleanly, what usually needs repair, and how to review a new Word document before editing it.",
+    publishedAt: "2026-07-02",
+    category: "Guides",
+    readingTime: 6,
+    visual: "study",
+    tool: {
+      href: "/pdf-to-word",
+      label: "Convert PDF to Word",
+      description: "Turn a PDF into an editable Word document and download the DOCX result.",
+    },
+    introduction: [
+      "A PDF is designed to preserve a finished page, while a Word document is designed to let content move as you edit it. Converting between them means reconstructing paragraphs, headings, tables, and images from their positions on the PDF page. That is why a converted file can look right at first glance but behave differently when you start typing.",
+      "The cleanest results come from text-based PDFs with a simple layout. Scans, forms, multi-column reports, and heavily designed brochures require more review. A good conversion workflow sets the right expectations and protects the original file.",
+    ],
+    sections: [
+      {
+        heading: "Check what kind of PDF you have",
+        paragraphs: [
+          "Try selecting a sentence in your PDF viewer. If individual words can be highlighted, the document probably contains real text and is a strong candidate for conversion. If the whole page behaves like one picture, it is a scan and may need optical character recognition before the words become editable.",
+          "Simple reports, letters, and single-column documents usually convert more predictably than newsletters, forms, and pages where text wraps around several images. Password restrictions can also prevent conversion until the document owner provides an accessible copy.",
+        ],
+      },
+      {
+        heading: "Convert and preserve the original",
+        paragraphs: [
+          "Open PDFNova's PDF to Word tool, add the PDF, and start the conversion. Download the DOCX into a separate working folder rather than saving over an earlier editable source. The PDF should remain your visual reference while you repair and edit the Word copy.",
+        ],
+        bullets: [
+          "Keep the source PDF unchanged.",
+          "Give the DOCX a clear working-version name.",
+          "Compare page count and major headings first.",
+          "Save a new PDF after editing and review that export too.",
+        ],
+      },
+      {
+        heading: "Review the parts most likely to shift",
+        paragraphs: [
+          "Inspect tables, columns, footnotes, page breaks, headers, bullet indentation, and text placed over images. These elements depend heavily on page geometry and can be rebuilt with extra text boxes or manual spacing during conversion.",
+          "Turn on Word's formatting marks when a paragraph refuses to move normally. Hidden line breaks, tabs, and section breaks are easier to fix when you can see them. Replace repeated spaces with proper paragraph and table formatting instead of nudging content into place.",
+        ],
+      },
+      {
+        heading: "Know when to rebuild instead",
+        paragraphs: [
+          "For a short, highly designed PDF, rebuilding the page in Word can be faster than repairing dozens of positioned elements. For a long text document, conversion usually saves substantial retyping even when headings and tables need attention.",
+          "Treat the converted document as a new editable draft, not a perfect recovery of the original source. Before sharing, run spelling checks, test links, inspect accessibility, and export a fresh PDF to confirm the final pages still look correct.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "rotate-pdf-pages-permanently",
+    title: "How to rotate PDF pages permanently and fix sideways scans",
+    excerpt:
+      "Correct one page or an entire document so the orientation stays fixed when the PDF is reopened or shared.",
+    publishedAt: "2026-06-25",
+    category: "Guides",
+    readingTime: 5,
+    visual: "split",
+    tool: {
+      href: "/rotate-pdf",
+      label: "Rotate PDF pages",
+      description: "Rotate all pages or enter selected page numbers and save a corrected PDF.",
+    },
+    introduction: [
+      "The rotate button in a PDF viewer often changes only your current view. Close the file, send it to someone else, or open it in another app and the page may be sideways again. Permanent rotation saves the orientation into the PDF itself.",
+      "This is particularly useful for phone scans and mixed document batches where one landscape page sits among portrait pages. Fixing orientation before merging, signing, or submitting the file prevents mistakes later in the workflow.",
+    ],
+    sections: [
+      {
+        heading: "View rotation and saved rotation are different",
+        paragraphs: [
+          "Viewer rotation is a temporary convenience. It helps you read the page without necessarily changing the document. A rotate-PDF tool creates a new file whose pages contain the corrected orientation, so another reader sees the same result.",
+          "If your viewer offers a Save command after rotating, it may preserve the change, but behaviour differs between applications. Creating a separate corrected copy is easier to verify and keeps the original available if the wrong pages were selected.",
+        ],
+      },
+      {
+        heading: "Rotate all pages or selected pages",
+        paragraphs: [
+          "Add the file to PDFNova's Rotate PDF tool and choose 90, 180, or 270 degrees. Leave the page field empty to rotate the whole document, or enter specific pages and ranges when only part of the file is sideways.",
+        ],
+        bullets: [
+          "Use 90 degrees for a quarter-turn clockwise.",
+          "Use 180 degrees for upside-down pages.",
+          "Use 270 degrees for a quarter-turn anticlockwise.",
+          "Enter a list such as 2, 5-8 to change selected pages only.",
+        ],
+      },
+      {
+        heading: "Check mixed-orientation documents carefully",
+        paragraphs: [
+          "A landscape chart can be intentionally wider than it is tall, so do not rotate every non-portrait page automatically. Judge orientation by the direction of its readable content rather than the shape of the page.",
+          "After processing, scan the page thumbnails from beginning to end. Then open the corrected pages at full size to ensure text, annotations, and form fields remain where expected.",
+        ],
+      },
+      {
+        heading: "Rotate early in the workflow",
+        paragraphs: [
+          "Correct pages before adding a watermark or visible signature, because those additions are positioned using the page orientation at that moment. Rotating afterward can leave the new content facing the wrong way or sitting in an awkward location.",
+          "If several files will be merged, correct each source first and then combine them. The final review becomes much simpler when every input is already readable.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "add-watermark-to-pdf-professionally",
+    title: "How to add a professional watermark to a PDF",
+    excerpt:
+      "Choose useful watermark text, placement, size, and opacity without making the document difficult to read.",
+    publishedAt: "2026-06-18",
+    category: "Guides",
+    readingTime: 5,
+    visual: "privacy",
+    tool: {
+      href: "/watermark",
+      label: "Add a PDF watermark",
+      description: "Stamp custom text across every page with adjustable placement and opacity.",
+    },
+    introduction: [
+      "A watermark communicates status or ownership without replacing the document's actual content. Labels such as DRAFT, CONFIDENTIAL, SAMPLE, and REVIEW COPY help readers understand how a file should be handled.",
+      "The most effective watermark is noticeable but not disruptive. Oversized solid text can hide signatures and figures, while a tiny pale label can be missed entirely. Placement and contrast should reflect the document's purpose.",
+    ],
+    sections: [
+      {
+        heading: "Use specific, meaningful text",
+        paragraphs: [
+          "Choose a short phrase that tells the reader what the mark means. DRAFT—NOT FOR APPROVAL is clearer than DRAFT when a document is circulating for comments. A client or project name can make a review copy easier to trace.",
+          "Do not place secrets in the watermark itself. The text appears on every processed page and may become visible in screenshots, printouts, and extracted pages.",
+        ],
+      },
+      {
+        heading: "Balance placement and opacity",
+        paragraphs: [
+          "A diagonal watermark across the centre is difficult to overlook and suits drafts or samples. A corner mark is less intrusive and works for ownership or filing labels. Start with moderate transparency, then inspect pages with both light and dark content.",
+        ],
+        bullets: [
+          "Keep the phrase short enough to fit cleanly.",
+          "Use diagonal placement for prominent status labels.",
+          "Use a corner when the mark should be discreet.",
+          "Check that charts, signatures, and small text remain readable.",
+        ],
+      },
+      {
+        heading: "Add the watermark to a final copy",
+        paragraphs: [
+          "Finish merging, splitting, and rotating pages before watermarking. Then add the clean final PDF to the Watermark tool, enter the label, choose its position, size, and opacity, and download the marked copy.",
+          "Keep an unwatermarked master separately. If the document status changes from draft to approved, you can create a new distribution copy without trying to remove a mark from an already processed file.",
+        ],
+      },
+      {
+        heading: "Understand what a watermark cannot do",
+        paragraphs: [
+          "A visible watermark discourages casual reuse and communicates handling instructions, but it is not access control. It does not encrypt the PDF, prevent copying, prove who opened it, or guarantee confidentiality.",
+          "For sensitive documents, combine clear labelling with an approved secure sharing method and appropriate permissions. The watermark is one communication layer inside a broader document policy.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "add-signature-to-pdf-online",
+    title: "How to add a visible signature to a PDF before sending it",
+    excerpt:
+      "Prepare the document, place a typed signature carefully, and understand when a basic visible signature is not enough.",
+    publishedAt: "2026-06-11",
+    category: "Productivity",
+    readingTime: 6,
+    visual: "privacy",
+    tool: {
+      href: "/sign-pdf",
+      label: "Add a signature",
+      description: "Place a typed signature on a selected PDF page and download the signed copy.",
+    },
+    introduction: [
+      "Adding your name to a signature line can complete many routine forms, approvals, and acknowledgements. Before you sign, make sure the document is the final version and that you understand what the recipient expects.",
+      "PDFNova's Sign PDF tool adds a visible typed signature to a page. It does not issue a certificate-backed digital signature or create an identity audit trail. Those distinctions matter for contracts and regulated workflows.",
+    ],
+    sections: [
+      {
+        heading: "Review the complete document first",
+        paragraphs: [
+          "Read every page, confirm names and dates, and make sure blank fields are handled correctly. Check that no page is missing and that the signature page belongs to the same version you reviewed.",
+          "If the document needs edits, make them before signing and produce a clean final PDF. Changing content after a signature is added can create confusion about what was accepted.",
+        ],
+      },
+      {
+        heading: "Place the visible signature",
+        paragraphs: [
+          "Open the Sign PDF tool, add the document, type your full name, and select the intended page. Choose a readable size and position that fits the signature area without covering dates, checkboxes, or nearby text. Process the file and download the result.",
+        ],
+        bullets: [
+          "Use the name expected by the receiving party.",
+          "Double-check the selected page number.",
+          "Leave space for the date or countersignature.",
+          "Open the downloaded PDF and inspect the final placement.",
+        ],
+      },
+      {
+        heading: "Know which kind of signature is required",
+        paragraphs: [
+          "A visible typed name may be accepted for an informal approval or internal form, but some transactions require a dedicated electronic-signature platform, verified identity, timestamps, certificates, witnesses, or a full audit trail.",
+          "Requirements vary by organisation, document, and jurisdiction. Ask the recipient or obtain appropriate professional guidance when validity is important. A signature that looks correct on the page is not automatically equivalent to every legal form of signing.",
+        ],
+      },
+      {
+        heading: "Store and share the signed copy carefully",
+        paragraphs: [
+          "Give the file a descriptive name that identifies it as signed without losing the original title. Keep the unsigned final version and the signed version separately, along with any email or confirmation that records when it was delivered.",
+          "Share the result through the channel requested by the recipient. If the document contains sensitive information, use an approved secure method rather than relying on the appearance of a signature for protection.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "convert-pdf-pages-to-jpg-images",
+    title: "How to convert PDF pages to JPG images without blurry text",
+    excerpt:
+      "Export PDF pages for presentations, websites, and sharing while choosing a resolution that keeps details clear.",
+    publishedAt: "2026-06-04",
+    category: "Guides",
+    readingTime: 5,
+    visual: "images",
+    tool: {
+      href: "/pdf-to-jpg",
+      label: "Convert PDF to JPG",
+      description: "Render each PDF page as a separate JPG image in your browser.",
+    },
+    introduction: [
+      "PDF is ideal for a complete document, but many slide editors, social platforms, content systems, and chat apps work more easily with images. Converting a page to JPG creates a flat visual copy that can be inserted almost anywhere.",
+      "The tradeoff is that image text is no longer selectable and quality depends on resolution. Choose the output for its destination instead of automatically generating the largest possible image.",
+    ],
+    sections: [
+      {
+        heading: "Decide whether JPG is the right output",
+        paragraphs: [
+          "Use JPG when a PDF page contains photographs, when broad compatibility matters, or when a platform specifically asks for that format. PNG can be better for crisp diagrams, screenshots, transparency, and pages dominated by sharp text, though it may produce larger files.",
+          "If the recipient needs to search, copy, print, or navigate the whole document, send the PDF instead. An image is best for displaying a page, not preserving every document feature.",
+        ],
+      },
+      {
+        heading: "Select a useful rendering scale",
+        paragraphs: [
+          "PDFNova lets you choose the scale used to render each page. A larger scale produces more pixels and clearer detail, but it also takes longer and creates bigger images. Start with a moderate scale for screen use and increase it only when small text is difficult to read.",
+        ],
+        bullets: [
+          "Use a moderate scale for chat, previews, and slides.",
+          "Use a higher scale for zooming or detailed diagrams.",
+          "Inspect the smallest important text in the output.",
+          "Keep the source PDF as the quality master.",
+        ],
+      },
+      {
+        heading: "Convert and organise the image files",
+        paragraphs: [
+          "Add the PDF, choose the JPG format and rendering scale, then start the conversion. Each page becomes a separate numbered image. Keep the page numbers in the file names so the original sequence remains obvious.",
+          "If you only need two pages from a large PDF, extract those pages first. Converting a smaller purpose-built PDF reduces processing time and avoids creating images you will immediately delete.",
+        ],
+      },
+      {
+        heading: "Avoid repeated image conversion",
+        paragraphs: [
+          "JPG uses lossy compression. Opening and resaving the same image repeatedly can add visible blocks and soft edges around text. Return to the PDF and create a fresh export when you need a different size.",
+          "For web publishing, resize the fresh image once to its final display dimensions and check it on a phone as well as a desktop. A page that looks sharp in a large editor window can become unreadable in a narrow feed.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "prepare-one-pdf-for-job-application",
+    title: "How to prepare one polished PDF for a job application",
+    excerpt:
+      "Combine a cover letter, résumé, and supporting documents into a tidy file that recruiters can open and review quickly.",
+    publishedAt: "2026-05-28",
+    category: "Productivity",
+    readingTime: 6,
+    visual: "merge",
+    tool: {
+      href: "/merge-pdf",
+      label: "Merge application PDFs",
+      description: "Arrange your application documents and combine them into one ordered PDF.",
+    },
+    introduction: [
+      "When an application portal provides one upload field for several documents, a combined PDF is easier to review than an archive or a loosely ordered set of files. The recruiter opens one attachment and sees the material in the sequence you intended.",
+      "The content still matters most, but clean document preparation removes avoidable friction. Consistent page sizes, readable text, a sensible file name, and a small enough upload make the application feel considered.",
+    ],
+    sections: [
+      {
+        heading: "Follow the employer's instructions exactly",
+        paragraphs: [
+          "First confirm which documents are required, whether they must be separate, the accepted file formats, and the maximum size. Do not combine files when the portal has dedicated fields for a résumé, cover letter, and portfolio.",
+          "Remove sensitive information that was not requested, such as complete identification numbers, banking details, or unrelated certificates. Include references only when the instructions ask for them.",
+        ],
+      },
+      {
+        heading: "Create a clear reading order",
+        paragraphs: [
+          "A common combined order is cover letter, résumé, then supporting certificates or work samples. Export each source to PDF, give the files numbered names, and add them to the merge tool. Drag them into the final sequence before processing.",
+        ],
+        bullets: [
+          "Put the most role-specific document first.",
+          "Remove accidental blank pages.",
+          "Rotate scanned certificates upright.",
+          "Check that every page belongs to this employer and role.",
+        ],
+      },
+      {
+        heading: "Review readability and consistency",
+        paragraphs: [
+          "Open the merged PDF and inspect it at normal zoom. Text should be selectable in documents exported from Word, links should work where appropriate, and scanned pages should be clear enough to read without extreme zooming.",
+          "Mixed page sizes are usually acceptable, but abrupt orientation changes or enormous scanned pages make the file awkward to navigate. Correct those sources before creating the final merge.",
+        ],
+      },
+      {
+        heading: "Name, compress, and verify the upload",
+        paragraphs: [
+          "Use a professional name such as firstname-lastname-application.pdf. If the file exceeds the portal limit, compress a copy using the lightest setting that fits, then check small text and fine lines again.",
+          "After uploading, use the portal preview or download option when available. Confirm that the correct final file is attached and keep a copy of exactly what you submitted with the confirmation message.",
+        ],
+      },
+    ],
+  },
 ];
 
 export function getBlogPost(slug: string): BlogPost | undefined {
