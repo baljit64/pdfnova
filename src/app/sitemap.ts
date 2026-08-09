@@ -8,11 +8,13 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "../seo/config";
 import { getAllLandingPages } from "../seo/landing/generate";
 import { TOOLS } from "../tools/registry";
+import { BLOG_POSTS } from "../blog/posts";
 
 /** Pages that are not tool pages but still belong in the sitemap. */
 const STATIC_PATHS: { path: string; priority: number; changeFrequency: "weekly" | "monthly" | "yearly" }[] = [
   { path: "/", priority: 1.0, changeFrequency: "weekly" },
   { path: "/convert-pdf", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/blog", priority: 0.7, changeFrequency: "weekly" },
   { path: "/help", priority: 0.6, changeFrequency: "monthly" },
   { path: "/about", priority: 0.5, changeFrequency: "yearly" },
   { path: "/contact", priority: 0.5, changeFrequency: "yearly" },
@@ -50,5 +52,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.3,
   }));
 
-  return [...staticEntries, ...toolEntries, ...comingSoonEntries];
+  const blogEntries = BLOG_POSTS.map((post) => ({
+    url: `${SITE_URL}/blog/${post.slug}`,
+    lastModified: new Date(`${post.updatedAt ?? post.publishedAt}T00:00:00.000Z`),
+    changeFrequency: "monthly" as const,
+    priority: 0.65,
+  }));
+
+  return [...staticEntries, ...toolEntries, ...blogEntries, ...comingSoonEntries];
 }

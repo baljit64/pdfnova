@@ -1,0 +1,196 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import {
+  BLOG_POSTS,
+  formatBlogDate,
+  getBlogPost,
+  getRelatedPosts,
+} from "../../../blog/posts";
+import BlogArtwork from "../../../components/blog/BlogArtwork";
+import BlogCard from "../../../components/blog/BlogCard";
+import JsonLdScript from "../../../seo/JsonLdScript";
+import { SITE_URL } from "../../../seo/config";
+
+interface RouteParams {
+  params: Promise<{ slug: string }>;
+}
+
+export const dynamicParams = false;
+
+export function generateStaticParams(): { slug: string }[] {
+  return BLOG_POSTS.map((post) => ({ slug: post.slug }));
+}
+
+export async function generateMetadata({ params }: RouteParams): Promise<Metadata> {
+  const { slug } = await params;
+  const post = getBlogPost(slug);
+  if (!post) return {};
+
+  const url = `${SITE_URL}/blog/${post.slug}`;
+  return {
+    title: `${post.title} | PDFNova`,
+    description: post.excerpt,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description: post.excerpt,
+      url,
+      siteName: "PDFNova",
+      publishedTime: `${post.publishedAt}T00:00:00.000Z`,
+      modifiedTime: `${post.updatedAt ?? post.publishedAt}T00:00:00.000Z`,
+      section: post.category,
+      images: [{ url: `${SITE_URL}/assets/hero.png`, alt: post.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: [`${SITE_URL}/assets/hero.png`],
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }: RouteParams) {
+  const { slug } = await params;
+  const post = getBlogPost(slug);
+  if (!post) notFound();
+
+  const url = `${SITE_URL}/blog/${post.slug}`;
+  const related = getRelatedPosts(post);
+  const schemas = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": `${url}#article`,
+      headline: post.title,
+      description: post.excerpt,
+      datePublished: post.publishedAt,
+      dateModified: post.updatedAt ?? post.publishedAt,
+      mainEntityOfPage: url,
+      image: `${SITE_URL}/assets/hero.png`,
+      author: { "@type": "Organization", name: "PDFNova", url: SITE_URL },
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      articleSection: post.category,
+      wordCount: [...post.introduction, ...post.sections.flatMap((section) => section.paragraphs)]
+        .join(" ")
+        .split(/\s+/).length,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
+        { "@type": "ListItem", position: 3, name: post.title, item: url },
+      ],
+    },
+  ];
+
+  return (
+    <div className="bg-white">
+      <JsonLdScript schemas={schemas} id="blog-post-jsonld" />
+      <main>
+        <header className="border-b border-blue-100 bg-gradient-to-b from-[#eef5ff] to-white">
+          <div className="mx-auto max-w-4xl px-6 pb-14 pt-10 text-center md:pb-20 md:pt-14">
+            <nav aria-label="Breadcrumb" className="mb-8 text-sm text-slate-500">
+              <Link href="/" className="text-inherit no-underline hover:text-blue-700">Home</Link>
+              <span className="mx-2" aria-hidden="true">/</span>
+              <Link href="/blog" className="text-inherit no-underline hover:text-blue-700">Blog</Link>
+              <span className="mx-2" aria-hidden="true">/</span>
+              <span className="text-slate-700">{post.category}</span>
+            </nav>
+            <div className="flex flex-wrap items-center justify-center gap-3 text-sm font-semibold">
+              <span className="rounded-full bg-blue-100 px-3 py-1 text-blue-800">{post.category}</span>
+              <time dateTime={post.publishedAt} className="text-slate-500">
+                {formatBlogDate(post.publishedAt)}
+              </time>
+              <span className="text-slate-300" aria-hidden="true">•</span>
+              <span className="text-slate-500">{post.readingTime} min read</span>
+            </div>
+            <h1 className="mx-auto mt-6 max-w-4xl text-4xl font-bold leading-tight tracking-tight text-slate-950 md:text-6xl">
+              {post.title}
+            </h1>
+            <p className="mx-auto mt-6 max-w-3xl text-xl leading-8 text-slate-600">{post.excerpt}</p>
+          </div>
+        </header>
+
+        <div className="mx-auto max-w-5xl px-6 py-12 md:py-16">
+          <BlogArtwork visual={post.visual} className="h-72 rounded-3xl md:h-[440px]" />
+
+          <article className="mx-auto mt-12 max-w-3xl md:mt-16">
+            <div className="space-y-6 text-lg leading-8 text-slate-700">
+              {post.introduction.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+
+            {post.sections.map((section, index) => (
+              <section key={section.heading} className="mt-12 scroll-mt-24">
+                <h2 className="text-3xl font-bold tracking-tight text-slate-950">{section.heading}</h2>
+                <div className="mt-5 space-y-5 text-lg leading-8 text-slate-700">
+                  {section.paragraphs.map((paragraph) => (
+                    <p key={paragraph}>{paragraph}</p>
+                  ))}
+                  {section.bullets && (
+                    <ul className="space-y-3 rounded-2xl border border-blue-100 bg-blue-50/70 px-6 py-5">
+                      {section.bullets.map((bullet) => (
+                        <li key={bullet} className="flex gap-3">
+                          <span className="mt-1 font-bold text-blue-700" aria-hidden="true">✓</span>
+                          <span>{bullet}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                {index === 1 && (
+                  <aside className="mt-10 overflow-hidden rounded-2xl bg-[#0b2a4a] p-7 text-white md:flex md:items-center md:justify-between md:gap-8">
+                    <div>
+                      <p className="text-lg font-bold">Try it with PDFNova</p>
+                      <p className="mt-1 leading-6 text-blue-100">{post.tool.description}</p>
+                    </div>
+                    <Link
+                      href={post.tool.href}
+                      className="mt-5 inline-flex shrink-0 items-center gap-2 rounded-xl bg-white px-5 py-3 font-bold text-blue-950 no-underline hover:bg-blue-50 md:mt-0"
+                    >
+                      {post.tool.label} <span aria-hidden="true">→</span>
+                    </Link>
+                  </aside>
+                )}
+              </section>
+            ))}
+
+            <div className="mt-14 border-t border-slate-200 pt-7 text-sm leading-6 text-slate-500">
+              <p>
+                Published by PDFNova on {formatBlogDate(post.publishedAt)}. This guide provides
+                general information; follow your organisation's requirements for sensitive or
+                regulated documents.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        <section className="border-t border-slate-200 bg-slate-50 py-16" aria-labelledby="related-reading">
+          <div className="mx-auto max-w-7xl px-6">
+            <div className="mb-8 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-blue-700">Keep learning</p>
+                <h2 id="related-reading" className="mt-2 text-3xl font-bold text-slate-950">Related reading</h2>
+              </div>
+              <Link href="/blog" className="hidden font-semibold text-blue-700 no-underline sm:block">
+                View all articles →
+              </Link>
+            </div>
+            <div className="grid gap-7 md:grid-cols-3">
+              {related.map((relatedPost) => (
+                <BlogCard key={relatedPost.slug} post={relatedPost} />
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}

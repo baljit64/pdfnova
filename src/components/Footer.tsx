@@ -6,6 +6,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex flex-wrap justify-center gap-6 text-sm">
           <Link href="/about" className="text-white/90 hover:text-white no-underline">About</Link>
+          <Link href="/blog" className="text-white/90 hover:text-white no-underline">Blog</Link>
           <Link href="/privacy" className="text-white/90 hover:text-white no-underline">Privacy</Link>
           <Link href="/terms" className="text-white/90 hover:text-white no-underline">Terms</Link>
           <Link href="/contact" className="text-white/90 hover:text-white no-underline">Contact</Link>

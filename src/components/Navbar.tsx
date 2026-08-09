@@ -16,6 +16,7 @@ export default function Navbar() {
           <Link href="/merge-pdf" className="no-underline text-inherit hover:text-blue-600">Merge PDF</Link>
           <Link href="/compress-pdf" className="no-underline text-inherit hover:text-blue-600">Compress PDF</Link>
           <Link href="/convert-pdf" className="no-underline text-inherit hover:text-blue-600">Convert PDF</Link>
+          <Link href="/blog" className="no-underline text-inherit hover:text-blue-600">Blog</Link>
           <Link href="/help" className="no-underline text-inherit hover:text-blue-600">Help</Link>
         </nav>
 

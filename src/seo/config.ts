@@ -112,6 +112,11 @@ export const ROUTE_META: Record<string, RouteMeta> = {
     description:
       "Help and FAQ for PDFNova. How to merge, split, compress and convert PDFs. Contact support.",
   },
+  "/blog": {
+    title: "PDF Guides, Tips & Tutorials | PDFNova Blog",
+    description:
+      "Practical PDF guides for compressing, merging, splitting, converting, and handling documents safely. Clear advice from PDFNova.",
+  },
   "/login": {
     title: "Login | PDFNova",
     description: "Login to PDFNova. Access your account.",
