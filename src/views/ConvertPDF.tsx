@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Card } from "antd";
 import { PictureOutlined } from "@ant-design/icons";

@@ -65,6 +65,7 @@ const checks: Array<[string, () => void | Promise<void>]> = [
     ]);
     assert.equal(home.includes("router.push"), false);
     assert.equal(converter.includes("router.push"), false);
+    assert.match(converter, /^\s*["']use client["'];/);
     assert.match(home, /<Link\s+href=\{tool\.path\}/);
     assert.match(converter, /<Link href="\/pdf-to-image"/);
   }],
