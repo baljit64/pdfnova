@@ -153,18 +153,12 @@ export default function Home() {
               Use practical PDF tools in your browser with no software to install. Most tools
               process files on your device; server-assisted tools are clearly identified.
             </p>
-            <div className="mt-8 flex gap-4">
+            <div className="mt-8">
               <Link
                 href="/merge-pdf"
                 className="inline-flex min-h-10 items-center rounded-md bg-red-500 px-5 font-semibold text-white no-underline transition hover:bg-red-600"
               >
                 Explore PDF tools
-              </Link>
-              <Link
-                href="/help"
-                className="inline-flex min-h-10 items-center rounded-md border border-gray-300 bg-white px-5 font-medium text-gray-800 no-underline transition hover:border-blue-400 hover:text-blue-700"
-              >
-                How it works
               </Link>
             </div>
           </div>

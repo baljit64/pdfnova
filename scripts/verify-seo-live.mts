@@ -166,6 +166,9 @@ const server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "star
   cwd: process.cwd(),
   env: process.env,
   stdio: ["ignore", "pipe", "pipe"],
+  // Next launches a child `next-server` process. Give the process tree its own
+  // group so cleanup does not leave that child running against `.next`.
+  detached: process.platform !== "win32",
 });
 
 let serverError = "";
@@ -313,5 +316,13 @@ try {
   if (serverError) console.error(serverError);
   throw error;
 } finally {
-  server.kill("SIGTERM");
+  if (server.pid && process.platform !== "win32") {
+    try {
+      process.kill(-server.pid, "SIGTERM");
+    } catch {
+      // The process group already exited.
+    }
+  } else {
+    server.kill("SIGTERM");
+  }
 }
