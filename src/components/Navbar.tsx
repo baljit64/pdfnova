@@ -1,15 +1,22 @@
  "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "antd";
 
 export default function Navbar() {
   return (
     <header className="bg-[#eef5ff] shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-blue-900 no-underline hover:text-blue-800">
-          <span className="w-8 h-8 bg-red-500 rounded flex items-center justify-center text-white text-lg font-normal">+</span>
-          PDFNova
+        <Link href="/" className="flex items-center no-underline" aria-label="PDFNova home">
+          <Image
+            src="/assets/pdf-nova-logo-horizontal.png"
+            alt="PDFNova"
+            width={157}
+            height={50}
+            priority
+            className="h-10 w-auto sm:h-11"
+          />
         </Link>
 
         <nav className="hidden md:flex gap-6 text-gray-700">

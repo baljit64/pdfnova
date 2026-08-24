@@ -18,7 +18,7 @@ import {
   CheckCircleOutlined,
   MobileOutlined,
 } from "@ant-design/icons";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const TOOLS = [
   {
@@ -39,29 +39,31 @@ const TOOLS = [
     path: "/compress-pdf",
     icon: <CompressOutlined />,
     title: "Compress PDF",
-    desc: "Reduce file size while optimizing for maximal PDF quality.",
+    desc: "Reduce PDF file size with lossless, balanced, strong or target-size options.",
     btn: "Compress PDF",
   },
   {
     path: "/pdf-to-word",
     icon: <FileWordOutlined />,
     title: "PDF to Word",
-    desc: "Easily convert your PDF files into easy to edit DOC and DOCX documents. The converted WORD document is almost 100% accurate.",
+    desc: "Convert a PDF into an editable DOCX, then review complex layouts in your document editor.",
     btn: "PDF to Word",
   },
   {
     path: "/pdf-to-powerpoint",
     icon: <FilePptOutlined />,
     title: "PDF to PowerPoint",
-    desc: "Turn your PDF files into easy to edit PPT and PPTX slideshows.",
+    desc: "A planned tool for converting PDF files into PowerPoint presentations.",
     btn: "PDF to PPT",
+    badge: "Coming soon",
   },
   {
     path: "/pdf-to-excel",
     icon: <FileExcelOutlined />,
     title: "PDF to Excel",
-    desc: "Pull data straight from PDFs into Excel spreadsheets in a few short seconds.",
+    desc: "A planned tool for converting PDF content into Excel spreadsheets.",
     btn: "PDF to Excel",
+    badge: "Coming soon",
   },
   {
     path: "/word-to-pdf",
@@ -74,8 +76,9 @@ const TOOLS = [
     path: "/powerpoint-to-pdf",
     icon: <FilePptOutlined />,
     title: "PowerPoint to PDF",
-    desc: "Make PPT and PPTX slideshows easy to view by converting them to PDF.",
+    desc: "A planned tool for converting PPT and PPTX presentations to PDF.",
     btn: "PPT to PDF",
+    badge: "Coming soon",
   },
   {
     path: "/excel-to-pdf",
@@ -88,7 +91,7 @@ const TOOLS = [
     path: "/edit-pdf",
     icon: <EditOutlined />,
     title: "Edit PDF",
-    desc: "Add text, images, shapes or freehand annotations to a PDF document. Edit the size, font, and color of the added content.",
+    desc: "Add text to a chosen PDF page and control its size and position.",
     btn: "Edit PDF",
     badge: "New!",
   },
@@ -96,8 +99,15 @@ const TOOLS = [
     path: "/pdf-to-jpg",
     icon: <PictureOutlined />,
     title: "PDF to JPG",
-    desc: "Convert each PDF page into a JPG or extract all images contained in a PDF.",
+    desc: "Render each PDF page as a downloadable JPG image.",
     btn: "PDF to JPG",
+  },
+  {
+    path: "/pdf-to-image",
+    icon: <PictureOutlined />,
+    title: "PDF to Image",
+    desc: "Render each PDF page as a downloadable PNG image.",
+    btn: "PDF to PNG",
   },
   {
     path: "/jpg-to-pdf",
@@ -110,28 +120,26 @@ const TOOLS = [
     path: "/sign-pdf",
     icon: <FormOutlined />,
     title: "Sign PDF",
-    desc: "Sign yourself or request electronic signatures from others.",
+    desc: "Add a typed signature to a chosen page of a PDF.",
     btn: "Sign PDF",
   },
   {
     path: "/watermark",
     icon: <BgColorsOutlined />,
     title: "Watermark",
-    desc: "Stamp an image or text over your PDF in seconds. Choose the typography, transparency and position.",
+    desc: "Stamp a text watermark over every PDF page with adjustable opacity and position.",
     btn: "Watermark",
   },
   {
     path: "/rotate-pdf",
     icon: <RotateRightOutlined />,
     title: "Rotate PDF",
-    desc: "Rotate your PDFs the way you need them. You can even rotate multiple PDFs at once!",
+    desc: "Rotate all or selected pages by 90, 180 or 270 degrees.",
     btn: "Rotate PDF",
   },
 ];
 
 export default function Home() {
-  const router = useRouter();
-
   return (
     <>
       <section className="bg-gradient-to-b from-[#eef5ff] to-white py-20">
@@ -144,9 +152,12 @@ export default function Home() {
               Merge, Compress & Convert PDFs with Ease.
             </p>
             <div className="mt-8 flex gap-4">
-              <Button type="primary" size="large" danger onClick={() => router.push("/merge-pdf")}>
+              <Link
+                href="/merge-pdf"
+                className="inline-flex min-h-10 items-center rounded-md bg-red-500 px-5 font-semibold text-white no-underline transition hover:bg-red-600"
+              >
                 Get Started
-              </Button>
+              </Link>
               <Button size="large">Watch Demo</Button>
             </div>
           </div>
@@ -173,9 +184,12 @@ export default function Home() {
                 <div className="text-4xl text-blue-600 mb-4">{tool.icon}</div>
                 <h3 className="text-lg font-semibold text-blue-900">{tool.title}</h3>
                 <p className="text-gray-600 text-sm mt-2 line-clamp-3">{tool.desc}</p>
-                <Button danger className="mt-4" onClick={() => router.push(tool.path)}>
+                <Link
+                  href={tool.path}
+                  className="mt-4 inline-flex min-h-8 items-center rounded-md border border-red-500 px-4 font-medium text-red-500 no-underline transition hover:bg-red-50"
+                >
                   {tool.btn}
-                </Button>
+                </Link>
               </Card>
             ))}
           </div>
@@ -186,8 +200,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-12">Why Choose Us?</h2>
           <div className="grid md:grid-cols-4 gap-8">
-            <Feature icon={<LockOutlined />} title="100% Secure" desc="Your files are processed locally." />
-            <Feature icon={<ThunderboltOutlined />} title="Fast & Easy" desc="Instant PDF processing." />
+            <Feature icon={<LockOutlined />} title="Private by design" desc="Most tools process files locally; server-assisted tools are clearly identified." />
+            <Feature icon={<ThunderboltOutlined />} title="Focused workflow" desc="Choose files, set the available options and download the result." />
             <Feature icon={<CheckCircleOutlined />} title="High Quality" desc="No watermark. Clean output." />
             <Feature icon={<MobileOutlined />} title="Works on All Devices" desc="Mobile, tablet & desktop." />
           </div>
@@ -196,9 +210,12 @@ export default function Home() {
 
       <section className="py-20 bg-gradient-to-b from-white to-[#eef5ff] text-center">
         <h2 className="text-3xl font-bold text-blue-900">Start Using Our Free PDF Tools Today!</h2>
-        <Button type="primary" danger size="large" className="mt-6" onClick={() => router.push("/merge-pdf")}>
+        <Link
+          href="/merge-pdf"
+          className="mt-6 inline-flex min-h-10 items-center rounded-md bg-red-500 px-5 font-semibold text-white no-underline transition hover:bg-red-600"
+        >
           Get Started
-        </Button>
+        </Link>
       </section>
     </>
   );

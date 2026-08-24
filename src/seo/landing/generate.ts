@@ -32,7 +32,7 @@ function privacySection(tool: ToolDefinition): ContentBlock {
       heading: "Privacy",
       paragraphs: [
         `${tool.name} is the one tool on PDFNova that cannot run on your own device, and we would rather be direct about that than let you assume otherwise. Reconstructing an editable document from a PDF requires layout analysis that is not practical in a browser, so your file is sent to a conversion service, processed there, and returned to you.`,
-        "The transfer happens over an encrypted HTTPS connection in both directions. The file passes through PDFNova's API route only to reach the conversion service — it is not written to disk here, not logged, and not retained after the response has been sent.",
+        "The file passes through PDFNova's API route and is submitted to CloudConvert for processing. The transfer uses HTTPS, but the document leaves your device and is handled by that third-party service, so review the privacy requirements that apply to your document before using this converter.",
         "If a document is sensitive enough that you would rather it never left your device at all, this is the tool to avoid. Every other tool on this site processes files entirely in your browser, and those pages say so because it is true of them.",
       ],
     };
@@ -41,10 +41,10 @@ function privacySection(tool: ToolDefinition): ContentBlock {
   return {
     heading: "Privacy",
     paragraphs: [
-      `Your files are not uploaded. When you add a ${tool.acceptLabel} file, your browser reads it from your device into the memory of the tab you are looking at, and the ${tool.name.toLowerCase()} operation runs there using your own processor. Nothing is transmitted to any server at any point.`,
-      "That means there is no file for anyone to store, no retention policy to trust, and no deletion schedule to take on faith. The document exists only in the memory of an open browser tab, and it is released the moment you close it, reload the page, or press start over.",
-      "The site uses standard anonymous analytics to count page views and how often each tool is used. Those events record which tool ran and whether it succeeded — never a file name, never file contents, and never anything that could identify a document or the person processing it.",
-      "No account is required, so no personal information is collected. There is no profile, no history and nothing tied to an identity, because no identity was ever created.",
+      `When you add a ${tool.acceptLabel} file, your browser reads it into the current tab and the ${tool.name.toLowerCase()} operation runs on your device. The tool's processing code does not upload the selected document to PDFNova's API.`,
+      "The document is held in browser memory while the tool is open. Closing or reloading the page clears that working state; PDFNova does not provide a server-side document history for these local tools.",
+      "The site uses Vercel Analytics for site-usage measurement. That analytics integration is separate from document processing and the tool code does not include file names or file contents in tool events.",
+      "No account is required to use the tool, and processed documents are not attached to a PDFNova profile.",
     ],
   };
 }
@@ -54,8 +54,8 @@ function securitySection(tool: ToolDefinition): ContentBlock {
     return {
       heading: "Security",
       paragraphs: [
-        "The page is served over HTTPS, and the file transfer to and from the conversion service is encrypted in both directions. Your document is streamed through rather than stored, so no copy is written to disk on PDFNova's side.",
-        "Uploads are validated before they are forwarded: the file must be a PDF and must be within the size limit. Anything else is rejected with a clear message rather than being passed on.",
+        "The page is served over HTTPS, and the requests to and from CloudConvert use HTTPS. This protects the transfer in transit, but it does not make a server-assisted conversion equivalent to on-device processing.",
+        "The API verifies that the submitted item is a PDF before forwarding it. The browser also applies the tool's 25 MB limit before starting the request.",
         "For documents where the transfer itself is the concern, the alternative is to keep the PDF as a PDF — the merge, split, compress, rotate, watermark, sign and image conversion tools all run entirely on your device and never transmit anything.",
       ],
     };
@@ -64,7 +64,7 @@ function securitySection(tool: ToolDefinition): ContentBlock {
   return {
     heading: "Security",
     paragraphs: [
-      "The strongest security property this tool has is structural: your file never travels anywhere, so there is no transmission to intercept and no server-side copy to breach. This is not a policy that could change — it is a consequence of where the code runs.",
+      "The current implementation performs this document operation in your browser. Because the tool code does not send the selected file to PDFNova's API, there is no PDFNova server-side document copy created by the operation.",
       "You can verify it in about thirty seconds. Open your browser's developer tools with F12, select the Network tab, and use the tool. You will see the page's scripts load — including the PDF libraries, which are fetched on demand the first time a tool runs — and then nothing further. No request carrying your document is ever made.",
       "For a stronger test, disconnect from the network once the page has loaded. The tool will keep working exactly as before, which is only possible because nothing is being sent.",
       "Uploaded files are validated in the browser before anything runs: the extension must match what the tool accepts, the file must not be empty, and it must be within the size limit. Malformed documents produce a clear error and a retry option rather than a silent failure.",
@@ -172,7 +172,7 @@ function buildCanonicalPage(tool: ToolDefinition, slugsForTool: string[]): Landi
     isCanonical: true,
     targetKeyword: tool.keywords[0],
     title: withBrand(`${tool.name} Online Free — ${tool.acceptLabel} Tool`),
-    description: `${tool.blurb} Free, no signup, no watermark. ${tool.serverSide ? "Converted securely and returned in seconds." : "Runs in your browser — files never leave your device."}`,
+    description: `${tool.blurb} Free, no signup, no watermark. ${tool.serverSide ? "Uses a server-assisted conversion and returns a DOCX." : "Runs in your browser — the tool does not upload your file."}`,
     h1: tool.name,
     intro: content.intro,
     sections: [
@@ -290,6 +290,11 @@ export function getLandingPage(slug: string): LandingPage | undefined {
 /** Variation pages only — the slugs the dynamic `[slug]` route serves. */
 export function getVariationLandingPages(): LandingPage[] {
   return getAllLandingPages().filter((page) => !page.isCanonical);
+}
+
+/** Canonical pages for working tools — the tool URLs eligible for indexing. */
+export function getCanonicalLandingPages(): LandingPage[] {
+  return getAllLandingPages().filter((page) => page.isCanonical);
 }
 
 export function getLandingPagesForTool(toolId: ToolId): LandingPage[] {

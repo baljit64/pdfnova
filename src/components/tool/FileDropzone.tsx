@@ -86,8 +86,9 @@ export default function FileDropzone({ tool, onFiles, selectedCount, disabled }:
       </div>
 
       <p id={hintId} className="mt-2 text-sm text-gray-500">
-        {hint}. Files are processed on this device
-        {tool.serverSide ? " except where a secure server converter is required" : ""}.
+        {hint}. {tool.serverSide
+          ? "This tool sends the file to a server-assisted converter over HTTPS."
+          : "This tool processes the file on this device."}
       </p>
 
       <input

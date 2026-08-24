@@ -8,7 +8,8 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         // Nothing here is worth a crawl budget: no content, and the API is POST-only.
-        disallow: ["/api/", "/login"],
+        // Login stays crawlable so search engines can read its noindex directive.
+        disallow: "/api/",
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

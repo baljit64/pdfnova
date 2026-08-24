@@ -8,9 +8,11 @@
     "build": "next build",
     "lint": "next lint",
     "start": "next start",
-    "verify:seo": "tsx scripts/verify-seo.mts",
+    "verify:landing": "tsx scripts/verify-seo.mts",
+    "verify:seo": "tsx scripts/verify-p0-seo.mts",
     "verify:engine": "tsx scripts/verify-engine.mts",
-    "verify": "npm run verify:engine && npm run verify:seo"
+    "verify": "npm run verify:engine && npm run verify:landing && npm run verify:seo",
+    "seo:check": "npm run build && tsx scripts/verify-seo-live.mts"
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",

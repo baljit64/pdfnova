@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import { SITE_URL, DEFAULT_DESCRIPTION, DEFAULT_TITLE, ROUTE_META } from "./config";
+import { BRAND_ASSETS, SITE_URL, ROUTE_META } from "./config";
 import type { LandingPage } from "./landing/types";
 
-const OG_IMAGE = `${SITE_URL}/assets/hero.png`;
+const OG_IMAGE = BRAND_ASSETS.socialImage;
 
 export function buildMetadata(path: string): Metadata {
-  const meta = ROUTE_META[path] ?? {
-    title: DEFAULT_TITLE,
-    description: DEFAULT_DESCRIPTION,
-  };
+  const meta = ROUTE_META[path];
+  if (!meta) throw new Error(`Missing SEO configuration for ${path}`);
 
   const url = `${SITE_URL}${path === "/" ? "" : path}`;
 
@@ -16,6 +14,7 @@ export function buildMetadata(path: string): Metadata {
     title: meta.title,
     description: meta.description,
     alternates: { canonical: url },
+    robots: { index: meta.indexable, follow: true },
     openGraph: {
       type: "website",
       title: meta.title,
@@ -35,13 +34,7 @@ export function buildMetadata(path: string): Metadata {
   };
 }
 
-/**
- * Metadata for a generated landing page.
- *
- * Every page is self-canonical: each targets a distinct long-tail phrase with
- * its own copy, so pointing them all at the parent tool would tell Google not to
- * rank the very pages that were written to rank.
- */
+/** Metadata for canonical tool pages and their preserved variation routes. */
 export function buildLandingMetadata(page: LandingPage): Metadata {
   const url = `${SITE_URL}${page.path}`;
 
@@ -65,7 +58,9 @@ export function buildLandingMetadata(page: LandingPage): Metadata {
       description: page.description,
       images: [OG_IMAGE],
     },
-    robots: { index: true, follow: true },
+    // Variation routes remain usable and crawlable, but P0 indexing is limited
+    // to the canonical functional tool page for each tool.
+    robots: { index: page.isCanonical, follow: true },
     metadataBase: new URL(SITE_URL),
   };
 }

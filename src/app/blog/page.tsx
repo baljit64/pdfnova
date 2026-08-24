@@ -3,31 +3,9 @@ import Link from "next/link";
 import { BLOG_POSTS, formatBlogDate } from "../../blog/posts";
 import BlogArtwork from "../../components/blog/BlogArtwork";
 import BlogCard from "../../components/blog/BlogCard";
-import { SITE_URL } from "../../seo/config";
+import { buildMetadata } from "../../seo/nextMetadata";
 
-const title = "PDF Guides, Tips & Tutorials | PDFNova Blog";
-const description =
-  "Practical PDF guides for compressing, merging, splitting, converting, and handling documents safely. Clear advice from PDFNova.";
-
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: `${SITE_URL}/blog` },
-  openGraph: {
-    type: "website",
-    title,
-    description,
-    url: `${SITE_URL}/blog`,
-    siteName: "PDFNova",
-    images: [{ url: `${SITE_URL}/assets/hero.png`, alt: "PDFNova PDF guides" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: [`${SITE_URL}/assets/hero.png`],
-  },
-};
+export const metadata: Metadata = buildMetadata("/blog");
 
 export default function BlogPage() {
   const featured = BLOG_POSTS.find((post) => post.featured) ?? BLOG_POSTS[0];

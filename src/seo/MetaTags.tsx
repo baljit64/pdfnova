@@ -1,7 +1,7 @@
  "use client";
 
 import { useEffect } from "react";
-import { SITE_URL } from "./config";
+import { BRAND_ASSETS, SITE_URL } from "./config";
 
 interface MetaTagsProps {
   title: string;
@@ -10,7 +10,7 @@ interface MetaTagsProps {
   image?: string;
 }
 
-const DEFAULT_IMAGE = `${SITE_URL}/assets/hero.png`;
+const DEFAULT_IMAGE = BRAND_ASSETS.socialImage;
 
 /** Optional per-page override. Layout already applies route-based SEO via ApplySEO. */
 export default function MetaTags({

@@ -10,7 +10,7 @@ import {
 import BlogArtwork from "../../../components/blog/BlogArtwork";
 import BlogCard from "../../../components/blog/BlogCard";
 import JsonLdScript from "../../../seo/JsonLdScript";
-import { SITE_URL } from "../../../seo/config";
+import { BRAND_ASSETS, SITE_URL } from "../../../seo/config";
 
 interface RouteParams {
   params: Promise<{ slug: string }>;
@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
     title: `${post.title} | PDFNova`,
     description: post.excerpt,
     alternates: { canonical: url },
+    robots: { index: true, follow: true },
     openGraph: {
       type: "article",
       title: post.title,
@@ -41,13 +42,13 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
       publishedTime: `${post.publishedAt}T00:00:00.000Z`,
       modifiedTime: `${post.updatedAt ?? post.publishedAt}T00:00:00.000Z`,
       section: post.category,
-      images: [{ url: `${SITE_URL}/assets/hero.png`, alt: post.title }],
+      images: [{ url: BRAND_ASSETS.socialImage, alt: post.title }],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.excerpt,
-      images: [`${SITE_URL}/assets/hero.png`],
+      images: [BRAND_ASSETS.socialImage],
     },
   };
 }
@@ -69,7 +70,7 @@ export default async function BlogPostPage({ params }: RouteParams) {
       datePublished: post.publishedAt,
       dateModified: post.updatedAt ?? post.publishedAt,
       mainEntityOfPage: url,
-      image: `${SITE_URL}/assets/hero.png`,
+      image: BRAND_ASSETS.socialImage,
       author: { "@type": "Organization", name: "PDFNova", url: SITE_URL },
       publisher: { "@id": `${SITE_URL}/#organization` },
       articleSection: post.category,

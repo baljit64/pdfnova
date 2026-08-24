@@ -1,144 +1,103 @@
-/**
- * SEO config: titles and meta descriptions for every route.
- * Use keywords naturally for better Google ranking (e.g. "free PDF merger", "online PDF tools").
- * Replace SITE_URL with your production domain before deploy.
- */
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://pdfnova.com";
+/** Preferred production origin. Canonicals, sitemaps and structured data all use it. */
+export const SITE_URL = "https://www.pdfnova.in";
 
-export { SITE_URL };
+export const BRAND_ASSETS = {
+  logo: `${SITE_URL}/assets/pdf-nova-logo-horizontal.png`,
+  appIcon: `${SITE_URL}/assets/pdf-nova-app-icon-light.png`,
+  socialImage: `${SITE_URL}/assets/pdf-nova-banner-dark.png`,
+} as const;
 
-export const DEFAULT_TITLE = "Free PDF Tools Online – Merge, Split, Compress & Convert PDFs | PDFNova";
+export const DEFAULT_TITLE =
+  "Free PDF Tools Online – Merge, Compress & Convert PDFs | PDFNova";
 export const DEFAULT_DESCRIPTION =
-  "Free online PDF tools: merge, split, compress, convert PDF to Word/Excel/JPG, add watermark, sign PDF. No signup. 100% secure. Use in your browser.";
+  "Use PDFNova to merge, split, compress, convert, edit, sign, watermark and rotate PDF files online without installing software.";
 
 export interface RouteMeta {
   title: string;
   description: string;
+  /** Whether this route belongs in search results and the XML sitemap. */
+  indexable: boolean;
 }
 
+/**
+ * SEO policy for non-generated routes.
+ *
+ * Functional tool metadata comes from the landing-page catalogue so tool copy,
+ * headings and metadata cannot drift. Blog article metadata comes from posts.ts.
+ */
 export const ROUTE_META: Record<string, RouteMeta> = {
   "/": {
-    title: "Free PDF Tools Online – Merge, Split, Compress & Convert PDFs | PDFNova",
-    description:
-      "Free online PDF tools: merge, split, compress, convert PDF to Word, Excel, JPG. Add watermark, sign PDF, rotate PDF. No signup. 100% secure.",
-  },
-  "/merge-pdf": {
-    title: "Merge PDF Online Free – Combine PDF Files in Order | PDFNova",
-    description:
-      "Merge PDF files online free. Combine multiple PDFs into one document in the order you want. No signup. Works in your browser. Fast and secure.",
-  },
-  "/split-pdf": {
-    title: "Split PDF Online – Separate PDF Pages into Multiple Files Free",
-    description:
-      "Split PDF online free. Separate one page or all pages into independent PDF files. No signup. Instant download. 100% secure.",
-  },
-  "/compress-pdf": {
-    title: "Compress PDF Online Free – Reduce PDF File Size | PDFNova",
-    description:
-      "Compress PDF online free. Reduce PDF file size while keeping good quality. No signup. Fast. Files stay in your browser.",
-  },
-  "/pdf-to-word": {
-    title: "PDF to Word Converter Online Free – PDF to DOCX | PDFNova",
-    description:
-      "Convert PDF to Word online free. Get editable DOC/DOCX from PDF. Accurate conversion. No signup. Secure.",
-  },
-  "/pdf-to-powerpoint": {
-    title: "PDF to PowerPoint Online – Convert PDF to PPT/PPTX Free",
-    description:
-      "Convert PDF to PowerPoint online. Turn PDF into editable PPT or PPTX slides. Free tool. No signup required.",
-  },
-  "/pdf-to-excel": {
-    title: "PDF to Excel Online Free – Extract PDF Data to Spreadsheet",
-    description:
-      "Convert PDF to Excel online free. Pull data from PDF into XLS/XLSX. Free PDF to Excel converter. No signup.",
-  },
-  "/word-to-pdf": {
-    title: "Word to PDF Converter Online Free – DOC/DOCX to PDF",
-    description:
-      "Convert Word to PDF online free. Turn DOC and DOCX files into PDF. No signup. Fast. Works in browser.",
-  },
-  "/powerpoint-to-pdf": {
-    title: "PowerPoint to PDF Online Free – Convert PPT/PPTX to PDF",
-    description:
-      "Convert PowerPoint to PDF online free. Turn PPT and PPTX slides into one PDF. No signup. Instant.",
-  },
-  "/excel-to-pdf": {
-    title: "Excel to PDF Online Free – Convert XLS/XLSX to PDF",
-    description:
-      "Convert Excel to PDF online free. Turn spreadsheets into PDF. XLS and XLSX supported. No signup.",
-  },
-  "/edit-pdf": {
-    title: "Edit PDF Online Free – Add Text, Images, Annotations | PDFNova",
-    description:
-      "Edit PDF online free. Add text, images, shapes to PDF. Change font size and position. No signup. Secure.",
-  },
-  "/pdf-to-jpg": {
-    title: "PDF to JPG Converter Online Free – Convert PDF Pages to Images",
-    description:
-      "Convert PDF to JPG online free. Turn each PDF page into a JPG image. No signup. Fast. High quality.",
-  },
-  "/pdf-to-image": {
-    title: "PDF to PNG/Image Online Free – PDF to Image Converter",
-    description:
-      "Convert PDF to PNG or image online free. Extract PDF pages as images. No signup. Works in browser.",
-  },
-  "/jpg-to-pdf": {
-    title: "JPG to PDF Converter Online Free – Image to PDF",
-    description:
-      "Convert JPG to PDF online free. Turn images into one PDF. Adjust order. No signup. Fast and secure.",
-  },
-  "/sign-pdf": {
-    title: "Sign PDF Online Free – Add Electronic Signature to PDF",
-    description:
-      "Sign PDF online free. Add your signature to PDF documents. Electronic signature. No signup. Secure.",
-  },
-  "/watermark": {
-    title: "Add Watermark to PDF Online Free – Text Watermark",
-    description:
-      "Add watermark to PDF online free. Stamp text over your PDF. Choose opacity and position. No signup.",
-  },
-  "/rotate-pdf": {
-    title: "Rotate PDF Online Free – Rotate PDF Pages 90, 180, 270°",
-    description:
-      "Rotate PDF online free. Rotate all pages 90, 180 or 270 degrees. No signup. Instant download.",
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    indexable: true,
   },
   "/convert-pdf": {
-    title: "Convert PDF Online – PDF to Word, JPG, Image | PDFNova",
+    title: "Convert PDF Online – PDF to Word, JPG & More | PDFNova",
     description:
-      "Convert PDF to Word, JPG, PNG and more. Free PDF converter tools. No signup. Secure.",
+      "Choose a PDFNova converter for PDF to Word, PDF to JPG, PDF to PNG, JPG to PDF and other available document formats.",
+    indexable: true,
   },
   "/help": {
-    title: "Help & FAQ – Free PDF Tools | PDFNova",
+    title: "PDF Tool Help & Frequently Asked Questions | PDFNova",
     description:
-      "Help and FAQ for PDFNova. How to merge, split, compress and convert PDFs. Contact support.",
+      "Find instructions and answers for merging, splitting, compressing and converting files with PDFNova's online PDF tools.",
+    indexable: true,
   },
   "/blog": {
     title: "PDF Guides, Tips & Tutorials | PDFNova Blog",
     description:
-      "Practical PDF guides for compressing, merging, splitting, converting, and handling documents safely. Clear advice from PDFNova.",
-  },
-  "/login": {
-    title: "Login | PDFNova",
-    description: "Login to PDFNova. Access your account.",
+      "Read practical PDF guides about compressing, merging, splitting, converting and handling documents with appropriate care.",
+    indexable: true,
   },
   "/about": {
-    title: "About PDFNova – Free PDF Tools Online",
+    title: "About PDFNova – Online PDF Tools",
     description:
-      "About PDFNova. Free online PDF tools: merge, split, compress, convert. Built for everyone. No signup.",
+      "Learn about PDFNova and its collection of browser-based tools for merging, splitting, compressing, converting and editing PDFs.",
+    indexable: true,
   },
   "/privacy": {
     title: "Privacy Policy | PDFNova",
-    description: "Privacy policy for PDFNova. How we handle your data. Your files are processed in your browser.",
+    description:
+      "Read how PDFNova handles site usage data and how local and server-assisted PDF tools process files.",
+    indexable: true,
   },
   "/terms": {
     title: "Terms of Use | PDFNova",
-    description: "Terms of use for PDFNova free PDF tools.",
+    description:
+      "Read the terms that apply when using PDFNova's online PDF and document tools.",
+    indexable: true,
   },
   "/contact": {
-    title: "Contact Us | PDFNova",
-    description: "Contact PDFNova. Send feedback or get help with our free PDF tools.",
+    title: "Contact PDFNova",
+    description:
+      "Contact PDFNova with questions, feedback or requests related to its PDF tools and guides.",
+    indexable: true,
+  },
+  "/login": {
+    title: "Login | PDFNova",
+    description: "Access the PDFNova login page.",
+    indexable: false,
+  },
+  "/pdf-to-excel": {
+    title: "PDF to Excel Converter – Coming Soon | PDFNova",
+    description:
+      "PDFNova's PDF to Excel converter is under development. Explore the PDF tools that are currently available.",
+    indexable: false,
+  },
+  "/pdf-to-powerpoint": {
+    title: "PDF to PowerPoint Converter – Coming Soon | PDFNova",
+    description:
+      "PDFNova's PDF to PowerPoint converter is under development. Explore the PDF tools that are currently available.",
+    indexable: false,
+  },
+  "/powerpoint-to-pdf": {
+    title: "PowerPoint to PDF Converter – Coming Soon | PDFNova",
+    description:
+      "PDFNova's PowerPoint to PDF converter is under development. Explore the PDF tools that are currently available.",
+    indexable: false,
   },
 };
 
-/** All public indexable paths for sitemap (no login, no hash). */
-export const SITEMAP_PATHS = Object.keys(ROUTE_META).filter((p) => p !== "/login");
+export const INDEXABLE_STATIC_PATHS = Object.entries(ROUTE_META)
+  .filter(([, meta]) => meta.indexable)
+  .map(([path]) => path);

@@ -18,18 +18,20 @@ npm run start
 
 ## SEO (Google / search)
 
-SEO is implemented for better search visibility:
+SEO is implemented around the preferred origin `https://www.pdfnova.in`:
 
-- **Per-route meta**: Every page has a unique `<title>` and `<meta name="description">` with relevant keywords (e.g. "merge PDF online free", "compress PDF").
+- **Per-route metadata**: Indexable pages have unique titles, descriptions and self-referencing canonicals.
 - **Open Graph & Twitter Cards**: `og:title`, `og:description`, `og:url`, `og:image` and Twitter equivalents for rich previews when shared.
-- **Canonical URLs**: Each page sets a canonical link to avoid duplicate content.
-- **JSON-LD**: WebSite and Organization schema on the homepage; SoftwareApplication schema on tool pages for rich results.
-- **Sitemap**: `public/sitemap.xml` lists all indexable URLs.
-- **robots.txt**: `public/robots.txt` allows crawlers and points to the sitemap.
+- **Indexability policy**: Functional canonical tools and useful content are indexable. Login, unfinished tools and preserved long-tail variations emit `noindex, follow` and stay out of the sitemap.
+- **JSON-LD**: Site-wide entities and tool-page structured data are rendered in the initial HTML.
+- **Sitemap and robots**: Next.js generates `/sitemap.xml` and `/robots.txt` from the same route policy.
+- **404 handling**: Unknown routes return an HTTP 404 response.
+- **Domain normalization**: Requests for `pdfnova.in` redirect directly to `https://www.pdfnova.in`.
 
-**Production URL**: Before deploying, set your live domain so all absolute URLs are correct:
+To verify the site in Google Search Console, set `GOOGLE_SITE_VERIFICATION` in the production environment to the token from Google's HTML-tag verification method, then deploy. Submit `https://www.pdfnova.in/sitemap.xml` after verification.
 
-1. Create `.env` from `.env.example` and set `NEXT_PUBLIC_SITE_URL=https://yourdomain.com`.
-2. Replace `https://pdfnova.com` in `public/robots.txt` and `public/sitemap.xml` with your domain, or use a build step to inject it.
+Run the complete rendered SEO audit after a production build:
 
-Submit your sitemap in [Google Search Console](https://search.google.com/search-console) after going live.
+```bash
+npm run seo:check
+```

@@ -5,7 +5,7 @@
  * and HowTo markup, generated from the same content the page renders — so the
  * markup can never drift out of sync with what a visitor actually sees.
  */
-import { SITE_URL } from "./config";
+import { BRAND_ASSETS, SITE_URL } from "./config";
 import type { LandingPage } from "./landing/types";
 import type { ToolDefinition } from "../tools/types";
 
@@ -19,7 +19,7 @@ export function websiteSchema(): Schema {
     name: "PDFNova",
     url: SITE_URL,
     description:
-      "Free online PDF tools: merge, split, compress, rotate, watermark, sign and convert PDFs. Files are processed in your browser.",
+      "Online tools to merge, split, compress, rotate, watermark, sign and convert PDF files.",
     publisher: { "@id": `${SITE_URL}/#organization` },
   };
 }
@@ -31,8 +31,8 @@ export function organizationSchema(): Schema {
     "@id": `${SITE_URL}/#organization`,
     name: "PDFNova",
     url: SITE_URL,
-    logo: `${SITE_URL}/assets/hero.png`,
-    description: "Free PDF tools that run in your browser — merge, split, compress and convert PDFs.",
+    logo: BRAND_ASSETS.appIcon,
+    description: "Online PDF tools for merging, splitting, compressing and converting documents.",
   };
 }
 

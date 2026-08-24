@@ -10,7 +10,7 @@ export default function Privacy() {
         <section>
           <h2 className="text-xl font-semibold text-blue-900">Data we process</h2>
           <p>
-            PDFNova is designed to process your PDF files in your browser when possible. We do not store or upload your documents to our servers for the core tools (merge, compress, PDF to image). If you use features that require a server (e.g. future cloud features), we will only process data as described at the time of use.
+            PDFNova processes files in your browser for tools such as merge, split, compress, rotate, watermark, sign and image conversion. Those tool implementations do not send the selected document to PDFNova&apos;s API. PDF to Word is different: it sends the document through PDFNova&apos;s API to CloudConvert for server-assisted conversion over HTTPS. Do not use that converter when your document-handling requirements prohibit third-party processing.
           </p>
         </section>
         <section>
