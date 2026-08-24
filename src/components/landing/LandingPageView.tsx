@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BLOG_POSTS } from "../../blog/posts";
 import { getTool } from "../../tools/registry";
 import { landingPageSchemas } from "../../seo/schema";
 import JsonLdScript from "../../seo/JsonLdScript";
@@ -19,6 +20,7 @@ interface Props {
  */
 export default function LandingPageView({ page }: Props) {
   const tool = getTool(page.toolId);
+  const relatedGuides = BLOG_POSTS.filter((post) => post.tool.href === `/${tool.slug}`);
 
   return (
     <>
@@ -189,6 +191,29 @@ export default function LandingPageView({ page }: Props) {
             <Link href="/privacy" className="text-red-500 hover:underline">privacy policy</Link>.
           </p>
         </section>
+
+        {relatedGuides.length > 0 && (
+          <section className="mt-14" aria-labelledby="related-guides">
+            <h2 id="related-guides" className="text-2xl font-bold text-blue-900">
+              Related PDF guides
+            </h2>
+            <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+              {relatedGuides.map((post) => (
+                <li key={post.slug}>
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="block rounded-xl border border-gray-200 bg-white p-4 no-underline transition-shadow hover:shadow-md"
+                  >
+                    <span className="font-semibold text-blue-900">{post.title}</span>
+                    <span className="mt-1 block text-sm leading-relaxed text-gray-600">
+                      {post.excerpt}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </>
   );

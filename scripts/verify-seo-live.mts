@@ -66,6 +66,25 @@ function metaContent(html: string, name: string): string[] {
     .map((tag) => attribute(tag, "content") ?? "");
 }
 
+function metaPropertyContent(html: string, property: string): string[] {
+  return tags(html, "meta")
+    .filter((tag) => attribute(tag, "property")?.toLowerCase() === property.toLowerCase())
+    .map((tag) => attribute(tag, "content") ?? "");
+}
+
+function jsonLdTypes(html: string): string[] {
+  const values: string[] = [];
+  for (const match of html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>(.*?)<\/script>/gis)) {
+    const parsed = JSON.parse(decodeHtml(match[1])) as Record<string, unknown> | Record<string, unknown>[];
+    for (const schema of Array.isArray(parsed) ? parsed : [parsed]) {
+      const type = schema["@type"];
+      if (Array.isArray(type)) values.push(...type.map(String));
+      else if (type) values.push(String(type));
+    }
+  }
+  return values;
+}
+
 function canonicalHrefs(html: string): string[] {
   return tags(html, "link")
     .filter((tag) => attribute(tag, "rel")?.toLowerCase() === "canonical")
@@ -150,6 +169,7 @@ const server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "star
 });
 
 let serverError = "";
+const renderedHtml = new Map<string, string>();
 server.stderr.on("data", (chunk) => {
   serverError += String(chunk);
 });
@@ -161,6 +181,7 @@ try {
     const response = await fetch(`${origin}${page.path}`);
     assert.equal(response.status, 200, page.path);
     const html = await response.text();
+    renderedHtml.set(page.path, html);
 
     assert.deepEqual(titleContents(html), [page.title], `${page.path}: title`);
     assert.deepEqual(metaContent(html, "description"), [page.description], `${page.path}: description`);
@@ -174,9 +195,55 @@ try {
     const response = await fetch(`${origin}${path}`);
     assert.equal(response.status, 200, path);
     const html = await response.text();
+    renderedHtml.set(path, html);
     assert.equal(metaContent(html, "robots").some((value) => /noindex/i.test(value) && /follow/i.test(value)), true, path);
   });
   console.log(`ok - ${noindexPaths.length} preserved non-SEO routes emit noindex, follow`);
+
+  const representativePaths = [
+    "/",
+    "/merge-pdf",
+    "/compress-pdf",
+    "/blog",
+    `/blog/${BLOG_POSTS[0].slug}`,
+  ];
+  for (const path of representativePaths) {
+    const html = renderedHtml.get(path);
+    assert.ok(html, path);
+    assert.equal(metaPropertyContent(html, "og:title").length, 1, `${path}: og:title`);
+    assert.deepEqual(
+      metaPropertyContent(html, "og:url"),
+      [path === "/" ? SITE_URL : absoluteUrl(path)],
+      `${path}: og:url`
+    );
+    assert.deepEqual(metaContent(html, "twitter:card"), ["summary_large_image"], `${path}: twitter:card`);
+    assert.match(html, /https:\/\/www\.pdfnova\.in/);
+    assert.doesNotMatch(html, /https?:\/\/(?:www\.)?pdfnova\.com|https?:\/\/[^"'\s]*vercel\.app/);
+  }
+
+  const homeSchemaTypes = jsonLdTypes(renderedHtml.get("/") ?? "");
+  assert.ok(homeSchemaTypes.includes("Organization"));
+  assert.ok(homeSchemaTypes.includes("WebSite"));
+  const toolSchemaTypes = jsonLdTypes(renderedHtml.get("/merge-pdf") ?? "");
+  for (const type of ["BreadcrumbList", "SoftwareApplication", "WebApplication", "HowTo", "FAQPage"])
+    assert.ok(toolSchemaTypes.includes(type), type);
+  assert.ok(jsonLdTypes(renderedHtml.get(`/blog/${BLOG_POSTS[0].slug}`) ?? "").includes("BlogPosting"));
+  assert.match(
+    renderedHtml.get("/merge-pdf") ?? "",
+    /href=["']\/blog\/merge-pdf-files-in-the-right-order["']/
+  );
+  console.log("ok - representative pages emit Open Graph, Twitter, JSON-LD and contextual guide links");
+
+  const knownPagePaths = new Set([...indexablePages.map((page) => page.path), ...noindexPaths]);
+  for (const [sourcePath, html] of renderedHtml) {
+    for (const tag of tags(html, "a")) {
+      const href = attribute(tag, "href");
+      if (!href?.startsWith("/") || href.startsWith("//")) continue;
+      const linkedPath = new URL(href, SITE_URL).pathname.replace(/\/$/, "") || "/";
+      assert.ok(knownPagePaths.has(linkedPath), `${sourcePath} links to missing ${linkedPath}`);
+    }
+  }
+  console.log(`ok - internal anchors from ${renderedHtml.size} rendered pages target known routes`);
 
   const sitemapResponse = await fetch(`${origin}/sitemap.xml`);
   assert.equal(sitemapResponse.status, 200);

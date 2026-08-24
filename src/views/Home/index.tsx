@@ -1,6 +1,6 @@
  "use client";
 
-import { Button, Card } from "antd";
+import { Card } from "antd";
 import {
   MergeOutlined,
   SplitCellsOutlined,
@@ -18,6 +18,7 @@ import {
   CheckCircleOutlined,
   MobileOutlined,
 } from "@ant-design/icons";
+import Image from "next/image";
 import Link from "next/link";
 
 const TOOLS = [
@@ -146,23 +147,37 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-blue-900 leading-tight">
-              The Best Free PDF Tools <br /> in One Place
+              Free Online PDF Tools to Merge, Compress, Convert &amp; Edit PDFs
             </h1>
             <p className="mt-6 text-lg text-gray-700">
-              Merge, Compress & Convert PDFs with Ease.
+              Use practical PDF tools in your browser with no software to install. Most tools
+              process files on your device; server-assisted tools are clearly identified.
             </p>
             <div className="mt-8 flex gap-4">
               <Link
                 href="/merge-pdf"
                 className="inline-flex min-h-10 items-center rounded-md bg-red-500 px-5 font-semibold text-white no-underline transition hover:bg-red-600"
               >
-                Get Started
+                Explore PDF tools
               </Link>
-              <Button size="large">Watch Demo</Button>
+              <Link
+                href="/help"
+                className="inline-flex min-h-10 items-center rounded-md border border-gray-300 bg-white px-5 font-medium text-gray-800 no-underline transition hover:border-blue-400 hover:text-blue-700"
+              >
+                How it works
+              </Link>
             </div>
           </div>
           <div className="hidden md:flex justify-center">
-            <img src="/assets/hero.png" alt="PDF Tools Illustration" className="max-w-lg" />
+            <Image
+              src="/assets/hero.png"
+              alt="PDFNova PDF tools dashboard illustration"
+              width={800}
+              height={533}
+              priority
+              sizes="(min-width: 768px) 50vw, 0px"
+              className="h-auto w-full max-w-lg"
+            />
           </div>
         </div>
       </section>
@@ -202,8 +217,8 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8">
             <Feature icon={<LockOutlined />} title="Private by design" desc="Most tools process files locally; server-assisted tools are clearly identified." />
             <Feature icon={<ThunderboltOutlined />} title="Focused workflow" desc="Choose files, set the available options and download the result." />
-            <Feature icon={<CheckCircleOutlined />} title="High Quality" desc="No watermark. Clean output." />
-            <Feature icon={<MobileOutlined />} title="Works on All Devices" desc="Mobile, tablet & desktop." />
+            <Feature icon={<CheckCircleOutlined />} title="Clean output" desc="PDFNova does not add its own branding to your files." />
+            <Feature icon={<MobileOutlined />} title="Works across devices" desc="Use a modern browser on mobile, tablet or desktop." />
           </div>
         </div>
       </section>

@@ -30,6 +30,28 @@ SEO is implemented around the preferred origin `https://www.pdfnova.in`:
 
 To verify the site in Google Search Console, set `GOOGLE_SITE_VERIFICATION` in the production environment to the token from Google's HTML-tag verification method, then deploy. Submit `https://www.pdfnova.in/sitemap.xml` after verification.
 
+## Environment variables
+
+Keep real values in `.env` locally and in Vercel for deployments. Never commit them to
+`.env.example`.
+
+- `CLOUDCONVERT_API_KEY` — server-only and required for PDF to Word. Enable it for Production;
+  use separate credentials for Preview or local Development when those environments need the tool.
+- `GOOGLE_SITE_VERIFICATION` — optional, non-secret HTML-tag verification token for Google Search
+  Console. Production is sufficient. Copy the tag's `content` value, not an HTML filename.
+- `CONTACT_FORM_ENDPOINT` — server-only HTTPS webhook that accepts the contact form JSON. Enable it
+  for Production, and use a test webhook for Preview/Development if needed.
+- `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` — currently unused because login is
+  not connected. Leave them blank until authentication is implemented. These project values are
+  browser-visible; never use a Supabase service-role key in a `NEXT_PUBLIC_` variable.
+
+The canonical site URL is intentionally fixed in `src/seo/config.ts`; no `SITE_URL` environment
+variable is required.
+
+In Vercel Project Settings → Domains, keep `www.pdfnova.in` as the primary domain. Edit
+`pdfnova.in`, redirect it to `www.pdfnova.in`, and select a permanent 308 status while preserving
+the path and query string. The application also contains the same permanent redirect as a fallback.
+
 Run the complete rendered SEO audit after a production build:
 
 ```bash

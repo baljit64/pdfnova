@@ -108,7 +108,9 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
 
       setRejection(problem ?? null);
       if (problem) {
-        track("upload_rejected", { ...analyticsBase, errorMessage: problem });
+        // Keep the useful file-specific explanation on screen, but never copy a
+        // selected filename into analytics.
+        track("upload_rejected", { ...analyticsBase, errorMessage: "File validation failed" });
       }
       if (accepted.length === 0) return;
 
@@ -244,7 +246,9 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
         setPhase("error");
         track("processing_failed", {
           ...analyticsBase,
-          errorMessage: message,
+          // Runner errors can contain document-specific details. The UI receives
+          // the full message; analytics only needs the failure category.
+          errorMessage: "Processing failed",
           durationMs: Date.now() - startedAt,
         });
       } finally {

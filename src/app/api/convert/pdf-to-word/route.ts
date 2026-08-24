@@ -23,6 +23,7 @@ async function waitForJob(jobId: string, apiKey: string) {
 
 export async function POST(req: Request) {
   const apiKey = process.env.CLOUDCONVERT_API_KEY;
+  
   if (!apiKey) {
     return NextResponse.json(
       { error: "Missing CLOUDCONVERT_API_KEY" },

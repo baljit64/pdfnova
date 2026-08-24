@@ -93,6 +93,23 @@ const checks: Array<[string, () => void | Promise<void>]> = [
     assert.match(schema, /BRAND_ASSETS\.appIcon/);
     assert.equal(BRAND_ASSETS.appIcon, `${SITE_URL}/assets/pdf-nova-app-icon-light.png`);
   }],
+  ["keeps example credentials empty and trust links genuine", async () => {
+    const [environment, footer] = await Promise.all([
+      readFile(new URL("../.env.example", import.meta.url), "utf8"),
+      readFile(new URL("../src/components/Footer.tsx", import.meta.url), "utf8"),
+    ]);
+
+    for (const key of [
+      "GOOGLE_SITE_VERIFICATION",
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "CLOUDCONVERT_API_KEY",
+      "CONTACT_FORM_ENDPOINT",
+    ]) {
+      assert.match(environment, new RegExp(`^${key}=\\s*$`, "m"), key);
+    }
+    assert.doesNotMatch(footer, /https:\/\/(facebook|twitter|youtube)\.com/);
+  }],
 ];
 
 let failures = 0;

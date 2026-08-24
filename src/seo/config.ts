@@ -2,6 +2,22 @@
 export const SITE_URL = "https://www.pdfnova.in";
 export const HOME_URL = `${SITE_URL}/`;
 
+function googleVerificationToken(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+
+  const trimmed = value.trim();
+  const contentValue = trimmed.match(/content=["']([^"']+)["']/i)?.[1];
+  const token = (contentValue ?? trimmed).trim();
+
+  // `google123.html` belongs to Google's HTML-file verification method and is
+  // not a valid value for the Metadata API's verification meta tag.
+  return token && !/\.html$/i.test(token) ? token : undefined;
+}
+
+export const GOOGLE_SITE_VERIFICATION = googleVerificationToken(
+  process.env.GOOGLE_SITE_VERIFICATION
+);
+
 export const BRAND_ASSETS = {
   logo: `${SITE_URL}/assets/pdf-nova-logo-horizontal.png`,
   appIcon: `${SITE_URL}/assets/pdf-nova-app-icon-light.png`,

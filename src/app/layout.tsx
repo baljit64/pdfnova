@@ -4,14 +4,26 @@ import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import JsonLd from "../seo/JsonLd";
-import { BRAND_ASSETS, DEFAULT_DESCRIPTION, DEFAULT_TITLE, HOME_URL, SITE_URL } from "../seo/config";
+import {
+  BRAND_ASSETS,
+  DEFAULT_DESCRIPTION,
+  DEFAULT_TITLE,
+  GOOGLE_SITE_VERIFICATION,
+  HOME_URL,
+  SITE_URL,
+} from "../seo/config";
 
 export const metadata: Metadata = {
+  applicationName: "PDFNova",
   title: {
     default: DEFAULT_TITLE,
     template: "%s",
   },
   description: DEFAULT_DESCRIPTION,
+  authors: [{ name: "Baljit Singh" }],
+  creator: "Baljit Singh",
+  publisher: "PDFNova",
+  category: "Utilities",
   metadataBase: new URL(SITE_URL),
   manifest: "/manifest.webmanifest",
   icons: {
@@ -45,8 +57,8 @@ export const metadata: Metadata = {
     description: DEFAULT_DESCRIPTION,
     images: [BRAND_ASSETS.socialImage],
   },
-  ...(process.env.GOOGLE_SITE_VERIFICATION
-    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+  ...(GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: GOOGLE_SITE_VERIFICATION } }
     : {}),
 };
 
