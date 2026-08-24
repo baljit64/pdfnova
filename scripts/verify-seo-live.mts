@@ -112,7 +112,8 @@ const indexablePages: PageExpectation[] = [
     path,
     title: ROUTE_META[path].title,
     description: ROUTE_META[path].description,
-    canonical: absoluteUrl(path),
+    // Next.js serializes the root canonical origin without its optional slash.
+    canonical: path === "/" ? SITE_URL : absoluteUrl(path),
   })),
   ...canonicalTools.map((page) => ({
     path: page.path,
@@ -181,7 +182,7 @@ try {
   assert.equal(sitemapResponse.status, 200);
   const sitemapXml = await sitemapResponse.text();
   const sitemapUrls = [...sitemapXml.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
-  assert.deepEqual(new Set(sitemapUrls), new Set(indexablePages.map((page) => page.canonical)));
+  assert.deepEqual(new Set(sitemapUrls), new Set(indexablePages.map((page) => absoluteUrl(page.path))));
   assert.equal(sitemapUrls.length, indexablePages.length);
   console.log(`ok - sitemap contains exactly ${sitemapUrls.length} canonical indexable URLs`);
 
