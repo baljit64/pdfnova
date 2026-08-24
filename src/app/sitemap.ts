@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
 import { BLOG_POSTS } from "../blog/posts";
-import { INDEXABLE_STATIC_PATHS, SITE_URL } from "../seo/config";
+import { HOME_URL, INDEXABLE_STATIC_PATHS, SITE_URL } from "../seo/config";
 import { getCanonicalLandingPages } from "../seo/landing/generate";
 
 function absoluteUrl(path: string): string {
-  return path === "/" ? SITE_URL : `${SITE_URL}${path}`;
+  return path === "/" ? HOME_URL : `${SITE_URL}${path}`;
 }
 
 /** Only canonical, useful and indexable URLs belong in the sitemap. */

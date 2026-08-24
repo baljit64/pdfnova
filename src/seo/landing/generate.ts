@@ -5,7 +5,7 @@
  * resolved `LandingPage`. Adding pages is a matter of editing `variations.ts`
  * or a tool's `related` list — nothing here needs to change.
  */
-import { SITE_URL } from "../config";
+import { HOME_URL, SITE_URL } from "../config";
 import { AVAILABLE_TOOL_IDS, TOOLS, getTool } from "../../tools/registry";
 import type { ToolDefinition, ToolId } from "../../tools/types";
 import { getToolContent } from "./toolContent";
@@ -188,7 +188,7 @@ function buildCanonicalPage(tool: ToolDefinition, slugsForTool: string[]): Landi
     faqs: content.faqs,
     related: buildRelated(tool, CANONICAL_VARIATION, slugsForTool),
     breadcrumbs: [
-      { name: "Home", url: SITE_URL },
+      { name: "Home", url: HOME_URL },
       { name: tool.name, url: `${SITE_URL}/${tool.slug}` },
     ],
   };
@@ -235,7 +235,7 @@ function buildVariationPage(
     faqs: [...variation.faqs(tool), ...content.faqs],
     related: buildRelated(tool, variation.id, slugsForTool),
     breadcrumbs: [
-      { name: "Home", url: SITE_URL },
+      { name: "Home", url: HOME_URL },
       { name: tool.name, url: `${SITE_URL}/${tool.slug}` },
       { name: variation.label, url: `${SITE_URL}/${slug}` },
     ],

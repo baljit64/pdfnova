@@ -10,7 +10,7 @@ import {
 import BlogArtwork from "../../../components/blog/BlogArtwork";
 import BlogCard from "../../../components/blog/BlogCard";
 import JsonLdScript from "../../../seo/JsonLdScript";
-import { BRAND_ASSETS, SITE_URL } from "../../../seo/config";
+import { BRAND_ASSETS, HOME_URL, SITE_URL } from "../../../seo/config";
 
 interface RouteParams {
   params: Promise<{ slug: string }>;
@@ -71,7 +71,7 @@ export default async function BlogPostPage({ params }: RouteParams) {
       dateModified: post.updatedAt ?? post.publishedAt,
       mainEntityOfPage: url,
       image: BRAND_ASSETS.socialImage,
-      author: { "@type": "Organization", name: "PDFNova", url: SITE_URL },
+      author: { "@type": "Organization", name: "PDFNova", url: HOME_URL },
       publisher: { "@id": `${SITE_URL}/#organization` },
       articleSection: post.category,
       wordCount: [...post.introduction, ...post.sections.flatMap((section) => section.paragraphs)]
@@ -82,7 +82,7 @@ export default async function BlogPostPage({ params }: RouteParams) {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 1, name: "Home", item: HOME_URL },
         { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
         { "@type": "ListItem", position: 3, name: post.title, item: url },
       ],

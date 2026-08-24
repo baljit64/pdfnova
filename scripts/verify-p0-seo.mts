@@ -49,8 +49,11 @@ const checks: Array<[string, () => void | Promise<void>]> = [
     for (const path of ["/login", "/pdf-to-excel", "/pdf-to-powerpoint", "/powerpoint-to-pdf"]) {
       assert.equal(urls.includes(`${SITE_URL}${path}`), false, path);
     }
+    assert.ok(urls.includes(`${SITE_URL}/`));
     assert.equal(new Set(urls).size, urls.length);
-    assert.equal(urls.every((url) => url === SITE_URL || url.startsWith(`${SITE_URL}/`)), true);
+    assert.equal(urls.every((url) => url.startsWith(`${SITE_URL}/`)), true);
+    assert.equal(urls.some((url) => url.includes("pdfnova.com")), false);
+    assert.equal(urls.some((url) => url.startsWith("https://pdfnova.in")), false);
   }],
   ["robots allows public pages and points to the preferred sitemap", () => {
     const value = robots();

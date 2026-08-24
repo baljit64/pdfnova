@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import JsonLd from "../seo/JsonLd";
-import { BRAND_ASSETS, DEFAULT_DESCRIPTION, DEFAULT_TITLE, SITE_URL } from "../seo/config";
+import { BRAND_ASSETS, DEFAULT_DESCRIPTION, DEFAULT_TITLE, HOME_URL, SITE_URL } from "../seo/config";
 
 export const metadata: Metadata = {
   title: {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     type: "website",
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
-    url: SITE_URL,
+    url: HOME_URL,
     siteName: "PDFNova",
     images: [{ url: BRAND_ASSETS.socialImage, width: 825, height: 240, alt: "PDFNova" }],
     locale: "en_US",

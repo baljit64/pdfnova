@@ -33,7 +33,7 @@ function reservePort(): Promise<number> {
 }
 
 function absoluteUrl(path: string): string {
-  return path === "/" ? SITE_URL : `${SITE_URL}${path}`;
+  return path === "/" ? `${SITE_URL}/` : `${SITE_URL}${path}`;
 }
 
 function tags(html: string, name: string): string[] {

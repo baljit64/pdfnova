@@ -1,5 +1,6 @@
 /** Preferred production origin. Canonicals, sitemaps and structured data all use it. */
 export const SITE_URL = "https://www.pdfnova.in";
+export const HOME_URL = `${SITE_URL}/`;
 
 export const BRAND_ASSETS = {
   logo: `${SITE_URL}/assets/pdf-nova-logo-horizontal.png`,

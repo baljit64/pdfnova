@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BRAND_ASSETS, SITE_URL, ROUTE_META } from "./config";
+import { BRAND_ASSETS, HOME_URL, SITE_URL, ROUTE_META } from "./config";
 import type { LandingPage } from "./landing/types";
 
 const OG_IMAGE = BRAND_ASSETS.socialImage;
@@ -8,7 +8,7 @@ export function buildMetadata(path: string): Metadata {
   const meta = ROUTE_META[path];
   if (!meta) throw new Error(`Missing SEO configuration for ${path}`);
 
-  const url = `${SITE_URL}${path === "/" ? "" : path}`;
+  const url = path === "/" ? HOME_URL : `${SITE_URL}${path}`;
 
   return {
     title: meta.title,
