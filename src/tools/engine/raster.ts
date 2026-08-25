@@ -16,14 +16,15 @@ type PdfJs = typeof import("pdfjs-dist");
 
 let pdfjsPromise: Promise<PdfJs> | null = null;
 
-/** Load pdf.js once per session and point it at the bundled worker. */
+/** Load the self-contained browser module and point it at its same-origin worker. */
 async function loadPdfJs(): Promise<PdfJs> {
   if (!pdfjsPromise) {
-    pdfjsPromise = import("pdfjs-dist").then((lib) => {
-      lib.GlobalWorkerOptions.workerSrc = new URL(
-        "pdfjs-dist/build/pdf.worker.min.mjs",
-        import.meta.url
-      ).toString();
+    // pdf.js 5 is already a bundled ESM application. Loading that bundle through
+    // webpack nests two runtimes and causes `Object.defineProperty` failures in
+    // Next's client chunk. Keep the module self-contained and load it natively.
+    // @ts-expect-error This is a same-origin runtime module, not a source file.
+    pdfjsPromise = import(/* webpackIgnore: true */ "/api/pdfjs/pdf.mjs").then((lib) => {
+      lib.GlobalWorkerOptions.workerSrc = "/api/pdfjs/pdf.worker.min.mjs";
       return lib;
     });
   }
@@ -80,7 +81,11 @@ export async function pdfToImages({
 }: PdfToImagesParams): Promise<ToolOutput[]> {
   const pdfjs = await loadPdfJs();
   const data = new Uint8Array(await file.arrayBuffer());
-  const pdf = await pdfjs.getDocument({ data }).promise;
+  const pdf = await pdfjs.getDocument({
+    data,
+    enableXfa: false,
+    isEvalSupported: false,
+  }).promise;
   const stem = baseName(file.name);
   const extension = format === "jpeg" ? "jpg" : "png";
   const mime = format === "jpeg" ? "image/jpeg" : "image/png";
@@ -239,7 +244,11 @@ async function rasterPass(
   const { PDFDocument } = await import("pdf-lib");
 
   // pdf.js takes ownership of the buffer it is given, so hand it a fresh copy.
-  const pdf = await pdfjs.getDocument({ data: new Uint8Array(source.slice(0)) }).promise;
+  const pdf = await pdfjs.getDocument({
+    data: new Uint8Array(source.slice(0)),
+    enableXfa: false,
+    isEvalSupported: false,
+  }).promise;
   const doc = await PDFDocument.create();
 
   try {
