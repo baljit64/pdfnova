@@ -33,12 +33,28 @@ export default function Terms() {
           </p>
         </section>
         <section>
+          <h2 className="text-xl font-semibold text-blue-900">Document ownership and responsibility</h2>
+          <p>
+            You keep ownership of the documents and output you process. You are responsible for
+            confirming that you have permission to use the files and for reviewing an output before
+            relying on it. PDFNova does not take ownership of the contents of your documents.
+          </p>
+        </section>
+        <section>
           <h2 className="text-xl font-semibold text-blue-900">Your files and output</h2>
           <p>
             You retain responsibility for the documents you process. Keep an original copy and
             inspect every output before relying on it, submitting it or deleting the source. PDF
             conversion can change layout, fonts, image quality, form fields, links or accessibility
             information, especially when converting between PDF and editable office formats.
+          </p>
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold text-blue-900">Suspension of abusive use</h2>
+          <p>
+            PDFNova may limit or suspend access to a server-assisted feature when it is necessary
+            to protect the service, its providers or other users from abuse, excessive automated
+            traffic or a security risk.
           </p>
         </section>
         <section>

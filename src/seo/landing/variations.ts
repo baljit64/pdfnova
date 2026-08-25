@@ -1295,6 +1295,6 @@ export function variationAppliesTo(
 ): boolean {
   if (variation.onlyTools && !variation.onlyTools.includes(tool.id)) return false;
   // Never claim on-device processing for a tool that posts to a server.
-  if (variation.localOnly && tool.serverSide) return false;
+  if (variation.localOnly && tool.processingType !== "client") return false;
   return tool.available;
 }

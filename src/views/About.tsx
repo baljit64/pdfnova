@@ -23,6 +23,16 @@ export default function About() {
         </section>
 
         <section>
+          <h2 className="text-xl font-semibold text-blue-900">Our mission</h2>
+          <p>
+            PDFNova exists to make routine document work simple, fast and accessible without
+            hiding how files are handled. The product focuses on practical controls, clear output
+            and privacy-conscious choices instead of unsupported claims about speed, security or
+            scale.
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-xl font-semibold text-blue-900">How file processing works</h2>
           <p>
             Most PDFNova tools run locally in the browser after the page code loads. Those tools
@@ -34,6 +44,16 @@ export default function About() {
             The processing notice on each tool is the source of truth. Read the full{" "}
             <Link href="/privacy" className="text-red-500 hover:underline">Privacy Policy</Link>{" "}
             before using PDFNova with confidential or regulated material.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold text-blue-900">Security and privacy</h2>
+          <p>
+            PDFNova is served over HTTPS. Browser-based tools keep selected files in the current
+            browser session, while the server-assisted PDF to Word tool transfers the selected
+            PDF to its conversion provider over HTTPS. Choose the processing model that fits your
+            document-handling requirements, especially for confidential or regulated material.
           </p>
         </section>
 

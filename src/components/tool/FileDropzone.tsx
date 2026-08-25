@@ -2,6 +2,7 @@
 
 import { useCallback, useId, useRef, useState } from "react";
 import { InboxOutlined } from "@ant-design/icons";
+import { PROCESSING_COPY } from "../../tools/processing";
 import type { ToolDefinition } from "../../tools/types";
 
 interface Props {
@@ -86,9 +87,7 @@ export default function FileDropzone({ tool, onFiles, selectedCount, disabled }:
       </div>
 
       <p id={hintId} className="mt-2 text-sm text-gray-500">
-        {hint}. {tool.serverSide
-          ? "This tool sends the file to a server-assisted converter over HTTPS."
-          : "This tool processes the file on this device."}
+        {hint}. {PROCESSING_COPY[tool.processingType].description}
       </p>
 
       <input

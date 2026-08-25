@@ -27,7 +27,7 @@ function withBrand(title: string): string {
 }
 
 function privacySection(tool: ToolDefinition): ContentBlock {
-  if (tool.serverSide) {
+  if (tool.processingType !== "client") {
     return {
       heading: "Privacy",
       paragraphs: [
@@ -50,7 +50,7 @@ function privacySection(tool: ToolDefinition): ContentBlock {
 }
 
 function securitySection(tool: ToolDefinition): ContentBlock {
-  if (tool.serverSide) {
+  if (tool.processingType !== "client") {
     return {
       heading: "Security",
       paragraphs: [
@@ -172,7 +172,7 @@ function buildCanonicalPage(tool: ToolDefinition, slugsForTool: string[]): Landi
     isCanonical: true,
     targetKeyword: tool.keywords[0],
     title: withBrand(`${tool.name} Online Free — ${tool.acceptLabel} Tool`),
-    description: `${tool.blurb} Free, no signup, no watermark. ${tool.serverSide ? "Uses a server-assisted conversion and returns a DOCX." : "Runs in your browser — the tool does not upload your file."}`,
+    description: `${tool.blurb} Free, no signup, no watermark. ${tool.processingType !== "client" ? "Uses a server-assisted conversion and returns a DOCX." : "Runs in your browser — the tool does not upload your file."}`,
     h1: tool.name,
     intro: content.intro,
     sections: [

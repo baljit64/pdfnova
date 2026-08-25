@@ -33,7 +33,7 @@ ok("every page has related links", pages.every(p => p.related.length >= 5));
 ok("every page has breadcrumbs", pages.every(p => p.breadcrumbs.length >= 2));
 
 // No page may claim on-device processing for the server-side tool.
-const serverPages = pages.filter(p => TOOLS[p.toolId].serverSide);
+const serverPages = pages.filter(p => TOOLS[p.toolId].processingType !== "client");
 ok("server-side tool has no local-only variations",
    serverPages.every(p => !["secure","without-upload","fast"].includes(p.variationId)),
    serverPages.map(p=>p.variationId).filter(v=>["secure","without-upload","fast"].includes(v)).join(","));

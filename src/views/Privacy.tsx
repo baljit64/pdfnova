@@ -55,12 +55,42 @@ export default function Privacy() {
         </section>
 
         <section>
+          <h2 className="text-xl font-semibold text-blue-900">Security</h2>
+          <p>
+            PDFNova is delivered over HTTPS. We use reasonable technical and organisational
+            measures appropriate to the service, but no internet transmission or browser storage
+            method can be guaranteed perfectly secure. Keep original files and avoid sending
+            documents to server-assisted tools when third-party processing is not permitted.
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-xl font-semibold text-blue-900">Contact messages</h2>
           <p>
             When the contact form is configured and a message is successfully submitted, the name,
             email address and message are sent to the configured support service so PDFNova can
             respond. Do not place passwords, payment information or sensitive document contents in
             a support message. Contact data is not used for advertising by PDFNova.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold text-blue-900">Children and international users</h2>
+          <p>
+            PDFNova is not designed for children to submit personal information. If you use the
+            service from outside the country where its hosting or service providers operate, your
+            information may be processed in the locations used by those providers. Use the service
+            only where this is appropriate for your documents and applicable rules.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold text-blue-900">Your choices and requests</h2>
+          <p>
+            You can avoid server-assisted document processing by choosing a tool labelled as local
+            browser processing, and you can choose not to submit contact information. For a
+            privacy question or request concerning a contact message, use the Contact page and
+            include enough information for us to understand the request.
           </p>
         </section>
 

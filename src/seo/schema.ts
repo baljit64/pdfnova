@@ -77,7 +77,7 @@ export function applicationSchema(page: LandingPage, tool: ToolDefinition): Sche
     applicationSubCategory: "PDF Tool",
     operatingSystem: "Any — runs in a web browser",
     browserRequirements: "Requires a modern browser with JavaScript enabled",
-    permissions: tool.serverSide
+    permissions: tool.processingType !== "client"
       ? "Files are sent to a conversion service over an encrypted connection"
       : "No permissions required — files are processed locally in the browser",
     isAccessibleForFree: true,

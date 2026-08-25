@@ -10,6 +10,7 @@ import FileDropzone from "./FileDropzone";
 import OptionsForm from "./OptionsForm";
 import ResultPanel from "./ResultPanel";
 import SelectedFiles from "./SelectedFiles";
+import ProcessingBadge from "./ProcessingBadge";
 import type {
   OptionValue,
   OptionValues,
@@ -321,6 +322,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
 
   return (
     <Card className="rounded-xl shadow-lg">
+      <ProcessingBadge type={tool.processingType} />
       <FileDropzone
         tool={tool}
         onFiles={handleFiles}

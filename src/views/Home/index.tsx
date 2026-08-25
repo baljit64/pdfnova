@@ -147,11 +147,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-blue-900 leading-tight">
-              Free Online PDF Tools to Merge, Compress, Convert &amp; Edit PDFs
+              Free Online PDF Tools – Merge, Compress, Convert &amp; Edit PDFs
             </h1>
             <p className="mt-6 text-lg text-gray-700">
-              Use practical PDF tools in your browser with no software to install. Most tools
-              process files on your device; server-assisted tools are clearly identified.
+              Use PDFNova to merge PDFs, compress files, convert PDF to Word, JPG or PNG, edit
+              documents, add signatures and rotate pages. Most tools run directly in your browser
+              with no signup or software to install; server-assisted tools are clearly identified.
             </p>
             <div className="mt-8">
               <Link

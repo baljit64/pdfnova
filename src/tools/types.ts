@@ -21,6 +21,9 @@ export type ToolId =
   | "word-to-pdf"
   | "excel-to-pdf";
 
+/** Where a selected document is handled once the user starts a tool. */
+export type ProcessingType = "client" | "server" | "hybrid";
+
 /** A single produced file, ready to preview and download. */
 export interface ToolOutput {
   /** Suggested download filename, including extension. */
@@ -112,8 +115,8 @@ export interface ToolDefinition {
   options?: OptionField[];
   /** Preview style for results. */
   outputKind: "pdf" | "images";
-  /** True when the tool posts to an API route instead of running in the browser. */
-  serverSide?: boolean;
+  /** The verified processing model shown in the workspace and privacy copy. */
+  processingType: ProcessingType;
   /** False for tools that are not shipped yet — these get no landing pages. */
   available: boolean;
   /** Long-tail seeds used when composing metadata. */

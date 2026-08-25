@@ -5,11 +5,31 @@
  *
  * Execution lives in `runners.ts`, which is only ever imported from the client.
  */
-import type { ToolDefinition, ToolId } from "./types";
+import type { ProcessingType, ToolDefinition, ToolId } from "./types";
 
 const PDF_ACCEPT = "application/pdf,.pdf";
 
-export const TOOLS: Record<ToolId, ToolDefinition> = {
+/**
+ * The privacy model is declared once for every tool and used by the UI and
+ * structured data. Do not infer it from marketing copy or the route name.
+ */
+export const TOOL_PROCESSING: Record<ToolId, ProcessingType> = {
+  "merge-pdf": "client",
+  "split-pdf": "client",
+  "compress-pdf": "client",
+  "rotate-pdf": "client",
+  watermark: "client",
+  "sign-pdf": "client",
+  "edit-pdf": "client",
+  "pdf-to-jpg": "client",
+  "pdf-to-image": "client",
+  "jpg-to-pdf": "client",
+  "pdf-to-word": "server",
+  "word-to-pdf": "client",
+  "excel-to-pdf": "client",
+};
+
+const TOOL_CONFIGS: Record<ToolId, Omit<ToolDefinition, "processingType">> = {
   "merge-pdf": {
     id: "merge-pdf",
     slug: "merge-pdf",
@@ -465,7 +485,6 @@ export const TOOLS: Record<ToolId, ToolDefinition> = {
     maxFiles: 1,
     maxFileSizeMB: 25,
     outputKind: "pdf",
-    serverSide: true,
     available: true,
     keywords: ["pdf to word", "pdf to docx", "convert pdf to editable word", "pdf to doc"],
     related: ["word-to-pdf", "pdf-to-jpg", "compress-pdf", "merge-pdf"],
@@ -541,6 +560,13 @@ export const TOOLS: Record<ToolId, ToolDefinition> = {
     related: ["word-to-pdf", "pdf-to-word", "merge-pdf", "compress-pdf"],
   },
 };
+
+export const TOOLS: Record<ToolId, ToolDefinition> = Object.fromEntries(
+  (Object.keys(TOOL_CONFIGS) as ToolId[]).map((id) => [
+    id,
+    { ...TOOL_CONFIGS[id], processingType: TOOL_PROCESSING[id] },
+  ])
+) as Record<ToolId, ToolDefinition>;
 
 export const TOOL_IDS = Object.keys(TOOLS) as ToolId[];
 
