@@ -140,18 +140,22 @@ export default function Navbar() {
           <Link href="/compress-pdf" className={primaryLinkClass}>Compress PDF</Link>
           <Popover
             content={<ToolMenu groups={convertGroups} />}
-            trigger="click"
+            trigger={["hover", "click"]}
             placement="bottomLeft"
             arrow={false}
+            mouseEnterDelay={0.08}
+            mouseLeaveDelay={0.15}
             overlayInnerStyle={{ borderRadius: 14, padding: 14 }}
           >
             <MenuTrigger>Convert PDF</MenuTrigger>
           </Popover>
           <Popover
             content={<ToolMenu groups={allToolGroups} expanded />}
-            trigger="click"
+            trigger={["hover", "click"]}
             placement="bottom"
             arrow={false}
+            mouseEnterDelay={0.08}
+            mouseLeaveDelay={0.15}
             overlayInnerStyle={{ borderRadius: 14, padding: 14 }}
           >
             <MenuTrigger>All PDF Tools</MenuTrigger>
