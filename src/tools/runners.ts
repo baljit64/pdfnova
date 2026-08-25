@@ -207,7 +207,10 @@ const RUNNERS: Record<ToolId, ToolRunner> = {
     return {
       outputs: await excelToPDF({
         file: ctx.files[0],
-        orientation: str(ctx, "orientation", "landscape") === "portrait" ? "portrait" : "landscape",
+        orientation: (() => {
+          const value = str(ctx, "orientation", "auto");
+          return value === "portrait" || value === "landscape" ? value : "auto";
+        })(),
         sheets: str(ctx, "sheets", "all") === "first" ? "first" : "all",
         onProgress: ctx.onProgress,
       }),

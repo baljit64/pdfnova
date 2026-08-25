@@ -11,7 +11,8 @@
     "verify:landing": "tsx scripts/verify-seo.mts",
     "verify:seo": "tsx scripts/verify-p0-seo.mts",
     "verify:engine": "tsx scripts/verify-engine.mts",
-    "verify": "npm run verify:engine && npm run verify:landing && npm run verify:seo",
+    "verify:excel": "tsx scripts/verify-excel-to-pdf.mts",
+    "verify": "npm run verify:engine && npm run verify:excel && npm run verify:landing && npm run verify:seo",
     "seo:check": "npm run build && tsx scripts/verify-seo-live.mts"
   },
   "dependencies": {
@@ -34,7 +35,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@tailwindcss/postcss": "^4.1.18",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.13.3",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "babel-plugin-react-compiler": "^1.0.0",
