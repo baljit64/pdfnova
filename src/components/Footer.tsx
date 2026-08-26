@@ -15,7 +15,7 @@ export default function Footer() {
         </div>
 
         <p className="text-sm text-gray-300 text-center md:text-left">
-          © {new Date().getFullYear()} PDFNova. All rights reserved. Built by Baljit Singh.
+          © {new Date().getFullYear()} PDFNova. All rights reserved.
         </p>
       </div>
     </footer>
