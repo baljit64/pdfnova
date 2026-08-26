@@ -18,6 +18,7 @@ import {
   SplitCellsOutlined,
 } from "@ant-design/icons";
 import { forwardRef, type ReactNode } from "react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 type ToolLink = {
   href: string;
@@ -122,7 +123,7 @@ const primaryLinkClass = "whitespace-nowrap px-1 py-2 text-sm font-bold uppercas
 export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-3 lg:px-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:gap-5 sm:px-5 lg:px-6">
         <Link href="/" className="flex shrink-0 no-underline" aria-label="PDFNova home">
           <Image
             src="/assets/pdf-nova-logo-horizontal.png"
@@ -145,7 +146,7 @@ export default function Navbar() {
             arrow={false}
             mouseEnterDelay={0.08}
             mouseLeaveDelay={0.15}
-            overlayInnerStyle={{ borderRadius: 14, padding: 14 }}
+            styles={{ container: { borderRadius: 14, padding: 14 } }}
           >
             <MenuTrigger>Convert PDF</MenuTrigger>
           </Popover>
@@ -156,16 +157,17 @@ export default function Navbar() {
             arrow={false}
             mouseEnterDelay={0.08}
             mouseLeaveDelay={0.15}
-            overlayInnerStyle={{ borderRadius: 14, padding: 14 }}
+            styles={{ container: { borderRadius: 14, padding: 14 } }}
           >
             <MenuTrigger>All PDF Tools</MenuTrigger>
           </Popover>
         </nav>
 
-        <div className="flex shrink-0 items-center gap-3">
-          <Link href="/" className="text-sm font-semibold text-slate-700 no-underline hover:text-red-500 lg:hidden">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <Link href="/" className="hidden text-sm font-semibold text-slate-700 no-underline hover:text-red-500 sm:inline lg:hidden">
             Tools
           </Link>
+          <LanguageSwitcher />
           <Link href="/login">
             <Button type="primary" danger>Login</Button>
           </Link>

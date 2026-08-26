@@ -4,3 +4,33 @@
   --color-primary: #083CCC;
   --color-secondary: #FFFFFF;
 }
+/* The Google Translate control is driven by PDFNova's custom language menu. */
+#pdfnova-google-translate,
+.goog-te-banner-frame,
+.goog-te-balloon-frame,
+.VIpgJd-ZVi9od-ORHb-OEVmcd,
+.VIpgJd-yAWNEb-L7lbkb,
+#goog-gt-tt {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+.goog-text-highlight {
+  background: inherit !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 639px) {
+  .pdfnova-language-popover {
+    inset-inline-start: 4vw !important;
+  }
+}
