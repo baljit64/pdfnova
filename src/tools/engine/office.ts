@@ -322,140 +322,67 @@ export async function excelToPDF({
 
 export interface WordToPdfParams {
   file: File;
+  signal: AbortSignal;
   onProgress?: Progress;
 }
 
 export async function wordToPDF({
   file,
+  signal,
   onProgress = noopProgress,
 }: WordToPdfParams): Promise<ToolOutput[]> {
-  const [mammoth, html2canvasModule, { jsPDF }] = await Promise.all([
-    import("mammoth"),
-    import("html2canvas"),
-    import("jspdf"),
-  ]);
-  const html2canvas = html2canvasModule.default;
-
-  onProgress(15, "Reading document");
-  const { value: html } = await mammoth.convertToHtml({ arrayBuffer: await file.arrayBuffer() });
-
-  // Render off-screen at A4 content width so line breaks match the final PDF.
-  const container = document.createElement("div");
-  Object.assign(container.style, {
-    position: "fixed",
-    left: "-10000px",
-    top: "0",
-    width: "170mm",
-    padding: "0",
-    background: "#ffffff",
-    fontFamily: "Arial, Helvetica, sans-serif",
-    fontSize: "12pt",
-    lineHeight: "1.5",
-    color: "#000000",
-  } satisfies Partial<CSSStyleDeclaration>);
-  container.innerHTML = html;
-  document.body.appendChild(container);
-
-  try {
-    onProgress(40, "Rendering pages");
-    const canvas = await html2canvas(container, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      backgroundColor: "#ffffff",
-    });
-
-    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const margin = 20;
-    const contentWidth = pageWidth - margin * 2;
-    const contentHeight = pageHeight - margin * 2;
-
-    // How many canvas pixels fit on one PDF page once scaled to the content width.
-    const pxPerMm = canvas.width / contentWidth;
-    const sliceHeightPx = Math.max(1, Math.floor(contentHeight * pxPerMm));
-    const pageCount = Math.max(1, Math.ceil(canvas.height / sliceHeightPx));
-
-    const slice = document.createElement("canvas");
-    const sliceContext = slice.getContext("2d");
-    if (!sliceContext) throw new Error("Your browser blocked canvas rendering.");
-
-    for (let page = 0; page < pageCount; page++) {
-      onProgress(40 + Math.round((page / pageCount) * 55), `Writing page ${page + 1} of ${pageCount}`);
-      const sourceY = page * sliceHeightPx;
-      const sourceHeight = Math.min(sliceHeightPx, canvas.height - sourceY);
-
-      slice.width = canvas.width;
-      slice.height = sourceHeight;
-      sliceContext.fillStyle = "#ffffff";
-      sliceContext.fillRect(0, 0, slice.width, slice.height);
-      sliceContext.drawImage(
-        canvas,
-        0,
-        sourceY,
-        canvas.width,
-        sourceHeight,
-        0,
-        0,
-        canvas.width,
-        sourceHeight
-      );
-
-      if (page > 0) pdf.addPage();
-      pdf.addImage(
-        slice.toDataURL("image/jpeg", 0.92),
-        "JPEG",
-        margin,
-        margin,
-        contentWidth,
-        sourceHeight / pxPerMm
-      );
-    }
-
-    slice.width = 0;
-    slice.height = 0;
-
-    const blob = pdf.output("blob");
-    onProgress(100);
-    return [{ name: `${baseName(file.name)}.pdf`, blob, kind: "pdf", size: blob.size }];
-  } finally {
-    container.remove();
-  }
+  const body = new FormData();
+  body.append("file", file);
+  onProgress(20, "Uploading to the document converter");
+  const response = await fetch("/api/convert/word-to-pdf", { method: "POST", body, signal });
+  if (!response.ok) throw new Error(await conversionError(response));
+  onProgress(85, "Downloading the PDF");
+  const blob = await response.blob();
+  onProgress(100);
+  return [{ name: `${baseName(file.name)}.pdf`, blob, kind: "pdf", size: blob.size }];
 }
 
 export interface PdfToWordParams {
   file: File;
+  ocr: boolean;
+  ocrLanguage: string;
   signal: AbortSignal;
   onProgress?: Progress;
 }
 
 export async function pdfToWord({
   file,
+  ocr,
+  ocrLanguage,
   signal,
   onProgress = noopProgress,
 }: PdfToWordParams): Promise<ToolOutput[]> {
   const body = new FormData();
   body.append("file", file);
+  body.append("ocr", ocr ? "on" : "off");
+  body.append("ocrLanguage", ocrLanguage);
 
   onProgress(20, "Uploading to the converter");
   const response = await fetch("/api/convert/pdf-to-word", { method: "POST", body, signal });
 
   if (!response.ok) {
     // The route answers with JSON on failure and a plain body on some errors.
-    const raw = await response.text();
-    let message = raw;
-    try {
-      const parsed = JSON.parse(raw);
-      if (parsed?.error) message = parsed.error;
-    } catch {
-      /* keep the raw text */
-    }
-    throw new Error(message || "Conversion failed. Please try again.");
+    throw new Error(await conversionError(response));
   }
 
   onProgress(85, "Downloading the Word file");
   const blob = await response.blob();
   onProgress(100);
   return [{ name: `${baseName(file.name)}.docx`, blob, kind: "file", size: blob.size }];
+}
+
+async function conversionError(response: Response): Promise<string> {
+  const raw = await response.text();
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed?.error) return parsed.error;
+  } catch {
+    // Keep a useful plain-text response when the server did not return JSON.
+  }
+  return raw || "Conversion failed. Please try again.";
 }

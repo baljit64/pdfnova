@@ -7,10 +7,37 @@
  */
 import { assertNotAborted, baseName, pdfBlob, toWinAnsiSafe } from "./blob";
 import type { ToolOutput } from "../types";
+import type { PDFDocument, PDFImage } from "pdf-lib";
 
 type Progress = (percent: number, message?: string) => void;
 
 const noopProgress: Progress = () => {};
+
+function copyMetadata(source: PDFDocument, target: PDFDocument): void {
+  const textValues: Array<[() => string | undefined, (value: string) => void]> = [
+    [() => source.getTitle(), (value) => target.setTitle(value)],
+    [() => source.getAuthor(), (value) => target.setAuthor(value)],
+    [() => source.getSubject(), (value) => target.setSubject(value)],
+    [() => source.getCreator(), (value) => target.setCreator(value)],
+    [() => source.getProducer(), (value) => target.setProducer(value)],
+  ];
+  for (const [read, write] of textValues) {
+    const value = read();
+    if (value) write(value);
+  }
+  const keywords = source.getKeywords();
+  if (keywords) target.setKeywords(keywords.split(/[,;]\s*/).filter(Boolean));
+  const created = source.getCreationDate();
+  const modified = source.getModificationDate();
+  if (created) target.setCreationDate(created);
+  if (modified) target.setModificationDate(modified);
+}
+
+/** pdf-lib cannot safely move interactive fields between documents; flattening keeps their visible values. */
+function preserveFormAppearance(document: PDFDocument): void {
+  const form = document.getForm();
+  if (form.getFields().length > 0) form.flatten();
+}
 
 export interface MergeParams {
   files: File[];
@@ -34,6 +61,8 @@ export async function mergePDFs({
     onProgress(Math.round((i / files.length) * 90), `Adding ${files[i].name}`);
 
     const source = await PDFDocument.load(await files[i].arrayBuffer());
+    preserveFormAppearance(source);
+    if (i === 0) copyMetadata(source, merged);
     const pages = await merged.copyPages(source, source.getPageIndices());
     const rotation = rotations[i] ?? 0;
 
@@ -115,12 +144,14 @@ export async function splitPDF({
 }: SplitParams): Promise<ToolOutput[]> {
   const { PDFDocument } = await import("pdf-lib");
   const source = await PDFDocument.load(await file.arrayBuffer());
+  preserveFormAppearance(source);
   const pageCount = source.getPageCount();
   const stem = baseName(file.name);
 
   if (mode === "range") {
     const indices = parsePageRanges(ranges?.trim() || "", pageCount);
     const doc = await PDFDocument.create();
+    copyMetadata(source, doc);
     const pages = await doc.copyPages(source, indices);
     pages.forEach((page) => doc.addPage(page));
     onProgress(90, "Writing extracted pages");
@@ -134,6 +165,7 @@ export async function splitPDF({
     assertNotAborted(signal);
     onProgress(Math.round((i / pageCount) * 100), `Extracting page ${i + 1} of ${pageCount}`);
     const doc = await PDFDocument.create();
+    copyMetadata(source, doc);
     const [page] = await doc.copyPages(source, [i]);
     doc.addPage(page);
     const blob = pdfBlob(await doc.save());
@@ -180,7 +212,11 @@ export async function rotatePDF({
 
 export interface WatermarkParams {
   file: File;
+  kind?: "text" | "image";
   text: string;
+  imageFile?: File;
+  imageWidthPercent?: number;
+  pages?: string;
   opacity: number;
   fontSize: number;
   position: "diagonal" | "center" | "bottom-right" | "top-left";
@@ -190,7 +226,11 @@ export interface WatermarkParams {
 
 export async function watermarkPDF({
   file,
+  kind = "text",
   text,
+  imageFile,
+  imageWidthPercent = 35,
+  pages: selectedPages,
   opacity,
   fontSize,
   position,
@@ -201,16 +241,57 @@ export async function watermarkPDF({
   const doc = await PDFDocument.load(await file.arrayBuffer());
   const font = await doc.embedFont(StandardFonts.HelveticaBold);
   const safeText = toWinAnsiSafe(text).trim();
-  if (!safeText) throw new Error("Enter watermark text using standard Latin characters.");
+  if (kind === "text" && !safeText) throw new Error("Enter watermark text using standard Latin characters.");
+
+  let image: PDFImage | undefined;
+  if (kind === "image") {
+    if (!imageFile) throw new Error("Choose a PNG or JPG watermark image.");
+    const bytes = new Uint8Array(await imageFile.arrayBuffer());
+    const isPng = imageFile.type === "image/png" || /\.png$/i.test(imageFile.name);
+    try {
+      image = isPng ? await doc.embedPng(bytes) : await doc.embedJpg(bytes);
+    } catch {
+      try {
+        image = isPng ? await doc.embedJpg(bytes) : await doc.embedPng(bytes);
+      } catch {
+        throw new Error("The watermark image must be a valid PNG or JPG file.");
+      }
+    }
+  }
 
   const pages = doc.getPages();
+  const targets = selectedPages?.trim()
+    ? new Set(parsePageRanges(selectedPages, pages.length))
+    : null;
   const textWidth = font.widthOfTextAtSize(safeText, fontSize);
   const textHeight = font.heightAtSize(fontSize);
 
   pages.forEach((page, index) => {
+    if (targets && !targets.has(index)) return;
     assertNotAborted(signal);
     onProgress(Math.round((index / pages.length) * 90), `Stamping page ${index + 1}`);
     const { width, height } = page.getSize();
+
+    if (kind === "image" && image) {
+      const drawWidth = width * Math.min(0.9, Math.max(0.05, imageWidthPercent / 100));
+      const drawHeight = drawWidth * (image.height / image.width);
+      const placements = {
+        diagonal: { x: (width - drawWidth) / 2, y: (height - drawHeight) / 2, rotate: degrees(45) },
+        center: { x: (width - drawWidth) / 2, y: (height - drawHeight) / 2, rotate: degrees(0) },
+        "bottom-right": { x: Math.max(24, width - drawWidth - 32), y: 32, rotate: degrees(0) },
+        "top-left": { x: 32, y: Math.max(24, height - drawHeight - 32), rotate: degrees(0) },
+      } as const;
+      const placement = placements[position];
+      page.drawImage(image, {
+        x: placement.x,
+        y: placement.y,
+        width: drawWidth,
+        height: drawHeight,
+        opacity,
+        rotate: placement.rotate,
+      });
+      return;
+    }
 
     // Placement is measured from the text box so long words stay on the page.
     const layouts = {
@@ -244,6 +325,7 @@ export async function watermarkPDF({
 export interface SignParams {
   file: File;
   text: string;
+  signatureImage?: File;
   /** 0 means the last page. */
   pageNumber: number;
   fontSize: number;
@@ -253,6 +335,7 @@ export interface SignParams {
 export async function signPDF({
   file,
   text,
+  signatureImage,
   pageNumber,
   fontSize,
   onProgress = noopProgress,
@@ -261,24 +344,43 @@ export async function signPDF({
   const doc = await PDFDocument.load(await file.arrayBuffer());
   const pages = doc.getPages();
   const safeText = toWinAnsiSafe(text).trim();
-  if (!safeText) throw new Error("Enter a signature using standard Latin characters.");
+  if (!safeText && !signatureImage) throw new Error("Type, draw or upload a signature first.");
 
   const index = pageNumber > 0 ? Math.min(pageNumber, pages.length) - 1 : pages.length - 1;
   const page = pages[index];
   const font = await doc.embedFont(StandardFonts.HelveticaOblique);
   const { width } = page.getSize();
-  const textWidth = font.widthOfTextAtSize(safeText, fontSize);
 
   onProgress(60, "Adding signature");
-  const x = Math.max(32, width - textWidth - 48);
-  page.drawText(safeText, { x, y: 56, size: fontSize, font, color: rgb(0.05, 0.09, 0.35) });
-  // A rule under the signature, the way a printed signature block reads.
-  page.drawLine({
-    start: { x, y: 48 },
-    end: { x: x + textWidth, y: 48 },
-    thickness: 0.75,
-    color: rgb(0.4, 0.4, 0.4),
-  });
+  if (signatureImage) {
+    const bytes = new Uint8Array(await signatureImage.arrayBuffer());
+    const isPng = signatureImage.type === "image/png" || /\.png$/i.test(signatureImage.name);
+    let embedded;
+    try {
+      embedded = isPng ? await doc.embedPng(bytes) : await doc.embedJpg(bytes);
+    } catch {
+      embedded = isPng ? await doc.embedJpg(bytes) : await doc.embedPng(bytes);
+    }
+    const drawWidth = Math.min(width * 0.38, 220);
+    const drawHeight = Math.min(drawWidth * (embedded.height / embedded.width), 100);
+    page.drawImage(embedded, {
+      x: Math.max(32, width - drawWidth - 48),
+      y: 42,
+      width: drawWidth,
+      height: drawHeight,
+    });
+  } else {
+    const textWidth = font.widthOfTextAtSize(safeText, fontSize);
+    const x = Math.max(32, width - textWidth - 48);
+    page.drawText(safeText, { x, y: 56, size: fontSize, font, color: rgb(0.05, 0.09, 0.35) });
+    // A rule under the signature, the way a printed signature block reads.
+    page.drawLine({
+      start: { x, y: 48 },
+      end: { x: x + textWidth, y: 48 },
+      thickness: 0.75,
+      color: rgb(0.4, 0.4, 0.4),
+    });
+  }
 
   const blob = pdfBlob(await doc.save());
   onProgress(100);
@@ -287,43 +389,90 @@ export async function signPDF({
 
 export interface EditParams {
   file: File;
+  mode?: "text" | "image" | "highlight";
   text: string;
+  imageFile?: File;
   pageNumber: number;
   x: number;
   /** Measured from the top of the page, which is how people read a page. */
   yFromTop: number;
   fontSize: number;
+  width?: number;
+  height?: number;
+  color?: string;
   onProgress?: Progress;
 }
 
 export async function addTextToPDF({
   file,
+  mode = "text",
   text,
+  imageFile,
   pageNumber,
   x,
   yFromTop,
   fontSize,
+  width = 240,
+  height: contentHeight = 80,
+  color = "black",
   onProgress = noopProgress,
 }: EditParams): Promise<ToolOutput[]> {
   const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
   const doc = await PDFDocument.load(await file.arrayBuffer());
   const pages = doc.getPages();
   const safeText = toWinAnsiSafe(text).trim();
-  if (!safeText) throw new Error("Enter text using standard Latin characters.");
+  if (mode === "text" && !safeText) throw new Error("Enter text using standard Latin characters.");
+  if (mode === "image" && !imageFile) throw new Error("Choose a PNG or JPG image to add.");
 
   const index = Math.max(0, Math.min(pageNumber - 1, pages.length - 1));
   const page = pages[index];
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const { height } = page.getSize();
+  const colors = {
+    black: rgb(0, 0, 0),
+    blue: rgb(0.05, 0.2, 0.72),
+    red: rgb(0.8, 0.08, 0.08),
+    yellow: rgb(1, 0.88, 0.12),
+  } as const;
+  const selectedColor = colors[color as keyof typeof colors] ?? colors.black;
 
-  onProgress(60, "Adding text");
-  page.drawText(safeText, {
-    x,
-    y: height - yFromTop,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
+  onProgress(60, "Adding content");
+  if (mode === "highlight") {
+    page.drawRectangle({
+      x,
+      y: height - yFromTop - contentHeight,
+      width,
+      height: contentHeight,
+      color: selectedColor,
+      opacity: 0.3,
+      borderOpacity: 0,
+    });
+  } else if (mode === "image" && imageFile) {
+    const bytes = new Uint8Array(await imageFile.arrayBuffer());
+    const isPng = imageFile.type === "image/png" || /\.png$/i.test(imageFile.name);
+    let embedded;
+    try {
+      embedded = isPng ? await doc.embedPng(bytes) : await doc.embedJpg(bytes);
+    } catch {
+      embedded = isPng ? await doc.embedJpg(bytes) : await doc.embedPng(bytes);
+    }
+    page.drawImage(embedded, {
+      x,
+      y: height - yFromTop - contentHeight,
+      width,
+      height: contentHeight,
+    });
+  } else {
+    page.drawText(safeText, {
+      x,
+      y: height - yFromTop,
+      size: fontSize,
+      lineHeight: fontSize * 1.25,
+      maxWidth: width,
+      font,
+      color: selectedColor,
+    });
+  }
 
   const blob = pdfBlob(await doc.save());
   onProgress(100);

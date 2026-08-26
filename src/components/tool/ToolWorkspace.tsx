@@ -11,6 +11,7 @@ import OptionsForm from "./OptionsForm";
 import ResultPanel from "./ResultPanel";
 import SelectedFiles from "./SelectedFiles";
 import ProcessingBadge from "./ProcessingBadge";
+import PdfPageSelector from "./PdfPageSelector";
 import type {
   OptionValue,
   OptionValues,
@@ -47,6 +48,8 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
   const [outputs, setOutputs] = useState<ToolOutput[]>([]);
   const [notice, setNotice] = useState<string | undefined>();
   const [rejection, setRejection] = useState<string | null>(null);
+  const [archiveBusy, setArchiveBusy] = useState(false);
+  const [archivePercent, setArchivePercent] = useState(0);
 
   const abortRef = useRef<AbortController | null>(null);
   const urlsRef = useRef<string[]>([]);
@@ -278,11 +281,37 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
     [analyticsBase, outputs, urls]
   );
 
-  const downloadAll = useCallback(() => {
-    track("download_all_clicked", { ...analyticsBase, outputCount: outputs.length });
-    // Staggered so browsers do not treat the batch as a popup flood.
-    outputs.forEach((_, index) => window.setTimeout(() => download(index), index * 350));
-  }, [analyticsBase, download, outputs]);
+  const downloadAll = useCallback(async () => {
+    if (outputs.length === 0 || archiveBusy) return;
+    setArchiveBusy(true);
+    setArchivePercent(0);
+    try {
+      const JSZip = (await import("jszip")).default;
+      const archive = new JSZip();
+      outputs.forEach((output) => archive.file(output.name, output.blob));
+      const blob = await archive.generateAsync(
+        { type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } },
+        ({ percent }) => setArchivePercent(Math.round(percent))
+      );
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${tool.slug}-files.zip`;
+      link.rel = "noopener";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
+      track("download_all_clicked", {
+        ...analyticsBase,
+        outputCount: outputs.length,
+        totalBytes: blob.size,
+      });
+    } finally {
+      setArchiveBusy(false);
+      setArchivePercent(0);
+    }
+  }, [analyticsBase, archiveBusy, outputs, tool.slug]);
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
@@ -296,6 +325,8 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
     setRejection(null);
     setPercent(0);
     setStatus("");
+    setArchiveBusy(false);
+    setArchivePercent(0);
     setPhase("idle");
     track("tool_reset", analyticsBase);
   }, [analyticsBase, releaseUrls, tool]);
@@ -313,6 +344,8 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
         notice={notice}
         onDownload={download}
         onDownloadAll={downloadAll}
+        archiveBusy={archiveBusy}
+        archivePercent={archivePercent}
         onReset={reset}
       />
     );
@@ -355,6 +388,17 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
           disabled={running}
         />
       )}
+
+      {files.length === 1 &&
+        tool.extensions.includes(".pdf") &&
+        (tool.options ?? []).some((field) => field.key === "pages") && (
+          <PdfPageSelector
+            file={files[0]}
+            value={String(options.pages ?? "")}
+            disabled={running}
+            onChange={(value) => updateOption("pages", value)}
+          />
+        )}
 
       {error && (
         <div className="mt-6">

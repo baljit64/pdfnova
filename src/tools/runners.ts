@@ -13,7 +13,12 @@ const num = (ctx: RunContext, key: string, fallback: number): number => {
 
 const str = (ctx: RunContext, key: string, fallback = ""): string => {
   const value = ctx.options[key];
-  return value === undefined || value === null ? fallback : String(value);
+  return value === undefined || value === null || value instanceof File ? fallback : String(value);
+};
+
+const selectedFile = (ctx: RunContext, key: string): File | undefined => {
+  const value = ctx.options[key];
+  return value instanceof File ? value : undefined;
 };
 
 const RUNNERS: Record<ToolId, ToolRunner> = {
@@ -102,7 +107,11 @@ const RUNNERS: Record<ToolId, ToolRunner> = {
     return {
       outputs: await watermarkPDF({
         file: ctx.files[0],
+        kind: str(ctx, "kind", "text") === "image" ? "image" : "text",
         text: str(ctx, "text", "DRAFT"),
+        imageFile: selectedFile(ctx, "image"),
+        pages: str(ctx, "pages"),
+        imageWidthPercent: num(ctx, "imageWidth", 35),
         opacity: Math.min(1, Math.max(0.05, num(ctx, "opacity", 0.3))),
         fontSize: num(ctx, "fontSize", 48),
         position: (["diagonal", "center", "bottom-right", "top-left"] as const).includes(
@@ -122,6 +131,7 @@ const RUNNERS: Record<ToolId, ToolRunner> = {
       outputs: await signPDF({
         file: ctx.files[0],
         text: str(ctx, "text"),
+        signatureImage: selectedFile(ctx, "signatureImage"),
         pageNumber: num(ctx, "pageNumber", 0),
         fontSize: num(ctx, "fontSize", 16),
         onProgress: ctx.onProgress,
@@ -134,11 +144,19 @@ const RUNNERS: Record<ToolId, ToolRunner> = {
     return {
       outputs: await addTextToPDF({
         file: ctx.files[0],
+        mode: (() => {
+          const value = str(ctx, "mode", "text");
+          return value === "image" || value === "highlight" ? value : "text";
+        })(),
         text: str(ctx, "text"),
+        imageFile: selectedFile(ctx, "image"),
         pageNumber: num(ctx, "pageNumber", 1),
         x: num(ctx, "x", 50),
         yFromTop: num(ctx, "y", 100),
         fontSize: num(ctx, "fontSize", 12),
+        width: num(ctx, "width", 240),
+        height: num(ctx, "height", 80),
+        color: str(ctx, "color", "black"),
         onProgress: ctx.onProgress,
       }),
     };
@@ -151,6 +169,7 @@ const RUNNERS: Record<ToolId, ToolRunner> = {
       format: "jpeg",
       scale: num(ctx, "scale", 2),
       quality: num(ctx, "quality", 0.92),
+      pages: str(ctx, "pages"),
       signal: ctx.signal,
       onProgress: ctx.onProgress,
     });
@@ -163,6 +182,7 @@ const RUNNERS: Record<ToolId, ToolRunner> = {
       file: ctx.files[0],
       format: "png",
       scale: num(ctx, "scale", 2),
+      pages: str(ctx, "pages"),
       signal: ctx.signal,
       onProgress: ctx.onProgress,
     });
@@ -191,6 +211,8 @@ const RUNNERS: Record<ToolId, ToolRunner> = {
     return {
       outputs: await pdfToWord({
         file: ctx.files[0],
+        ocr: str(ctx, "ocr", "off") === "on",
+        ocrLanguage: str(ctx, "ocrLanguage", "eng"),
         signal: ctx.signal,
         onProgress: ctx.onProgress,
       }),
@@ -199,7 +221,7 @@ const RUNNERS: Record<ToolId, ToolRunner> = {
 
   "word-to-pdf": async (ctx): Promise<RunResult> => {
     const { wordToPDF } = await import("./engine/office");
-    return { outputs: await wordToPDF({ file: ctx.files[0], onProgress: ctx.onProgress }) };
+    return { outputs: await wordToPDF({ file: ctx.files[0], signal: ctx.signal, onProgress: ctx.onProgress }) };
   },
 
   "excel-to-pdf": async (ctx): Promise<RunResult> => {

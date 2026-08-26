@@ -31,9 +31,9 @@ function privacySection(tool: ToolDefinition): ContentBlock {
     return {
       heading: "Privacy",
       paragraphs: [
-        `${tool.name} is the one tool on PDFNova that cannot run on your own device, and we would rather be direct about that than let you assume otherwise. Reconstructing an editable document from a PDF requires layout analysis that is not practical in a browser, so your file is sent to a conversion service, processed there, and returned to you.`,
+        `${tool.name} uses server-assisted document conversion because preserving editable structure and office-document layout is not practical in a browser. Your file is sent to a conversion service, processed there, and returned to you.`,
         "The file passes through PDFNova's API route and is submitted to CloudConvert for processing. The transfer uses HTTPS, but the document leaves your device and is handled by that third-party service, so review the privacy requirements that apply to your document before using this converter.",
-        "If a document is sensitive enough that you would rather it never left your device at all, this is the tool to avoid. Every other tool on this site processes files entirely in your browser, and those pages say so because it is true of them.",
+        "If a document must not leave your device, avoid server-assisted tools and use one of the tools explicitly labelled as on-device.",
       ],
     };
   }
@@ -55,8 +55,8 @@ function securitySection(tool: ToolDefinition): ContentBlock {
       heading: "Security",
       paragraphs: [
         "The page is served over HTTPS, and the requests to and from CloudConvert use HTTPS. This protects the transfer in transit, but it does not make a server-assisted conversion equivalent to on-device processing.",
-        "The API verifies that the submitted item is a PDF before forwarding it. The browser also applies the tool's 25 MB limit before starting the request.",
-        "For documents where the transfer itself is the concern, the alternative is to keep the PDF as a PDF — the merge, split, compress, rotate, watermark, sign and image conversion tools all run entirely on your device and never transmit anything.",
+        `The API validates the submitted ${tool.acceptLabel} file and enforces the tool's ${tool.maxFileSizeMB} MB limit before forwarding it.`,
+        "For documents where the transfer itself is the concern, use an on-device tool or a trusted desktop application instead.",
       ],
     };
   }

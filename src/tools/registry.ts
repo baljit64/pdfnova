@@ -25,7 +25,7 @@ export const TOOL_PROCESSING: Record<ToolId, ProcessingType> = {
   "pdf-to-image": "client",
   "jpg-to-pdf": "client",
   "pdf-to-word": "server",
-  "word-to-pdf": "client",
+  "word-to-pdf": "server",
   "excel-to-pdf": "client",
 };
 
@@ -191,8 +191,8 @@ const TOOL_CONFIGS: Record<ToolId, Omit<ToolDefinition, "processingType">> = {
     verb: "watermark",
     outputNoun: "watermarked PDF",
     actionLabel: "Add watermark",
-    tagline: "Stamp text such as DRAFT or CONFIDENTIAL across every page.",
-    blurb: "Stamp text across every page of a PDF.",
+    tagline: "Stamp text or a logo on all or selected PDF pages.",
+    blurb: "Stamp text or an image on PDF pages.",
     accept: PDF_ACCEPT,
     acceptLabel: "PDF",
     extensions: [".pdf"],
@@ -202,12 +202,30 @@ const TOOL_CONFIGS: Record<ToolId, Omit<ToolDefinition, "processingType">> = {
     maxFileSizeMB: 100,
     options: [
       {
+        key: "kind",
+        label: "Watermark type",
+        type: "radio",
+        defaultValue: "text",
+        choices: [
+          { label: "Text watermark", value: "text" },
+          { label: "Image or logo", value: "image" },
+        ],
+      },
+      {
         key: "text",
         label: "Watermark text",
         type: "text",
         defaultValue: "DRAFT",
         placeholder: "e.g. CONFIDENTIAL",
-        required: true,
+        help: "Used when Text watermark is selected.",
+      },
+      {
+        key: "image",
+        label: "Watermark image",
+        type: "file",
+        defaultValue: "",
+        accept: "image/png,image/jpeg,.png,.jpg,.jpeg",
+        help: "Used when Image or logo is selected. Transparent PNG works best.",
       },
       {
         key: "position",
@@ -240,6 +258,23 @@ const TOOL_CONFIGS: Record<ToolId, Omit<ToolDefinition, "processingType">> = {
         step: 0.05,
         help: "0.05 is barely visible, 1 is solid.",
       },
+      {
+        key: "imageWidth",
+        label: "Image width (% of page)",
+        type: "number",
+        defaultValue: 35,
+        min: 5,
+        max: 90,
+        step: 5,
+      },
+      {
+        key: "pages",
+        label: "Pages to watermark",
+        type: "text",
+        defaultValue: "",
+        placeholder: "Leave empty for all pages",
+        help: "Use a list such as 1-3, 7, or choose pages from the preview.",
+      },
     ],
     outputKind: "pdf",
     available: true,
@@ -254,8 +289,8 @@ const TOOL_CONFIGS: Record<ToolId, Omit<ToolDefinition, "processingType">> = {
     verb: "sign",
     outputNoun: "signed PDF",
     actionLabel: "Sign PDF",
-    tagline: "Add a typed signature to a document and download it straight away.",
-    blurb: "Add a typed signature to a document.",
+    tagline: "Type, draw or upload a signature and add it to a PDF.",
+    blurb: "Type, draw or upload a PDF signature.",
     accept: PDF_ACCEPT,
     acceptLabel: "PDF",
     extensions: [".pdf"],
@@ -266,11 +301,18 @@ const TOOL_CONFIGS: Record<ToolId, Omit<ToolDefinition, "processingType">> = {
     options: [
       {
         key: "text",
-        label: "Your signature",
+        label: "Typed signature (optional)",
         type: "text",
         defaultValue: "",
         placeholder: "Type your full name",
-        required: true,
+        help: "Used when no drawn or uploaded signature is provided.",
+      },
+      {
+        key: "signatureImage",
+        label: "Draw or upload your signature",
+        type: "signature",
+        defaultValue: "",
+        accept: "image/png,image/jpeg,.png,.jpg,.jpeg",
       },
       {
         key: "pageNumber",
@@ -304,9 +346,9 @@ const TOOL_CONFIGS: Record<ToolId, Omit<ToolDefinition, "processingType">> = {
     name: "Edit PDF",
     verb: "edit",
     outputNoun: "edited PDF",
-    actionLabel: "Add text",
-    tagline: "Drop text onto any page of an existing PDF and save a new copy.",
-    blurb: "Add text anywhere on a PDF page.",
+    actionLabel: "Add content",
+    tagline: "Add text, an image or a highlight box to a PDF page.",
+    blurb: "Add text, images or highlights to a PDF.",
     accept: PDF_ACCEPT,
     acceptLabel: "PDF",
     extensions: [".pdf"],
@@ -316,17 +358,49 @@ const TOOL_CONFIGS: Record<ToolId, Omit<ToolDefinition, "processingType">> = {
     maxFileSizeMB: 100,
     options: [
       {
+        key: "mode",
+        label: "What would you like to add?",
+        type: "radio",
+        defaultValue: "text",
+        choices: [
+          { label: "Text", value: "text" },
+          { label: "Image", value: "image" },
+          { label: "Highlight box", value: "highlight" },
+        ],
+      },
+      {
         key: "text",
         label: "Text to add",
         type: "text",
         defaultValue: "",
         placeholder: "Type the text you want on the page",
-        required: true,
+        help: "Used in Text mode. Line breaks are preserved.",
+      },
+      {
+        key: "image",
+        label: "Image to add",
+        type: "file",
+        defaultValue: "",
+        accept: "image/png,image/jpeg,.png,.jpg,.jpeg",
       },
       { key: "pageNumber", label: "Page number", type: "number", defaultValue: 1, min: 1, step: 1 },
       { key: "fontSize", label: "Font size", type: "number", defaultValue: 12, min: 6, max: 72, step: 1 },
+      {
+        key: "color",
+        label: "Text or highlight colour",
+        type: "select",
+        defaultValue: "black",
+        choices: [
+          { label: "Black", value: "black" },
+          { label: "Blue", value: "blue" },
+          { label: "Red", value: "red" },
+          { label: "Yellow", value: "yellow" },
+        ],
+      },
       { key: "x", label: "Distance from the left (pt)", type: "number", defaultValue: 50, min: 0, step: 5 },
       { key: "y", label: "Distance from the top (pt)", type: "number", defaultValue: 100, min: 0, step: 5 },
+      { key: "width", label: "Width (pt)", type: "number", defaultValue: 240, min: 10, max: 1000, step: 10 },
+      { key: "height", label: "Image/highlight height (pt)", type: "number", defaultValue: 80, min: 5, max: 1000, step: 5 },
     ],
     outputKind: "pdf",
     available: true,
@@ -371,6 +445,14 @@ const TOOL_CONFIGS: Record<ToolId, Omit<ToolDefinition, "processingType">> = {
         max: 1,
         step: 0.02,
       },
+      {
+        key: "pages",
+        label: "Pages to convert",
+        type: "text",
+        defaultValue: "",
+        placeholder: "Leave empty for all pages",
+        help: "Use a list such as 1-3, 7. You can also select pages from the preview.",
+      },
     ],
     outputKind: "images",
     available: true,
@@ -405,6 +487,14 @@ const TOOL_CONFIGS: Record<ToolId, Omit<ToolDefinition, "processingType">> = {
           { label: "High — 144 dpi", value: 2 },
           { label: "Print — 288 dpi", value: 4 },
         ],
+      },
+      {
+        key: "pages",
+        label: "Pages to convert",
+        type: "text",
+        defaultValue: "",
+        placeholder: "Leave empty for all pages",
+        help: "Use a list such as 1-3, 7. You can also select pages from the preview.",
       },
     ],
     outputKind: "images",
@@ -484,6 +574,32 @@ const TOOL_CONFIGS: Record<ToolId, Omit<ToolDefinition, "processingType">> = {
     minFiles: 1,
     maxFiles: 1,
     maxFileSizeMB: 25,
+    options: [
+      {
+        key: "ocr",
+        label: "Scanned document OCR",
+        type: "radio",
+        defaultValue: "off",
+        choices: [
+          { label: "Off — the PDF already has selectable text", value: "off" },
+          { label: "On — recognise text in scanned pages", value: "on" },
+        ],
+      },
+      {
+        key: "ocrLanguage",
+        label: "OCR language",
+        type: "select",
+        defaultValue: "eng",
+        choices: [
+          { label: "English", value: "eng" },
+          { label: "Hindi", value: "hin" },
+          { label: "Spanish", value: "spa" },
+          { label: "French", value: "fra" },
+          { label: "German", value: "deu" },
+        ],
+        help: "Used only when OCR is turned on.",
+      },
+    ],
     outputKind: "pdf",
     available: true,
     keywords: ["pdf to word", "pdf to docx", "convert pdf to editable word", "pdf to doc"],
@@ -582,8 +698,8 @@ export function findToolBySlug(slug: string): ToolDefinition | undefined {
 }
 
 /** Default option values for a tool, used to seed the workspace form. */
-export function defaultOptions(tool: ToolDefinition): Record<string, string | number> {
-  const values: Record<string, string | number> = {};
+export function defaultOptions(tool: ToolDefinition): import("./types").OptionValues {
+  const values: import("./types").OptionValues = {};
   for (const field of tool.options ?? []) values[field.key] = field.defaultValue;
   return values;
 }

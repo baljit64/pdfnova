@@ -3,15 +3,21 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "clean": "node scripts/clean-next.mjs",
+    "build": "npm run clean && next build",
+    "build:incremental": "next build",
     "lint": "next lint",
     "start": "next start",
     "verify:landing": "tsx scripts/verify-seo.mts",
     "verify:seo": "tsx scripts/verify-p0-seo.mts",
     "verify:engine": "tsx scripts/verify-engine.mts",
     "verify:excel": "tsx scripts/verify-excel-to-pdf.mts",
+    "verify:e2e": "npm run build && playwright test",
     "verify": "npm run verify:engine && npm run verify:excel && npm run verify:landing && npm run verify:seo",
     "seo:check": "npm run build && tsx scripts/verify-seo-live.mts"
   },
@@ -20,10 +26,9 @@
     "@supabase/supabase-js": "^2.87.2",
     "@vercel/analytics": "^2.0.1",
     "antd": "^6.1.3",
-    "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^5.0.2",
-    "mammoth": "^1.8.0",
+    "jszip": "^3.10.1",
     "next": "^15.5.21",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^5.4.449",
@@ -35,6 +40,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@next/eslint-plugin-next": "^15.5.21",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.5",

@@ -6,6 +6,7 @@
  * installed package so it can never drift out of sync with the API version.
  */
 import { assertNotAborted, baseName, pdfBlob } from "./blob";
+import { parsePageRanges } from "./pdf";
 import type { ToolOutput } from "../types";
 
 type Progress = (percent: number, message?: string) => void;
@@ -80,6 +81,8 @@ export interface PdfToImagesParams {
   /** Roughly maps to DPI: 1 ≈ 72dpi, 2 ≈ 144dpi, 4 ≈ 288dpi. */
   scale: number;
   quality?: number;
+  /** Empty means every page. Uses the same 1-based syntax as split and rotate. */
+  pages?: string;
   signal: AbortSignal;
   onProgress?: Progress;
 }
@@ -89,6 +92,7 @@ export async function pdfToImages({
   format,
   scale,
   quality = 0.92,
+  pages,
   signal,
   onProgress = noopProgress,
 }: PdfToImagesParams): Promise<ToolOutput[]> {
@@ -99,13 +103,17 @@ export async function pdfToImages({
   const extension = format === "jpeg" ? "jpg" : "png";
   const mime = format === "jpeg" ? "image/jpeg" : "image/png";
   const outputs: ToolOutput[] = [];
+  const selectedPages = pages?.trim()
+    ? parsePageRanges(pages.trim(), pdf.numPages).map((index) => index + 1)
+    : Array.from({ length: pdf.numPages }, (_, index) => index + 1);
 
   try {
-    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+    for (let selectedIndex = 0; selectedIndex < selectedPages.length; selectedIndex++) {
+      const pageNumber = selectedPages[selectedIndex];
       assertNotAborted(signal);
       onProgress(
-        Math.round(((pageNumber - 1) / pdf.numPages) * 100),
-        `Rendering page ${pageNumber} of ${pdf.numPages}`
+        Math.round((selectedIndex / selectedPages.length) * 100),
+        `Rendering selected page ${selectedIndex + 1} of ${selectedPages.length}`
       );
       const canvas = await renderPage(pdf, pageNumber, scale);
       const blob = await canvasToBlob(canvas, mime, format === "jpeg" ? quality : undefined);
@@ -124,6 +132,38 @@ export async function pdfToImages({
 
   onProgress(100);
   return outputs;
+}
+
+export interface PdfThumbnail {
+  pageNumber: number;
+  blob: Blob;
+}
+
+/** Low-resolution page previews used by page-selecting tools. */
+export async function renderPdfThumbnails(
+  file: File,
+  signal: AbortSignal,
+  maxPages = 60
+): Promise<{ thumbnails: PdfThumbnail[]; pageCount: number }> {
+  const pdfjs = await loadPdfJs();
+  const data = new Uint8Array(await file.arrayBuffer());
+  const pdf = await pdfjs.getDocument(pdfDocumentOptions(data)).promise;
+  const thumbnails: PdfThumbnail[] = [];
+
+  try {
+    const count = Math.min(pdf.numPages, maxPages);
+    for (let pageNumber = 1; pageNumber <= count; pageNumber++) {
+      assertNotAborted(signal);
+      const canvas = await renderPage(pdf, pageNumber, 0.28);
+      const blob = await canvasToBlob(canvas, "image/jpeg", 0.72);
+      canvas.width = 0;
+      canvas.height = 0;
+      thumbnails.push({ pageNumber, blob });
+    }
+    return { thumbnails, pageCount: pdf.numPages };
+  } finally {
+    await pdf.destroy();
+  }
 }
 
 export interface ImagesToPdfParams {
@@ -257,6 +297,7 @@ async function rasterPass(
     pdfDocumentOptions(new Uint8Array(source.slice(0)))
   ).promise;
   const doc = await PDFDocument.create();
+  const sourceDocument = await PDFDocument.load(source.slice(0), { updateMetadata: false });
 
   try {
     for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
@@ -265,6 +306,27 @@ async function rasterPass(
         progressBase + Math.round(((pageNumber - 1) / pdf.numPages) * progressSpan),
         `Compressing page ${pageNumber} of ${pdf.numPages}`
       );
+
+      // Preserve original page objects whenever a usable text layer exists. This
+      // keeps text selectable/searchable and avoids turning vector pages into a
+      // blurry photograph. Scan-only pages still receive the substantial image
+      // recompression users expect from Balanced and Strong modes.
+      let hasSearchableText = true;
+      try {
+        const sourcePage = await pdf.getPage(pageNumber);
+        const text = await sourcePage.getTextContent();
+        hasSearchableText = text.items.some((item) => (
+          "str" in item && typeof item.str === "string" && item.str.trim().length > 0
+        ));
+      } catch {
+        // If inspection fails, preserving the page is safer than flattening it.
+      }
+
+      if (hasSearchableText) {
+        const [page] = await doc.copyPages(sourceDocument, [pageNumber - 1]);
+        doc.addPage(page);
+        continue;
+      }
 
       const canvas = await renderPage(pdf, pageNumber, pass.scale);
       const jpeg = await canvasToBlob(canvas, "image/jpeg", pass.quality);

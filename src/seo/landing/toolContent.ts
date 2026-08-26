@@ -206,7 +206,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       {
         question: "Can I download all the split files at once?",
         answer:
-          "Yes. The results view has a download-all button that saves every file in turn. Your browser may ask once for permission to download multiple files — allow it and the rest follow automatically.",
+          "Yes. The results view packages every split file into one ZIP archive, so one click downloads the complete set without triggering a series of browser download prompts.",
       },
       {
         question: "Is the original file changed?",
@@ -323,7 +323,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       ],
     },
     limitations:
-      "Any level other than Lossless converts page text into an image, which removes text selection, copy and paste, and searchability. Compression also cannot reduce a file below the size its content fundamentally requires.",
+      "Searchable pages are preserved rather than flattened, so text-heavy documents may shrink less than scanned pages. Compression also cannot reduce a file below the size its content fundamentally requires.",
   },
 
   "rotate-pdf": {
@@ -519,7 +519,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       ],
     },
     limitations:
-      "Only text watermarks are supported, using Latin-1 characters, in a single colour, at one position per document.",
+      "Text and PNG/JPG image watermarks are supported with one placement style per run. Text uses Latin-1 characters, and image watermarks use the same size and opacity on every selected page.",
   },
 
   "sign-pdf": {
@@ -611,7 +611,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       ],
     },
     limitations:
-      "Typed signatures only, one page per run, with no cryptographic signing, certificate, timestamp or audit trail.",
+      "Typed, drawn and uploaded image signatures are visual marks only, one page per run, with no cryptographic certificate, timestamp or audit trail.",
   },
 
   "edit-pdf": {
@@ -703,7 +703,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       ],
     },
     limitations:
-      "Existing text cannot be edited or removed, only new text added; images, shapes and freehand annotation are not supported, and text is placed as a single line with no automatic wrapping.",
+      "Existing text cannot be rewritten or removed. The tool adds new text, an image or a highlight rectangle at numeric coordinates; drag-and-drop layout and redaction are not yet supported.",
   },
 
   "pdf-to-jpg": {
@@ -775,7 +775,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       {
         question: "Can I convert only some pages?",
         answer:
-          "The tool converts the whole document, but every page is shown separately in the results so you can download only the ones you want. If you would rather convert a subset, split the PDF first and convert the piece you extracted.",
+          "Yes. Enter a range such as 1-3, 7 or click the page thumbnails before converting. Only the selected pages are rendered, and their original page numbers are kept in the filenames.",
       },
       {
         question: "Why is my JPG blurry?",
@@ -880,7 +880,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       {
         question: "Can I convert a specific page only?",
         answer:
-          "The whole document is converted, but each page is listed separately so you can download just the ones you want. To convert a subset only, split the PDF first.",
+          "Yes. Enter a range such as 1-3, 7 or click the page thumbnails before converting. Only those pages are rendered, and their original page numbers are kept in the filenames.",
       },
       {
         question: "Is there a page limit?",
@@ -996,7 +996,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
 
   "pdf-to-word": {
     intro: [
-      "Getting a PDF back into an editable Word document is the hardest conversion on this site, and it is the only one that does not run on your own device. A PDF stores positioned glyphs, not paragraphs — reconstructing headings, columns, tables and lists from that requires layout analysis that browsers cannot reasonably do.",
+      "Getting a PDF back into an editable Word document requires a dedicated conversion service. A PDF stores positioned glyphs, not paragraphs — reconstructing headings, columns, tables and lists from that requires layout analysis that browsers cannot reasonably do.",
       "This tool sends your file to a dedicated conversion service and returns a DOCX you can open in Word, Google Docs, LibreOffice or Pages. Because it leaves your device, this is the one PDFNova tool where the privacy story is different, and we would rather say so plainly than bury it.",
     ],
     benefits: [
@@ -1049,7 +1049,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       {
         question: "Does this tool run on my device like the others?",
         answer:
-          "No, and this is the one exception. PDF to Word requires layout analysis that is not practical in a browser, so your file is sent over an encrypted connection to a conversion service, converted there, and returned. Every other tool on PDFNova processes files entirely on your own device.",
+          "No. PDF to Word requires layout analysis that is not practical in a browser, so your file is sent over an encrypted connection to a conversion service, converted there, and returned.",
       },
       {
         question: "How accurate is the conversion?",
@@ -1059,7 +1059,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       {
         question: "Will it work on a scanned PDF?",
         answer:
-          "A scanned page is a photograph, so there is no text to recover unless the PDF has already had OCR applied to it. If your scan has no text layer, the conversion cannot produce editable text.",
+          "Yes. Turn on the OCR option and choose the document language. OCR adds a text layer before the Word conversion, though poor scans can still need manual correction.",
       },
       {
         question: "Why is the file size limit lower for this tool?",
@@ -1080,13 +1080,14 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       ],
     },
     limitations:
-      "This tool sends your file to an external conversion service rather than processing it on your device; scanned PDFs without an existing text layer cannot be converted to editable text; and complex layouts require manual correction afterwards.",
+      "This tool sends your file to an external conversion service rather than processing it on your device. OCR must be enabled for scanned PDFs, and complex layouts can still require manual correction afterwards.",
   },
 
   "word-to-pdf": {
     intro: [
       "Sending a Word document to someone means hoping their fonts, their version of Word and their page setup match yours. Sending a PDF means it looks the same for everybody. That is why nearly every application form, submission portal and job posting asks for a PDF.",
-      "This tool reads your DOCX, lays it out at A4 width, and paginates it properly across as many pages as it needs. The result is a PDF that opens identically wherever it lands.",
+      "This tool sends your DOC or DOCX to a dedicated Word-compatible conversion engine, preserving pagination, selectable text, headers and footers. The result is a PDF that opens identically wherever it lands.",
+      "That server-assisted approach is a deliberate tradeoff. A browser can draw a visual snapshot of a document, but it cannot reproduce Word's layout rules closely enough for long reports, tables, section breaks and repeating page furniture. Using a document engine produces a much more useful PDF, while the processing notice makes clear that the file leaves your device.",
     ],
     benefits: [
       {
@@ -1098,22 +1099,26 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
         body: "The layout is rendered once and fixed, so it does not shift depending on which fonts the recipient has installed.",
       },
       {
-        title: "No account, no upload",
-        body: "The conversion runs on your own device, so the document never leaves it.",
+        title: "Layout-aware conversion",
+        body: "A dedicated document engine preserves Word pagination and selectable text.",
+      },
+      {
+        title: "Useful PDF structure",
+        body: "Text stays searchable and links remain interactive, so the result is accessible and practical instead of being a stack of page screenshots.",
       },
     ],
     steps: [
       { title: "Add your Word file", body: "Drop in a DOC or DOCX file up to 40 MB." },
-      { title: "Convert", body: "Press Convert to PDF. The document is rendered and paginated in your browser." },
-      { title: "Wait for the pages", body: "Progress is reported per page. Long documents take proportionally longer." },
+      { title: "Convert", body: "Press Convert to PDF. The document is uploaded over HTTPS and processed." },
+      { title: "Wait for the result", body: "The converted PDF is returned as soon as the document engine finishes." },
       { title: "Review the preview", body: "Read through the result to check the pagination before downloading." },
       { title: "Download the PDF", body: "The file is saved with the same name as the Word document." },
     ],
     features: [
       { title: "Multi-page output", body: "Automatic pagination across A4 pages with consistent margins." },
       { title: "DOCX and DOC", body: "Both Word formats are accepted." },
-      { title: "Runs on your device", body: "No upload, no account, no server round trip." },
-      { title: "A4 with margins", body: "20 mm margins on every side, matching standard document conventions." },
+      { title: "Selectable text", body: "Text, links and document structure remain usable in the PDF." },
+      { title: "Word pagination", body: "Headers, footers and explicit page breaks are handled by the document engine." },
       { title: "Preview before download", body: "Check the pagination before you save the file." },
     ],
     useCases: [
@@ -1133,43 +1138,49 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
         title: "Archiving",
         body: "PDF is a far more stable long-term format than a Word file tied to a particular version of an application.",
       },
+      {
+        title: "Reviewing contracts and reports",
+        body: "Headers, footers, page numbers and explicit page breaks remain in place, which makes the exported copy suitable for review, approval and distribution.",
+      },
     ],
     faqs: [
       {
         question: "Will my formatting be preserved exactly?",
         answer:
-          "Headings, paragraphs, lists, tables, bold and italic all come through. Highly customised layouts — text boxes, precise column arrangements, headers and footers, and unusual embedded fonts — may render differently, because the document is re-laid-out rather than read by Word itself.",
+          "Headings, paragraphs, lists, tables, text boxes, headers and footers are handled by a Word-compatible layout engine. Unusual fonts or version-specific features can still produce small differences.",
       },
       {
         question: "Does my document leave my device?",
         answer:
-          "No. The DOCX is read, converted to HTML, rendered and turned into a PDF entirely inside your browser. Nothing is uploaded anywhere.",
+          "Yes. The document is sent over HTTPS to the dedicated conversion service and returned through PDFNova's API. Use another workflow when third-party processing is prohibited.",
       },
       {
         question: "Will long documents be split across pages correctly?",
         answer:
-          "Yes. The rendered content is divided into A4-sized sections and each becomes its own page with consistent margins. Note that the split is by height, so a page break can occasionally land mid-paragraph.",
+          "Yes. The Word-compatible engine respects explicit page breaks and normal paragraph and table pagination.",
       },
       {
         question: "Is the text in the PDF selectable?",
         answer:
-          "No. The document is rendered visually and each page is embedded as an image, so the output is a faithful picture of your document rather than a text-searchable PDF. If searchable text is essential, use the export-to-PDF function in Word itself.",
+          "Yes. Text is preserved as searchable, selectable PDF content instead of rendering each page as an image.",
       },
       {
         question: "Are DOC files supported as well as DOCX?",
         answer:
-          "DOCX is fully supported. The older binary DOC format is accepted but converts less reliably — if you have the option, save as DOCX first for a noticeably better result.",
+          "Yes. Both the older binary DOC format and modern DOCX files are handled by the server conversion engine.",
       },
     ],
     technical: {
       heading: "How Word to PDF works",
       paragraphs: [
-        "The DOCX is parsed by Mammoth, which converts the document's XML into semantic HTML — headings become heading elements, lists become list elements, and so on. That HTML is placed in an off-screen container sized to A4's content width so line breaks fall where they will in the finished PDF.",
-        "The container is rendered to a canvas at 2x scale, then sliced into A4-page-height sections. Each slice is encoded as a JPEG and placed onto its own page with 20 mm margins. This slicing step is what produces correct multi-page output, and it is also why the resulting text is not selectable.",
+        "The DOC or DOCX file is sent through PDFNova's protected conversion route to a dedicated document conversion service. That service uses a Word-compatible layout engine to produce the PDF.",
+        "The resulting PDF is streamed back to the browser. Text remains selectable, explicit page breaks are respected, and headers, footers and complex document layout are handled by the conversion engine.",
+        "The API validates the filename and file-size limit before creating a conversion job. Requests are rate-limited, the API credential remains on the server, and the converted file is returned directly rather than being attached to a PDFNova account or document history.",
+        "Font availability still matters. When a document uses a font unavailable to the conversion engine, a substitute with similar metrics may be selected, which can slightly change line endings. Embedded fonts and common office fonts give the most predictable result, so the preview should always be reviewed before the PDF is distributed as a final record.",
       ],
     },
     limitations:
-      "Output pages are images rather than selectable text, page breaks are determined by height and can fall mid-paragraph, and headers, footers and complex layout features are not reproduced.",
+      "This tool requires a server upload and external conversion service. Unusual fonts or features specific to one Word version can still produce small layout differences.",
   },
 
   "excel-to-pdf": {

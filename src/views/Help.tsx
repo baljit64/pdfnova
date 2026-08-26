@@ -30,7 +30,7 @@ export default function Help() {
         <div>
           <h2 className="text-xl font-semibold text-blue-900 mb-2">Is my data secure?</h2>
           <p>
-            Most tools process the selected file directly in your browser. PDF to Word is the exception: it sends the file through PDFNova&apos;s API to CloudConvert over HTTPS. Check the notice on each tool and avoid server-assisted conversion when your document-handling rules prohibit it.
+            Most tools process the selected file directly in your browser. PDF to Word and Word to PDF send the file through PDFNova&apos;s API to CloudConvert over HTTPS for OCR and higher-fidelity document layout. Check the notice on each tool and avoid server-assisted conversion when your document-handling rules prohibit it.
           </p>
         </div>
 

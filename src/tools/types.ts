@@ -35,9 +35,9 @@ export interface ToolOutput {
   size: number;
 }
 
-export type OptionValue = string | number;
+export type OptionValue = string | number | File;
 
-export type OptionFieldType = "text" | "number" | "radio" | "select";
+export type OptionFieldType = "text" | "number" | "radio" | "select" | "file" | "signature";
 
 export interface OptionField {
   key: string;
@@ -50,6 +50,7 @@ export interface OptionField {
   max?: number;
   step?: number;
   choices?: { label: string; value: OptionValue }[];
+  accept?: string;
   /** Text fields only: run is blocked until the field is non-empty. */
   required?: boolean;
 }

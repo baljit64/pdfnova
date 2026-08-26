@@ -21,13 +21,13 @@ export default function Privacy() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-blue-900">Server-assisted PDF to Word</h2>
+          <h2 className="text-xl font-semibold text-blue-900">Server-assisted document conversion</h2>
           <p>
-            PDF to Word is the exception. It sends the selected PDF through a PDFNova API route to
-            CloudConvert over HTTPS, receives the converted DOCX and returns it to the browser.
-            The PDFNova route does not intentionally save the document to an application database
-            or user account, but CloudConvert processes the file under its own service and privacy
-            terms. Do not use that converter when your document-handling requirements prohibit
+            PDF to Word and Word to PDF send the selected document through a PDFNova API route to
+            CloudConvert over HTTPS and return the converted result to the browser. The PDFNova
+            route does not intentionally save the document to an application database or user
+            account, but CloudConvert processes the file under its own service and privacy terms.
+            Do not use these converters when your document-handling requirements prohibit
             third-party processing.
           </p>
         </section>

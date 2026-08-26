@@ -13,6 +13,8 @@ interface Props {
   notice?: string;
   onDownload: (index: number) => void;
   onDownloadAll: () => void;
+  archiveBusy: boolean;
+  archivePercent: number;
   onReset: () => void;
 }
 
@@ -27,6 +29,8 @@ export default function ResultPanel({
   notice,
   onDownload,
   onDownloadAll,
+  archiveBusy,
+  archivePercent,
   onReset,
 }: Props) {
   const showInlineViewer = outputs.length === 1 && outputs[0].kind === "pdf";
@@ -53,8 +57,13 @@ export default function ResultPanel({
               size="large"
               icon={<DownloadOutlined />}
               onClick={outputs.length === 1 ? () => onDownload(0) : onDownloadAll}
+              loading={outputs.length > 1 && archiveBusy}
             >
-              {outputs.length === 1 ? `Download ${outputs[0].name}` : `Download all ${outputs.length} files`}
+              {outputs.length === 1
+                ? `Download ${outputs[0].name}`
+                : archiveBusy
+                  ? `Preparing ZIP ${archivePercent}%`
+                  : `Download all ${outputs.length} as ZIP`}
             </Button>
             <Button size="large" icon={<UndoOutlined />} onClick={onReset}>
               Start over
