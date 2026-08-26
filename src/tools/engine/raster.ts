@@ -14,6 +14,19 @@ const noopProgress: Progress = () => {};
 
 type PdfJs = typeof import("pdfjs-dist");
 
+/**
+ * Keep these hardening options in one non-literal value. Some pdf.js type
+ * releases omit `isEvalSupported` even though the runtime supports it; passing
+ * a named value avoids that release-specific excess-property error.
+ */
+function pdfDocumentOptions(data: Uint8Array) {
+  return {
+    data,
+    enableXfa: false,
+    isEvalSupported: false,
+  };
+}
+
 let pdfjsPromise: Promise<PdfJs> | null = null;
 
 /** Load the self-contained browser module and point it at its same-origin worker. */
@@ -81,11 +94,7 @@ export async function pdfToImages({
 }: PdfToImagesParams): Promise<ToolOutput[]> {
   const pdfjs = await loadPdfJs();
   const data = new Uint8Array(await file.arrayBuffer());
-  const pdf = await pdfjs.getDocument({
-    data,
-    enableXfa: false,
-    isEvalSupported: false,
-  }).promise;
+  const pdf = await pdfjs.getDocument(pdfDocumentOptions(data)).promise;
   const stem = baseName(file.name);
   const extension = format === "jpeg" ? "jpg" : "png";
   const mime = format === "jpeg" ? "image/jpeg" : "image/png";
@@ -244,11 +253,9 @@ async function rasterPass(
   const { PDFDocument } = await import("pdf-lib");
 
   // pdf.js takes ownership of the buffer it is given, so hand it a fresh copy.
-  const pdf = await pdfjs.getDocument({
-    data: new Uint8Array(source.slice(0)),
-    enableXfa: false,
-    isEvalSupported: false,
-  }).promise;
+  const pdf = await pdfjs.getDocument(
+    pdfDocumentOptions(new Uint8Array(source.slice(0)))
+  ).promise;
   const doc = await PDFDocument.create();
 
   try {

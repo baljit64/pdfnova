@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import { File } from "node:buffer";
 import { PDFDocument } from "pdf-lib";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import * as XLSX from "xlsx";
@@ -25,7 +24,7 @@ function ok(name: string, condition: boolean, detail = "") {
 }
 
 async function pdfText(blob: Blob): Promise<{ pages: string[]; links: string[] }> {
-  const pdf = await getDocument({ data: new Uint8Array(await blob.arrayBuffer()), disableWorker: true }).promise;
+  const pdf = await getDocument({ data: new Uint8Array(await blob.arrayBuffer()) }).promise;
   const pages: string[] = [];
   const links: string[] = [];
   for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {

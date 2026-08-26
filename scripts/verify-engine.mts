@@ -17,7 +17,10 @@ async function makePdf(pages: number, label: string): Promise<File> {
     const p = doc.addPage([595, 842]);
     p.drawText(`${label} page ${i + 1}`, { x: 50, y: 780, size: 20, font, color: rgb(0, 0, 0) });
   }
-  return new File([await doc.save()], `${label}.pdf`, { type: "application/pdf" });
+  // Copy into an ArrayBuffer-backed view that is valid as a browser BlobPart.
+  return new File([new Uint8Array(await doc.save())], `${label}.pdf`, {
+    type: "application/pdf",
+  });
 }
 
 const load = async (blob: Blob) => PDFDocument.load(await blob.arrayBuffer());

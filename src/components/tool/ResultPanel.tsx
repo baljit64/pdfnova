@@ -82,6 +82,7 @@ export default function ResultPanel({
               {outputs.map((output, index) => (
                 <li key={output.name} className="rounded-lg border border-gray-200 p-3">
                   {/* Rendered from a local object URL, so next/image would add no value. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={urls[index]}
                     alt={`Page ${index + 1} of the converted document`}
