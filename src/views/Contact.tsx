@@ -41,7 +41,7 @@ export default function Contact() {
 
   if (sent) {
     return (
-      <div className="max-w-md mx-auto px-6 py-16 text-center">
+      <div className="pdfnova-form-page max-w-md mx-auto px-6 py-16 text-center sm:py-20">
         <h1 className="text-3xl font-bold text-blue-900 mb-4">Message sent</h1>
         <p className="text-gray-600 mb-6">Thanks for reaching out. We&apos;ll get back to you soon.</p>
         <Link href="/">
@@ -52,11 +52,11 @@ export default function Contact() {
   }
 
   return (
-    <div className="max-w-md mx-auto px-6 py-16">
+    <div className="pdfnova-form-page max-w-md mx-auto px-6 py-16 sm:py-20">
       <h1 className="text-3xl font-bold text-blue-900 mb-2">Contact us</h1>
       <p className="text-gray-600 mb-8">Have a question or feedback? Send us a message.</p>
 
-      <Form layout="vertical" onFinish={onFinish}>
+      <Form layout="vertical" onFinish={onFinish} className="rounded-2xl border border-[var(--border)] bg-white p-6 shadow-[var(--shadow-sm)] sm:p-8">
         <Form.Item
           name="name"
           label="Name"

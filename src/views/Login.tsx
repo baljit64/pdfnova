@@ -17,11 +17,11 @@ export default function Login() {
   };
 
   return (
-    <div className="max-w-md mx-auto px-6 py-16">
+    <div className="pdfnova-form-page max-w-md mx-auto px-6 py-16 sm:py-20">
       <h1 className="text-3xl font-bold text-blue-900 mb-2">Login</h1>
       <p className="text-gray-600 mb-8">Sign in to access your account.</p>
 
-      <Form layout="vertical" onFinish={onFinish}>
+      <Form layout="vertical" onFinish={onFinish} className="rounded-2xl border border-[var(--border)] bg-white p-6 shadow-[var(--shadow-sm)] sm:p-8">
         <Form.Item
           name="email"
           label="Email"

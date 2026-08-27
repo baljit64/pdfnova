@@ -2,11 +2,12 @@
 
 import { Button } from "antd";
 import {
-  ArrowDownOutlined,
-  ArrowUpOutlined,
-  DeleteOutlined,
-  RotateRightOutlined,
-} from "@ant-design/icons";
+  ArrowDown,
+  ArrowUp,
+  FileText,
+  RotateCw,
+  Trash2,
+} from "lucide-react";
 import { formatBytes } from "../../tools/engine/blob";
 import type { FileListControls } from "../../tools/types";
 
@@ -43,33 +44,39 @@ export default function SelectedFiles({
   const canRotate = !!controls?.rotate;
 
   return (
-    <section className="mt-6" aria-label="Selected files">
-      <h2 className="mb-2 text-sm font-semibold text-blue-900">
+    <section className="mt-7" aria-label="Selected files">
+      <div className="mb-3 flex items-center justify-between gap-3">
+      <h2 className="text-sm font-bold text-[var(--text-primary)]">
         {files.length} file{files.length === 1 ? "" : "s"} selected
         {canReorder ? " — they will be processed in this order" : ""}
       </h2>
+      <span className="rounded-full bg-[var(--success-soft)] px-2.5 py-1 text-xs font-bold text-[var(--success)]">Ready</span>
+      </div>
 
-      <ol className="space-y-2">
+      <ol className="space-y-3">
         {files.map((file, index) => (
           <li
             key={`${file.name}-${file.size}-${index}`}
-            className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2"
+            className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-white px-4 py-3 shadow-[var(--shadow-xs)]"
           >
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-gray-800">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[var(--primary-soft)] text-[var(--primary)]"><FileText className="h-5 w-5" /></span>
+              <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
                 {canReorder && (
-                  <span className="mr-2 text-gray-400" aria-hidden="true">
+                  <span className="mr-2 text-[var(--text-muted)]" aria-hidden="true">
                     {index + 1}.
                   </span>
                 )}
                 {file.name}
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="mt-0.5 text-xs text-[var(--text-muted)]">
                 {formatBytes(file.size)}
                 {canRotate && (rotations[index] ?? 0) !== 0
                   ? ` · rotated ${rotations[index]}°`
                   : ""}
               </p>
+              </div>
             </div>
 
             <div className="flex shrink-0 items-center gap-1">
@@ -79,7 +86,7 @@ export default function SelectedFiles({
                     size="small"
                     type="text"
                     disabled={disabled || index === 0}
-                    icon={<ArrowUpOutlined />}
+                    icon={<ArrowUp className="h-4 w-4" />}
                     aria-label={`Move ${file.name} up`}
                     onClick={() => onMove(index, index - 1)}
                   />
@@ -87,7 +94,7 @@ export default function SelectedFiles({
                     size="small"
                     type="text"
                     disabled={disabled || index === files.length - 1}
-                    icon={<ArrowDownOutlined />}
+                    icon={<ArrowDown className="h-4 w-4" />}
                     aria-label={`Move ${file.name} down`}
                     onClick={() => onMove(index, index + 1)}
                   />
@@ -98,7 +105,7 @@ export default function SelectedFiles({
                 <Button
                   size="small"
                   disabled={disabled}
-                  icon={<RotateRightOutlined />}
+                  icon={<RotateCw className="h-4 w-4" />}
                   aria-label={`Rotate ${file.name}. Currently ${rotations[index] ?? 0} degrees`}
                   onClick={() => onRotate(index)}
                 >
@@ -112,7 +119,7 @@ export default function SelectedFiles({
                   type="text"
                   danger
                   disabled={disabled || files.length <= minFiles}
-                  icon={<DeleteOutlined />}
+                  icon={<Trash2 className="h-4 w-4" />}
                   aria-label={`Remove ${file.name}`}
                   onClick={() => onRemove(index)}
                 />

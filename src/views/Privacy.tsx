@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Privacy() {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-16">
+    <div className="pdfnova-content-page max-w-3xl mx-auto px-6 py-16 sm:py-20">
       <h1 className="text-3xl font-bold text-blue-900 mb-6">Privacy Policy</h1>
       <p className="text-sm text-gray-500 mb-8">
         Last updated: <time dateTime="2026-08-25">August 25, 2026</time>

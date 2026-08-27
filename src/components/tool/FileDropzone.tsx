@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useId, useRef, useState } from "react";
-import { InboxOutlined } from "@ant-design/icons";
+import { FileUp, UploadCloud } from "lucide-react";
 import { PROCESSING_COPY } from "../../tools/processing";
 import type { ToolDefinition } from "../../tools/types";
 
@@ -65,28 +65,32 @@ export default function FileDropzone({ tool, onFiles, selectedCount, disabled }:
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         className={[
-          "flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-12 text-center transition-colors",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600",
+          "group flex min-h-[280px] flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-all",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--primary)]",
           disabled
-            ? "cursor-not-allowed border-gray-200 bg-gray-50 opacity-60"
-            : "cursor-pointer border-blue-200 bg-[#f7fbff] hover:border-blue-400 hover:bg-[#eef5ff]",
-          dragging ? "border-red-400 bg-red-50" : "",
+            ? "cursor-not-allowed border-[var(--border)] bg-[var(--page)] opacity-60"
+            : "cursor-pointer border-[var(--border-strong)] bg-[var(--page)] hover:border-[var(--primary)] hover:bg-[var(--primary-soft)]",
+          dragging ? "scale-[1.01] border-[var(--primary)] bg-[var(--primary-soft)] shadow-[var(--shadow-sm)]" : "",
         ].join(" ")}
       >
-        <span className="text-4xl text-blue-600" aria-hidden="true">
-          <InboxOutlined />
+        <span className="grid h-14 w-14 place-items-center rounded-2xl border border-[var(--border)] bg-white text-[var(--primary)] shadow-[var(--shadow-xs)] transition group-hover:-translate-y-0.5 group-hover:shadow-[var(--shadow-sm)]" aria-hidden="true">
+          <UploadCloud className="h-7 w-7" strokeWidth={1.8} />
         </span>
-        <p className="text-base font-semibold text-blue-900">
+        <p className="mt-2 text-lg font-bold text-[var(--text-primary)]">
           {selectedCount > 0 && tool.multiple
             ? `Add more files${remaining > 0 ? ` — ${remaining} slot${remaining === 1 ? "" : "s"} left` : ""}`
             : `Drop your ${tool.acceptLabel} ${tool.multiple ? "files" : "file"} here`}
         </p>
-        <p className="text-sm text-gray-600">
-          or <span className="font-medium text-red-500 underline">browse your device</span>
+        <p className="text-sm text-[var(--text-secondary)]">Drag and drop here, or</p>
+        <span className="mt-1 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--primary)] px-5 text-sm font-bold text-white shadow-[var(--shadow-xs)]">
+          <FileUp className="h-4 w-4" /> Browse files
+        </span>
+        <p className="mt-1 text-xs font-medium text-[var(--text-muted)]">
+          Files are checked before processing starts
         </p>
       </div>
 
-      <p id={hintId} className="mt-2 text-sm text-gray-500">
+      <p id={hintId} className="mt-3 text-center text-xs leading-5 text-[var(--text-muted)]">
         {hint}. {PROCESSING_COPY[tool.processingType].description}
       </p>
 

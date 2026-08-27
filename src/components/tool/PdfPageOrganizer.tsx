@@ -20,13 +20,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import {
-  DeleteOutlined,
-  HolderOutlined,
-  LeftOutlined,
-  RightOutlined,
-  RotateRightOutlined,
-} from "@ant-design/icons";
+import { ChevronLeft, ChevronRight, GripVertical, RotateCw, Trash2 } from "lucide-react";
 import { Button } from "antd";
 import {
   moveOrganizerPage,
@@ -103,8 +97,8 @@ function SortablePage({
       data-page-id={page.id}
       tabIndex={-1}
       aria-label={`${label}, ${page.selected ? "selected" : "not selected"}, ${positionText.toLowerCase()}, rotation ${page.rotation} degrees`}
-      className={`relative rounded-xl border bg-white p-2 shadow-sm outline-none transition-shadow focus:ring-2 focus:ring-blue-500 ${
-        page.selected ? "border-gray-200" : "border-gray-300 opacity-60"
+      className={`relative rounded-xl border bg-white p-2 shadow-[var(--shadow-xs)] outline-none transition-shadow focus:ring-2 focus:ring-[var(--primary)] ${
+        page.selected ? "border-[var(--border)]" : "border-[var(--border-strong)] opacity-60"
       } ${isDragging ? "z-10 shadow-xl" : ""}`}
       style={{
         transform: CSS.Transform.toString(transform),
@@ -112,12 +106,12 @@ function SortablePage({
       }}
     >
       <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="truncate text-xs font-semibold text-gray-800">{label}</span>
+        <span className="truncate text-xs font-semibold text-[var(--text-primary)]">{label}</span>
         <Button
           size="small"
           type="text"
           disabled={disabled}
-          icon={<HolderOutlined />}
+          icon={<GripVertical className="h-4 w-4" />}
           className="cursor-grab touch-none active:cursor-grabbing"
           aria-label={`Drag ${label}`}
           {...attributes}
@@ -128,7 +122,7 @@ function SortablePage({
       {mode === "split" ? (
         <button
           type="button"
-          className="block w-full cursor-pointer rounded-lg bg-gray-100 p-2 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed"
+          className="block w-full cursor-pointer rounded-lg bg-[var(--page)] p-2 text-left focus:outline-none focus:ring-2 focus:ring-[var(--primary)] disabled:cursor-not-allowed"
           disabled={disabled}
           aria-label={`${page.selected ? "Deselect" : "Select"} ${label}`}
           aria-pressed={page.selected}
@@ -137,14 +131,14 @@ function SortablePage({
           <PagePreview page={page} thumbnailUrl={thumbnailUrl} />
         </button>
       ) : (
-        <div role="img" aria-label={`Preview of ${label}`} className="rounded-lg bg-gray-100 p-2">
+        <div role="img" aria-label={`Preview of ${label}`} className="rounded-lg bg-[var(--page)] p-2">
           <PagePreview page={page} thumbnailUrl={thumbnailUrl} />
         </div>
       )}
 
       <div className="mt-2">
-        <p className="truncate text-xs text-gray-600">{page.sourceName} · page {page.sourcePageIndex + 1}</p>
-        <p className="text-xs font-medium text-blue-900">{positionText} · {page.rotation}°</p>
+        <p className="truncate text-xs text-[var(--text-secondary)]">{page.sourceName} · page {page.sourcePageIndex + 1}</p>
+        <p className="text-xs font-semibold text-[var(--secondary)]">{positionText} · {page.rotation}°</p>
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-1">
@@ -152,7 +146,7 @@ function SortablePage({
           size="small"
           type="text"
           disabled={disabled || index === 0}
-          icon={<LeftOutlined />}
+          icon={<ChevronLeft className="h-4 w-4" />}
           aria-label={`Move ${label} left`}
           onClick={() => onMove(page, -1)}
         />
@@ -160,7 +154,7 @@ function SortablePage({
           size="small"
           type="text"
           disabled={disabled || index === pageCount - 1}
-          icon={<RightOutlined />}
+          icon={<ChevronRight className="h-4 w-4" />}
           aria-label={`Move ${label} right`}
           onClick={() => onMove(page, 1)}
         />
@@ -168,7 +162,7 @@ function SortablePage({
           size="small"
           type="text"
           disabled={disabled}
-          icon={<RotateRightOutlined />}
+          icon={<RotateCw className="h-4 w-4" />}
           aria-label={`Rotate ${label} clockwise`}
           onClick={() => onRotate(page)}
         />
@@ -178,7 +172,7 @@ function SortablePage({
             type="text"
             danger
             disabled={disabled || pageCount <= 1}
-            icon={<DeleteOutlined />}
+            icon={<Trash2 className="h-4 w-4" />}
             aria-label={`Remove ${label}`}
             onClick={() => onRemove(page)}
           />
@@ -205,7 +199,7 @@ function PagePreview({ page, thumbnailUrl }: { page: OrganizerPage; thumbnailUrl
           }}
         />
       ) : (
-        <span className="text-xs text-gray-500">Preview unavailable</span>
+        <span className="text-xs text-[var(--text-muted)]">Preview unavailable</span>
       )}
     </div>
   );
@@ -310,11 +304,11 @@ export default function PdfPageOrganizer({
   };
 
   return (
-    <section className="mt-6" aria-labelledby="pdf-page-organizer-heading">
-      <h2 id="pdf-page-organizer-heading" className="mb-3 text-base font-semibold text-blue-950">
+    <section className="mt-7 rounded-2xl border border-[var(--border)] bg-[var(--page)] p-4 sm:p-5" aria-labelledby="pdf-page-organizer-heading">
+      <h2 id="pdf-page-organizer-heading" className="mb-2 text-base font-bold text-[var(--text-primary)]">
         {mode === "merge" ? `Arrange ${pages.length} pages` : `Choose and arrange ${pages.length} pages`}
       </h2>
-      <p className="mb-3 text-sm text-gray-600">
+      <p className="mb-4 text-sm text-[var(--text-secondary)]">
         {mode === "merge"
           ? "Drag pages or use the arrow buttons to set the final PDF order."
           : `${selectedPositions.size} of ${pages.length} pages selected.`}

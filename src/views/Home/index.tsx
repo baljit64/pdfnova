@@ -1,250 +1,307 @@
- "use client";
+"use client";
 
-import { Card } from "antd";
 import {
-  MergeOutlined,
-  SplitCellsOutlined,
-  CompressOutlined,
-  FileWordOutlined,
-  FilePptOutlined,
-  FileExcelOutlined,
-  EditOutlined,
-  PictureOutlined,
-  FormOutlined,
-  BgColorsOutlined,
-  RotateRightOutlined,
-  LockOutlined,
-  ThunderboltOutlined,
-  CheckCircleOutlined,
-  MobileOutlined,
-} from "@ant-design/icons";
-import Image from "next/image";
+  ArrowRight,
+  BadgeCheck,
+  Check,
+  Download,
+  FileCheck2,
+  LockKeyhole,
+  Search,
+  Settings2,
+  ShieldCheck,
+  Sparkles,
+  UploadCloud,
+  WifiOff,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
+import { useMemo, useState } from "react";
+import { BLOG_POSTS, formatBlogDate } from "../../blog/posts";
+import BlogArtwork from "../../components/blog/BlogArtwork";
+import ToolCard from "../../components/tools/ToolCard";
+import Container from "../../components/ui/Container";
+import SectionHeading from "../../components/ui/SectionHeading";
 
-const TOOLS = [
-  {
-    path: "/merge-pdf",
-    icon: <MergeOutlined />,
-    title: "Merge PDF",
-    desc: "Combine PDFs in the order you want with the easiest PDF merger available.",
-    btn: "Merge PDFs",
-  },
-  {
-    path: "/split-pdf",
-    icon: <SplitCellsOutlined />,
-    title: "Split PDF",
-    desc: "Separate one page or a whole set for easy conversion into independent PDF files.",
-    btn: "Split PDF",
-  },
-  {
-    path: "/compress-pdf",
-    icon: <CompressOutlined />,
-    title: "Compress PDF",
-    desc: "Reduce PDF file size with lossless, balanced, strong or target-size options.",
-    btn: "Compress PDF",
-  },
-  {
-    path: "/pdf-to-word",
-    icon: <FileWordOutlined />,
-    title: "PDF to Word",
-    desc: "Convert a PDF into an editable DOCX, then review complex layouts in your document editor.",
-    btn: "PDF to Word",
-  },
-  {
-    path: "/pdf-to-powerpoint",
-    icon: <FilePptOutlined />,
-    title: "PDF to PowerPoint",
-    desc: "A planned tool for converting PDF files into PowerPoint presentations.",
-    btn: "PDF to PPT",
-    badge: "Coming soon",
-  },
-  {
-    path: "/pdf-to-excel",
-    icon: <FileExcelOutlined />,
-    title: "PDF to Excel",
-    desc: "A planned tool for converting PDF content into Excel spreadsheets.",
-    btn: "PDF to Excel",
-    badge: "Coming soon",
-  },
-  {
-    path: "/word-to-pdf",
-    icon: <FileWordOutlined />,
-    title: "Word to PDF",
-    desc: "Make DOC and DOCX files easy to read by converting them to PDF.",
-    btn: "Word to PDF",
-  },
-  {
-    path: "/powerpoint-to-pdf",
-    icon: <FilePptOutlined />,
-    title: "PowerPoint to PDF",
-    desc: "A planned tool for converting PPT and PPTX presentations to PDF.",
-    btn: "PPT to PDF",
-    badge: "Coming soon",
-  },
-  {
-    path: "/excel-to-pdf",
-    icon: <FileExcelOutlined />,
-    title: "Excel to PDF",
-    desc: "Make EXCEL spreadsheets easy to read by converting them to PDF.",
-    btn: "Excel to PDF",
-  },
-  {
-    path: "/edit-pdf",
-    icon: <EditOutlined />,
-    title: "Edit PDF",
-    desc: "Add text to a chosen PDF page and control its size and position.",
-    btn: "Edit PDF",
-    badge: "New!",
-  },
-  {
-    path: "/pdf-to-jpg",
-    icon: <PictureOutlined />,
-    title: "PDF to JPG",
-    desc: "Render each PDF page as a downloadable JPG image.",
-    btn: "PDF to JPG",
-  },
-  {
-    path: "/pdf-to-image",
-    icon: <PictureOutlined />,
-    title: "PDF to Image",
-    desc: "Render each PDF page as a downloadable PNG image.",
-    btn: "PDF to PNG",
-  },
-  {
-    path: "/jpg-to-pdf",
-    icon: <PictureOutlined />,
-    title: "JPG to PDF",
-    desc: "Convert JPG images to PDF in seconds. Easily adjust orientation and margins.",
-    btn: "JPG to PDF",
-  },
-  {
-    path: "/sign-pdf",
-    icon: <FormOutlined />,
-    title: "Sign PDF",
-    desc: "Add a typed signature to a chosen page of a PDF.",
-    btn: "Sign PDF",
-  },
-  {
-    path: "/watermark",
-    icon: <BgColorsOutlined />,
-    title: "Watermark",
-    desc: "Stamp a text watermark over every PDF page with adjustable opacity and position.",
-    btn: "Watermark",
-  },
-  {
-    path: "/rotate-pdf",
-    icon: <RotateRightOutlined />,
-    title: "Rotate PDF",
-    desc: "Rotate all or selected pages by 90, 180 or 270 degrees.",
-    btn: "Rotate PDF",
-  },
+type Category = "All tools" | "Organize" | "Optimize" | "Convert" | "Edit & sign";
+
+type HomeTool = {
+  id: string;
+  title: string;
+  category: Exclude<Category, "All tools">;
+  description: string;
+  unavailable?: boolean;
+};
+
+const CATEGORIES: Category[] = ["All tools", "Organize", "Optimize", "Convert", "Edit & sign"];
+
+const TOOLS: HomeTool[] = [
+  { id: "merge-pdf", title: "Merge PDF", category: "Organize", description: "Combine PDFs into one file in the exact order you choose." },
+  { id: "split-pdf", title: "Split PDF", category: "Organize", description: "Extract selected pages or create a separate PDF for each page." },
+  { id: "compress-pdf", title: "Compress PDF", category: "Optimize", description: "Reduce file size with balanced, strong, or target-size options." },
+  { id: "rotate-pdf", title: "Rotate PDF", category: "Organize", description: "Turn all or selected pages and save the corrected document." },
+  { id: "pdf-to-word", title: "PDF to Word", category: "Convert", description: "Turn PDF content into an editable DOCX document." },
+  { id: "word-to-pdf", title: "Word to PDF", category: "Convert", description: "Convert DOC and DOCX files into shareable PDF documents." },
+  { id: "pdf-to-jpg", title: "PDF to JPG", category: "Convert", description: "Render selected PDF pages as clear JPG images." },
+  { id: "pdf-to-image", title: "PDF to PNG", category: "Convert", description: "Export PDF pages as high-quality PNG image files." },
+  { id: "jpg-to-pdf", title: "JPG to PDF", category: "Convert", description: "Arrange images and combine them into one polished PDF." },
+  { id: "excel-to-pdf", title: "Excel to PDF", category: "Convert", description: "Lay out spreadsheet data as clean, readable PDF tables." },
+  { id: "edit-pdf", title: "Edit PDF", category: "Edit & sign", description: "Add text and annotations to the page you choose." },
+  { id: "sign-pdf", title: "Sign PDF", category: "Edit & sign", description: "Place a signature on a selected PDF page." },
+  { id: "watermark", title: "Watermark PDF", category: "Edit & sign", description: "Add text or image watermarks with precise placement." },
+  { id: "pdf-to-powerpoint", title: "PDF to PowerPoint", category: "Convert", description: "Turn PDF pages into an editable presentation.", unavailable: true },
+  { id: "pdf-to-excel", title: "PDF to Excel", category: "Convert", description: "Extract PDF tables into spreadsheet-ready data.", unavailable: true },
+  { id: "powerpoint-to-pdf", title: "PowerPoint to PDF", category: "Convert", description: "Convert presentations into dependable PDF files.", unavailable: true },
 ];
 
-export default function Home() {
-  return (
-    <>
-      <section className="bg-gradient-to-b from-[#eef5ff] to-white py-20">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-blue-900 leading-tight">
-              Free Online PDF Tools – Merge, Compress, Convert &amp; Edit PDFs
-            </h1>
-            <p className="mt-6 text-lg text-gray-700">
-              Use PDFNova to merge PDFs, compress files, convert PDF to Word, JPG or PNG, edit
-              documents, add signatures and rotate pages. Most tools run directly in your browser
-              with no signup or software to install; server-assisted tools are clearly identified.
-            </p>
-            <div className="mt-8">
-              <Link
-                href="/merge-pdf"
-                className="inline-flex min-h-10 items-center rounded-md bg-red-500 px-5 font-semibold text-white no-underline transition hover:bg-red-600"
-              >
-                Explore PDF tools
-              </Link>
-            </div>
-          </div>
-          <div className="hidden md:flex justify-center">
-            <Image
-              src="/assets/hero.png"
-              alt="PDFNova PDF tools dashboard illustration"
-              width={800}
-              height={533}
-              priority
-              sizes="(min-width: 768px) 50vw, 0px"
-              className="h-auto w-full max-w-lg"
-            />
-          </div>
-        </div>
-      </section>
+const POPULAR_IDS = ["merge-pdf", "compress-pdf", "pdf-to-word", "jpg-to-pdf", "split-pdf", "edit-pdf"];
 
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-blue-900 mb-8 text-center">All PDF tools</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {TOOLS.map((tool) => (
-              <Card
-                key={tool.path}
-                className="shadow-lg rounded-xl text-center relative hover:shadow-xl transition-shadow"
-              >
-                {tool.badge && (
-                  <span className="absolute top-3 right-3 text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
-                    {tool.badge}
-                  </span>
-                )}
-                <div className="text-4xl text-blue-600 mb-4">{tool.icon}</div>
-                <h3 className="text-lg font-semibold text-blue-900">{tool.title}</h3>
-                <p className="text-gray-600 text-sm mt-2 line-clamp-3">{tool.desc}</p>
-                <Link
-                  href={tool.path}
-                  className="mt-4 inline-flex min-h-8 items-center rounded-md border border-red-500 px-4 font-medium text-red-500 no-underline transition hover:bg-red-50"
-                >
-                  {tool.btn}
-                </Link>
-              </Card>
+export default function Home() {
+  const [category, setCategory] = useState<Category>("All tools");
+  const [query, setQuery] = useState("");
+
+  const filteredTools = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    return TOOLS.filter((tool) => {
+      const matchesCategory = category === "All tools" || tool.category === category;
+      const matchesQuery = !normalized || `${tool.title} ${tool.description}`.toLowerCase().includes(normalized);
+      return matchesCategory && matchesQuery;
+    });
+  }, [category, query]);
+
+  const searchMatches = query.trim() ? filteredTools.slice(0, 5) : [];
+  const popularTools = TOOLS.filter((tool) => POPULAR_IDS.includes(tool.id));
+
+  function submitSearch(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setCategory("All tools");
+    document.getElementById("all-tools")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  return (
+    <div className="overflow-hidden bg-white">
+      <section className="relative isolate border-b border-[var(--border)] bg-[var(--page)] py-20 sm:py-24 lg:py-28">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_20%,rgba(204,68,53,0.1),transparent_28%),radial-gradient(circle_at_86%_18%,rgba(28,57,141,0.11),transparent_30%)]" />
+        <div className="absolute left-1/2 top-16 -z-10 h-72 w-72 -translate-x-1/2 rounded-full border border-[var(--border)]/70 opacity-60" />
+        <Container className="text-center">
+          <span className="section-eyebrow gap-2 normal-case tracking-normal">
+            <Sparkles className="h-3.5 w-3.5" /> Free, fast and privacy-first
+          </span>
+          <h1 className="mx-auto mt-6 max-w-4xl text-4xl font-bold tracking-[-0.04em] text-[var(--text-primary)] sm:text-6xl lg:text-7xl">
+            Everything you need to work with <span className="text-[var(--primary)]">PDFs.</span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-[var(--text-secondary)] sm:text-xl">
+            Merge, split, compress, convert, edit and sign documents with focused tools that work
+            right in your browser.
+          </p>
+
+          <form onSubmit={submitSearch} className="relative mx-auto mt-9 max-w-2xl text-left" id="tool-search" role="search">
+            <label htmlFor="home-tool-search" className="sr-only">Search PDF tools</label>
+            <Search className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[var(--text-muted)]" />
+            <input
+              id="home-tool-search"
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="What do you want to do with your PDF?"
+              className="h-16 w-full rounded-2xl border border-[var(--border-strong)] bg-white pl-13 pr-28 text-base text-[var(--text-primary)] shadow-[var(--shadow-md)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--primary)] focus:ring-4 focus:ring-[#cc4435]/10"
+            />
+            <button type="submit" className="absolute right-2 top-2 h-12 rounded-xl border-0 bg-[var(--primary)] px-5 font-bold text-white hover:bg-[var(--primary-hover)]">
+              Find tool
+            </button>
+            {query.trim() ? (
+              <div className="absolute left-0 right-0 top-[72px] z-20 overflow-hidden rounded-2xl border border-[var(--border)] bg-white p-2 shadow-[var(--shadow-lg)]">
+                {searchMatches.length ? searchMatches.map((tool) => (
+                  tool.unavailable ? (
+                    <div key={tool.id} className="flex items-center justify-between rounded-xl px-4 py-3 text-sm text-[var(--text-muted)]">
+                      <span>{tool.title}</span><span className="text-xs font-bold uppercase">Coming soon</span>
+                    </div>
+                  ) : (
+                    <Link key={tool.id} href={`/${tool.id}`} className="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-[var(--text-primary)] no-underline hover:bg-[var(--primary-soft)] hover:text-[var(--primary)]">
+                      {tool.title}<ArrowRight className="h-4 w-4" />
+                    </Link>
+                  )
+                )) : <p className="px-4 py-3 text-sm text-[var(--text-secondary)]">No matching tool yet.</p>}
+              </div>
+            ) : null}
+          </form>
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-sm">
+            <span className="mr-1 font-semibold text-[var(--text-secondary)]">Popular:</span>
+            {popularTools.slice(0, 4).map((tool) => (
+              <Link key={tool.id} href={`/${tool.id}`} className="rounded-full border border-[var(--border)] bg-white px-3.5 py-1.5 font-semibold text-[var(--text-secondary)] no-underline shadow-[var(--shadow-xs)] hover:border-[#f4c7c0] hover:text-[var(--primary)]">
+                {tool.title}
+              </Link>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
 
-      <section className="bg-[#f7fbff] py-20">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-12">Why Choose Us?</h2>
-          <div className="grid md:grid-cols-4 gap-8">
-            <Feature icon={<LockOutlined />} title="Private by design" desc="Most tools process files locally; server-assisted tools are clearly identified." />
-            <Feature icon={<ThunderboltOutlined />} title="Focused workflow" desc="Choose files, set the available options and download the result." />
-            <Feature icon={<CheckCircleOutlined />} title="Clean output" desc="PDFNova does not add its own branding to your files." />
-            <Feature icon={<MobileOutlined />} title="Works across devices" desc="Use a modern browser on mobile, tablet or desktop." />
+      <section className="py-20 sm:py-24">
+        <Container>
+          <SectionHeading eyebrow="Most popular" title="Finish common PDF tasks in a few clicks" description="Straightforward tools for the document jobs people do every day." />
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {popularTools.map((tool) => (
+              <ToolCard key={tool.id} id={tool.id} href={`/${tool.id}`} title={tool.title} description={tool.description} />
+            ))}
           </div>
-        </div>
+        </Container>
       </section>
 
-      <section className="py-20 bg-gradient-to-b from-white to-[#eef5ff] text-center">
-        <h2 className="text-3xl font-bold text-blue-900">Start Using Our Free PDF Tools Today!</h2>
-        <Link
-          href="/merge-pdf"
-          className="mt-6 inline-flex min-h-10 items-center rounded-md bg-red-500 px-5 font-semibold text-white no-underline transition hover:bg-red-600"
-        >
-          Get Started
-        </Link>
+      <section className="border-y border-[var(--border)] bg-[var(--page)] py-20 sm:py-24" id="all-tools">
+        <Container>
+          <SectionHeading eyebrow="Toolbox" title="All PDF tools" description="Choose a category or search by the result you need." />
+          <div className="mt-9 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Filter tools by category">
+            {CATEGORIES.map((item) => (
+              <button
+                key={item}
+                type="button"
+                role="tab"
+                aria-selected={category === item}
+                onClick={() => setCategory(item)}
+                className={`min-h-10 rounded-full border px-4 text-sm font-bold transition ${category === item ? "border-[var(--secondary)] bg-[var(--secondary)] text-white" : "border-[var(--border-strong)] bg-white text-[var(--text-secondary)] hover:border-[var(--secondary)] hover:text-[var(--secondary)]"}`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+          <div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredTools.map((tool) => (
+              <ToolCard
+                key={tool.id}
+                id={tool.id}
+                href={`/${tool.id}`}
+                title={tool.title}
+                description={tool.description}
+                badge={tool.unavailable ? "Planned" : undefined}
+                unavailable={tool.unavailable}
+                compact
+              />
+            ))}
+          </div>
+          {!filteredTools.length ? (
+            <p className="mt-10 text-center text-[var(--text-secondary)]">No tools match your search.</p>
+          ) : null}
+        </Container>
       </section>
-    </>
-  );
-}
 
-function Feature({
-  icon,
-  title,
-  desc,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-}) {
-  return (
-    <div className="text-center">
-      <div className="text-4xl text-blue-700 mb-4">{icon}</div>
-      <h3 className="font-semibold text-lg">{title}</h3>
-      <p className="text-gray-600 mt-2">{desc}</p>
+      <section className="py-20 sm:py-24">
+        <Container>
+          <div className="overflow-hidden rounded-3xl bg-[var(--secondary)] px-6 py-10 text-white shadow-[var(--shadow-md)] sm:px-10 lg:grid lg:grid-cols-[1fr_1.2fr] lg:items-center lg:gap-14 lg:px-14 lg:py-14">
+            <div>
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10"><ShieldCheck className="h-6 w-6" /></span>
+              <h2 className="mt-6 text-3xl font-bold tracking-tight sm:text-4xl">Your files stay under your control</h2>
+              <p className="mt-4 max-w-xl leading-7 text-blue-100">Most PDFNova tools process files locally in your browser. When a task needs server assistance, the workspace tells you before processing begins.</p>
+            </div>
+            <div className="mt-9 grid gap-3 sm:grid-cols-3 lg:mt-0">
+              {[
+                [LockKeyhole, "Private by design", "Local processing whenever possible"],
+                [WifiOff, "No installation", "Works in a modern web browser"],
+                [BadgeCheck, "Clear status", "Processing method shown up front"],
+              ].map(([Icon, title, text]) => {
+                const FeatureIcon = Icon as typeof LockKeyhole;
+                return (
+                  <div key={title as string} className="rounded-2xl border border-white/10 bg-white/8 p-5">
+                    <FeatureIcon className="h-5 w-5 text-red-200" />
+                    <h3 className="mt-4 font-bold">{title as string}</h3>
+                    <p className="mt-2 text-sm leading-6 text-blue-100">{text as string}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      <section className="border-y border-[var(--border)] bg-[var(--page)] py-20 sm:py-24">
+        <Container>
+          <SectionHeading eyebrow="Simple workflow" title="How PDFNova works" description="A clean path from source file to finished document." />
+          <div className="relative mt-12 grid gap-5 md:grid-cols-3">
+            {[
+              [UploadCloud, "1", "Choose your file", "Add documents from your device using the secure workspace."],
+              [Settings2, "2", "Set your options", "Preview pages and choose only the settings relevant to your task."],
+              [Download, "3", "Download the result", "Review the outcome and save one file or a ZIP of multiple outputs."],
+            ].map(([Icon, number, title, text]) => {
+              const StepIcon = Icon as typeof UploadCloud;
+              return (
+                <article key={number as string} className="relative rounded-2xl border border-[var(--border)] bg-white p-7 text-center shadow-[var(--shadow-xs)]">
+                  <span className="absolute right-5 top-5 text-5xl font-black text-slate-100">{number as string}</span>
+                  <span className="mx-auto grid h-13 w-13 place-items-center rounded-2xl bg-[var(--primary-soft)] text-[var(--primary)]"><StepIcon className="h-6 w-6" /></span>
+                  <h3 className="mt-5 text-lg font-bold">{title as string}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{text as string}</p>
+                </article>
+              );
+            })}
+          </div>
+        </Container>
+      </section>
+
+      <section className="py-20 sm:py-24">
+        <Container className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div>
+            <p className="section-eyebrow">Built for real work</p>
+            <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Powerful enough to help. Simple enough to trust.</h2>
+            <p className="mt-4 text-lg leading-8 text-[var(--text-secondary)]">No crowded dashboards or hidden processing steps—just focused document workflows with clear feedback.</p>
+            <Link href="#all-tools" className="pdfnova-primary-button mt-7">Explore all tools <ArrowRight className="h-4 w-4" /></Link>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              [Zap, "Fast workflows", "Start working without an account or software download."],
+              [FileCheck2, "Useful previews", "See pages and selected files before you create the result."],
+              [Check, "Focused options", "Every control is relevant to the current task."],
+              [ShieldCheck, "Honest privacy", "Know whether processing happens locally or on a server."],
+            ].map(([Icon, title, text]) => {
+              const BenefitIcon = Icon as typeof Zap;
+              return (
+                <article key={title as string} className="rounded-2xl border border-[var(--border)] bg-white p-6 shadow-[var(--shadow-xs)]">
+                  <BenefitIcon className="h-6 w-6 text-[var(--secondary)]" />
+                  <h3 className="mt-4 font-bold">{title as string}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{text as string}</p>
+                </article>
+              );
+            })}
+          </div>
+        </Container>
+      </section>
+
+      <section className="border-t border-[var(--border)] bg-[var(--page)] py-20 sm:py-24">
+        <Container>
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <SectionHeading align="left" eyebrow="Guides" title="Work smarter with PDFs" description="Practical advice for better files, safer sharing, and cleaner results." />
+            <Link href="/blog" className="pdfnova-secondary-button shrink-0">View all guides <ArrowRight className="h-4 w-4" /></Link>
+          </div>
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {BLOG_POSTS.slice(0, 3).map((post) => (
+              <article key={post.slug} className="group overflow-hidden rounded-2xl border border-[var(--border)] bg-white shadow-[var(--shadow-xs)] transition hover:-translate-y-1 hover:shadow-[var(--shadow-md)]">
+                <Link href={`/blog/${post.slug}`} aria-label={`Read ${post.title}`}>
+                  <BlogArtwork visual={post.visual} className="h-44" />
+                </Link>
+                <div className="p-6">
+                  <div className="flex gap-2 text-xs font-bold uppercase tracking-wide text-[var(--secondary)]">
+                    <span>{post.category}</span><span className="text-[var(--text-muted)]">·</span>
+                    <time dateTime={post.publishedAt} className="text-[var(--text-muted)]">{formatBlogDate(post.publishedAt)}</time>
+                  </div>
+                  <h3 className="mt-3 text-lg font-bold leading-7"><Link href={`/blog/${post.slug}`} className="text-inherit no-underline group-hover:text-[var(--primary)]">{post.title}</Link></h3>
+                  <Link href={`/blog/${post.slug}`} className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--primary)] no-underline">Read guide <ArrowRight className="h-4 w-4" /></Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      <section className="bg-white py-20 sm:py-24">
+        <Container>
+          <div className="relative overflow-hidden rounded-3xl bg-[var(--primary-soft)] px-6 py-12 text-center sm:px-12 sm:py-16">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_50%,rgba(204,68,53,0.12),transparent_28%),radial-gradient(circle_at_85%_50%,rgba(28,57,141,0.1),transparent_25%)]" />
+            <div className="relative">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Ready to finish your PDF task?</h2>
+              <p className="mx-auto mt-4 max-w-xl text-lg text-[var(--text-secondary)]">Choose a tool, add your file, and get a polished result in a few focused steps.</p>
+              <Link href="#all-tools" className="pdfnova-primary-button mt-7">Choose a PDF tool <ArrowRight className="h-4 w-4" /></Link>
+            </div>
+          </div>
+        </Container>
+      </section>
     </div>
   );
 }

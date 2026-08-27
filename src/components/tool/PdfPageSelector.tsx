@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button, Spin } from "antd";
-import { CheckCircleFilled } from "@ant-design/icons";
+import { CheckCircle2 } from "lucide-react";
 import { parsePageRanges } from "../../tools/engine/pdf";
 
 interface Props {
@@ -76,7 +76,7 @@ export default function PdfPageSelector({ file, value, disabled, onChange }: Pro
   }, [pageCount, value]);
 
   if (loading) {
-    return <div className="mt-5 flex items-center gap-3 text-sm text-gray-600"><Spin size="small" /> Preparing page previews…</div>;
+    return <div className="mt-5 flex items-center gap-3 text-sm text-[var(--text-secondary)]"><Spin size="small" /> Preparing page previews…</div>;
   }
   if (error) return <p className="mt-4 text-sm text-amber-700">Preview unavailable: {error}</p>;
 
@@ -90,18 +90,18 @@ export default function PdfPageSelector({ file, value, disabled, onChange }: Pro
   };
 
   return (
-    <section className="mt-6" aria-label="Page preview and selection">
+    <section className="mt-7 rounded-2xl border border-[var(--border)] bg-[var(--page)] p-4 sm:p-5" aria-label="Page preview and selection">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-gray-800">Choose pages visually</h3>
-          <p className="text-xs text-gray-500">
+          <h3 className="text-sm font-bold text-[var(--text-primary)]">Choose pages visually</h3>
+          <p className="text-xs text-[var(--text-muted)]">
             {value.trim() ? `${selected.size} of ${pageCount} pages selected` : `All ${pageCount} pages selected`}
           </p>
         </div>
         {value.trim() && <Button size="small" onClick={() => onChange("")} disabled={disabled}>Select all</Button>}
       </div>
 
-      <ul className="grid max-h-[420px] grid-cols-3 gap-3 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-3 sm:grid-cols-5 md:grid-cols-6">
+      <ul className="grid max-h-[420px] grid-cols-3 gap-3 overflow-y-auto rounded-xl border border-[var(--border)] bg-white p-3 sm:grid-cols-5 md:grid-cols-6">
         {items.map((item) => {
           const active = !value.trim() || selected.has(item.pageNumber);
           return (
@@ -112,13 +112,13 @@ export default function PdfPageSelector({ file, value, disabled, onChange }: Pro
                 aria-pressed={active}
                 aria-label={`${active ? "Deselect" : "Select"} page ${item.pageNumber}`}
                 onClick={() => toggle(item.pageNumber)}
-                className={`relative w-full overflow-hidden rounded-md border-2 bg-white p-1 text-left transition ${active ? "border-blue-600" : "border-transparent opacity-55 hover:opacity-80"}`}
+                className={`relative w-full overflow-hidden rounded-lg border-2 bg-white p-1 text-left transition ${active ? "border-[var(--primary)]" : "border-transparent opacity-55 hover:opacity-80"}`}
               >
                 {/* Object URLs are local previews and do not benefit from next/image. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={item.url} alt="" className="aspect-[0.72] w-full object-contain" />
                 <span className="mt-1 block text-center text-xs font-medium">{item.pageNumber}</span>
-                {active && <CheckCircleFilled className="absolute right-1 top-1 rounded-full bg-white text-blue-600" aria-hidden="true" />}
+                {active && <CheckCircle2 className="absolute right-1 top-1 h-4 w-4 rounded-full bg-white text-[var(--primary)]" aria-hidden="true" />}
               </button>
             </li>
           );

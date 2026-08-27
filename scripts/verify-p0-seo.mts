@@ -62,15 +62,18 @@ const checks: Array<[string, () => void | Promise<void>]> = [
     assert.deepEqual(value.rules, [{ userAgent: "*", allow: "/", disallow: "/api/" }]);
   }],
   ["homepage and converter expose normal crawlable links", async () => {
-    const [home, converter] = await Promise.all([
+    const [home, converter, toolCard] = await Promise.all([
       readFile(new URL("../src/views/Home/index.tsx", import.meta.url), "utf8"),
       readFile(new URL("../src/views/ConvertPDF.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../src/components/tools/ToolCard.tsx", import.meta.url), "utf8"),
     ]);
     assert.equal(home.includes("router.push"), false);
     assert.equal(converter.includes("router.push"), false);
-    assert.match(converter, /^\s*["']use client["'];/);
-    assert.match(home, /<Link\s+href=\{tool\.path\}/);
-    assert.match(converter, /<Link href="\/pdf-to-image"/);
+    assert.match(home, /<ToolCard/);
+    assert.match(converter, /<ToolCard/);
+    assert.match(toolCard, /<Link href=\{href\}/);
+    assert.match(home, /href=\{`\/\$\{tool\.id\}`\}/);
+    assert.match(converter, /href=\{`\/\$\{tool\.id\}`\}/);
   }],
   ["registers brand logo, favicons and installable app icons", async () => {
     const [navbar, layout, schema, manifest] = await Promise.all([

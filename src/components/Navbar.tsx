@@ -1,98 +1,73 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import { Button, Popover } from "antd";
-import {
-  BgColorsOutlined,
-  CompressOutlined,
-  DownOutlined,
-  EditOutlined,
-  FileExcelOutlined,
-  FileImageOutlined,
-  FileWordOutlined,
-  FormOutlined,
-  MergeOutlined,
-  PictureOutlined,
-  RotateRightOutlined,
-  SplitCellsOutlined,
-} from "@ant-design/icons";
-import { forwardRef, type ReactNode } from "react";
+import Link from "next/link";
+import { ChevronDown, Menu, Search, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import LanguageSwitcher from "./LanguageSwitcher";
+import Container from "./ui/Container";
+import ToolIcon from "./tools/ToolIcon";
 
-type ToolLink = {
-  href: string;
-  label: string;
-  icon: ReactNode;
-};
+type MenuName = "tools" | "convert" | null;
 
-type ToolGroup = {
-  title: string;
-  tools: ToolLink[];
-};
-
-const convertGroups: ToolGroup[] = [
+const TOOL_GROUPS = [
   {
-    title: "Convert to PDF",
-    tools: [
-      { href: "/jpg-to-pdf", label: "JPG to PDF", icon: <PictureOutlined /> },
-      { href: "/word-to-pdf", label: "Word to PDF", icon: <FileWordOutlined /> },
-      { href: "/excel-to-pdf", label: "Excel to PDF", icon: <FileExcelOutlined /> },
+    title: "Organize",
+    links: [
+      ["merge-pdf", "Merge PDF"],
+      ["split-pdf", "Split PDF"],
+      ["rotate-pdf", "Rotate PDF"],
+    ],
+  },
+  {
+    title: "Optimize & edit",
+    links: [
+      ["compress-pdf", "Compress PDF"],
+      ["edit-pdf", "Edit PDF"],
+      ["watermark", "Watermark PDF"],
+      ["sign-pdf", "Sign PDF"],
     ],
   },
   {
     title: "Convert from PDF",
-    tools: [
-      { href: "/pdf-to-jpg", label: "PDF to JPG", icon: <FileImageOutlined /> },
-      { href: "/pdf-to-image", label: "PDF to PNG", icon: <PictureOutlined /> },
-      { href: "/pdf-to-word", label: "PDF to Word", icon: <FileWordOutlined /> },
+    links: [
+      ["pdf-to-word", "PDF to Word"],
+      ["pdf-to-jpg", "PDF to JPG"],
+      ["pdf-to-image", "PDF to PNG"],
     ],
   },
-];
+  {
+    title: "Convert to PDF",
+    links: [
+      ["word-to-pdf", "Word to PDF"],
+      ["excel-to-pdf", "Excel to PDF"],
+      ["jpg-to-pdf", "JPG to PDF"],
+    ],
+  },
+] as const;
 
-const allToolGroups: ToolGroup[] = [
-  {
-    title: "Organize PDF",
-    tools: [
-      { href: "/merge-pdf", label: "Merge PDF", icon: <MergeOutlined /> },
-      { href: "/split-pdf", label: "Split PDF", icon: <SplitCellsOutlined /> },
-      { href: "/rotate-pdf", label: "Rotate PDF", icon: <RotateRightOutlined /> },
-    ],
-  },
-  {
-    title: "Optimize PDF",
-    tools: [
-      { href: "/compress-pdf", label: "Compress PDF", icon: <CompressOutlined /> },
-    ],
-  },
-  ...convertGroups,
-  {
-    title: "Edit PDF",
-    tools: [
-      { href: "/edit-pdf", label: "Edit PDF", icon: <EditOutlined /> },
-      { href: "/watermark", label: "Add watermark", icon: <BgColorsOutlined /> },
-      { href: "/sign-pdf", label: "Sign PDF", icon: <FormOutlined /> },
-    ],
-  },
-];
+const CONVERT_GROUPS = TOOL_GROUPS.slice(2);
 
-function ToolMenu({ groups, expanded = false }: { groups: ToolGroup[]; expanded?: boolean }) {
+function MegaMenu({ groups, onNavigate }: { groups: typeof TOOL_GROUPS; onNavigate: () => void }) {
   return (
-    <div className={expanded ? "grid w-[min(92vw,960px)] grid-cols-2 gap-x-10 gap-y-7 p-2 lg:grid-cols-3" : "grid w-[min(90vw,480px)] grid-cols-1 gap-6 p-2 sm:grid-cols-2"}>
+    <div className={`grid gap-7 p-6 ${groups.length > 2 ? "lg:grid-cols-4" : "sm:grid-cols-2"}`}>
       {groups.map((group) => (
         <section key={group.title} aria-label={group.title}>
-          <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">{group.title}</h2>
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]">
+            {group.title}
+          </p>
           <div className="space-y-1">
-            {group.tools.map((tool) => (
+            {group.links.map(([id, label]) => (
               <Link
-                key={tool.href}
-                href={tool.href}
-                className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm font-semibold text-slate-800 no-underline transition hover:bg-slate-100 hover:text-red-500"
+                key={id}
+                href={`/${id}`}
+                onClick={onNavigate}
+                className="group flex items-center gap-3 rounded-xl px-2 py-2.5 text-sm font-semibold text-[var(--text-primary)] no-underline transition hover:bg-[var(--primary-soft)] hover:text-[var(--primary-hover)]"
               >
-                <span className="grid h-7 w-7 place-items-center rounded-md bg-slate-100 text-base text-red-500">
-                  {tool.icon}
+                <span className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--border)] bg-white text-[var(--primary)] transition group-hover:border-[#f4c7c0]">
+                  <ToolIcon id={id} className="h-4.5 w-4.5" />
                 </span>
-                {tool.label}
+                {label}
               </Link>
             ))}
           </div>
@@ -102,77 +77,114 @@ function ToolMenu({ groups, expanded = false }: { groups: ToolGroup[]; expanded?
   );
 }
 
-const MenuTrigger = forwardRef<HTMLButtonElement, { children: ReactNode }>(function MenuTrigger(
-  { children },
-  ref
-) {
-  return (
-    <button
-      ref={ref}
-      type="button"
-      className="inline-flex items-center gap-2 whitespace-nowrap border-0 bg-transparent px-1 py-2 text-sm font-bold uppercase tracking-tight text-slate-800 transition hover:text-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
-    >
-      {children}
-      <DownOutlined className="text-xs" aria-hidden="true" />
-    </button>
-  );
-});
-
-const primaryLinkClass = "whitespace-nowrap px-1 py-2 text-sm font-bold uppercase tracking-tight text-slate-800 no-underline transition hover:text-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500";
-
 export default function Navbar() {
+  const [openMenu, setOpenMenu] = useState<MenuName>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpenMenu(null);
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:gap-5 sm:px-5 lg:px-6">
-        <Link href="/" className="flex shrink-0 no-underline" aria-label="PDFNova home">
+    <header className="sticky top-0 z-50 border-b border-white/70 bg-white/90 shadow-[0_1px_8px_rgb(16_24_40/0.05)] backdrop-blur-xl">
+      <Container className="relative flex h-[72px] items-center justify-between gap-5">
+        <Link href="/" onClick={() => { setOpenMenu(null); setMobileOpen(false); }} className="flex shrink-0 no-underline" aria-label="PDFNova home">
           <Image
             src="/assets/pdf-nova-logo-horizontal.png"
             alt="PDFNova"
             width={157}
             height={50}
             priority
-            className="h-9 w-auto lg:h-10"
+            className="h-9 w-auto"
           />
         </Link>
 
-        <nav aria-label="Primary navigation" className="hidden items-center gap-4 lg:flex xl:gap-7">
-          <Link href="/merge-pdf" className={primaryLinkClass}>Merge PDF</Link>
-          <Link href="/split-pdf" className={primaryLinkClass}>Split PDF</Link>
-          <Link href="/compress-pdf" className={primaryLinkClass}>Compress PDF</Link>
-          <Popover
-            content={<ToolMenu groups={convertGroups} />}
-            trigger={["hover", "click"]}
-            placement="bottomLeft"
-            arrow={false}
-            mouseEnterDelay={0.08}
-            mouseLeaveDelay={0.15}
-            styles={{ container: { borderRadius: 14, padding: 14 } }}
+        <nav aria-label="Primary navigation" className="hidden items-center gap-1 lg:flex">
+          <button
+            type="button"
+            onMouseEnter={() => setOpenMenu("tools")}
+            onClick={() => setOpenMenu(openMenu === "tools" ? null : "tools")}
+            aria-expanded={openMenu === "tools"}
+            className="inline-flex h-10 items-center gap-1 rounded-lg border-0 bg-transparent px-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-slate-100"
           >
-            <MenuTrigger>Convert PDF</MenuTrigger>
-          </Popover>
-          <Popover
-            content={<ToolMenu groups={allToolGroups} expanded />}
-            trigger={["hover", "click"]}
-            placement="bottom"
-            arrow={false}
-            mouseEnterDelay={0.08}
-            mouseLeaveDelay={0.15}
-            styles={{ container: { borderRadius: 14, padding: 14 } }}
+            PDF Tools <ChevronDown className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onMouseEnter={() => setOpenMenu("convert")}
+            onClick={() => setOpenMenu(openMenu === "convert" ? null : "convert")}
+            aria-expanded={openMenu === "convert"}
+            className="inline-flex h-10 items-center gap-1 rounded-lg border-0 bg-transparent px-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-slate-100"
           >
-            <MenuTrigger>All PDF Tools</MenuTrigger>
-          </Popover>
+            Convert <ChevronDown className="h-4 w-4" />
+          </button>
+          <Link href="/compress-pdf" onClick={() => setOpenMenu(null)} className="rounded-lg px-3 py-2.5 text-sm font-semibold text-[var(--text-primary)] no-underline hover:bg-slate-100">
+            Compress
+          </Link>
+          <Link href="/blog" onClick={() => setOpenMenu(null)} className="rounded-lg px-3 py-2.5 text-sm font-semibold text-[var(--text-primary)] no-underline hover:bg-slate-100">
+            Blog
+          </Link>
         </nav>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <Link href="/" className="hidden text-sm font-semibold text-slate-700 no-underline hover:text-red-500 sm:inline lg:hidden">
-            Tools
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          <Link
+            href="/#tool-search"
+            onClick={() => setOpenMenu(null)}
+            aria-label="Search PDF tools"
+            className="hidden h-10 w-10 place-items-center rounded-lg text-[var(--text-secondary)] no-underline hover:bg-slate-100 hover:text-[var(--primary)] sm:grid"
+          >
+            <Search className="h-5 w-5" />
           </Link>
-          <LanguageSwitcher />
-          <Link href="/login">
-            <Button type="primary" danger>Login</Button>
+          <div className="hidden sm:block"><LanguageSwitcher /></div>
+          <Link href="/login" className="pdfnova-primary-button hidden !min-h-10 !rounded-lg !px-4 lg:inline-flex">
+            Log in
           </Link>
+          <button
+            type="button"
+            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((value) => !value)}
+            className="grid h-10 w-10 place-items-center rounded-lg border border-[var(--border)] bg-white text-[var(--text-primary)] lg:hidden"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
-      </div>
+
+        {openMenu ? (
+          <div
+            onMouseLeave={() => setOpenMenu(null)}
+            className={`absolute top-[64px] z-50 overflow-hidden rounded-2xl border border-[var(--border)] bg-white shadow-[var(--shadow-lg)] ${openMenu === "tools" ? "left-5 right-5" : "left-1/2 w-[620px] -translate-x-1/2"}`}
+          >
+            <MegaMenu
+              groups={(openMenu === "tools" ? TOOL_GROUPS : CONVERT_GROUPS) as typeof TOOL_GROUPS}
+              onNavigate={() => setOpenMenu(null)}
+            />
+          </div>
+        ) : null}
+      </Container>
+
+      {mobileOpen ? (
+        <div className="max-h-[calc(100vh-72px)] overflow-y-auto border-t border-[var(--border)] bg-white lg:hidden">
+          <Container className="py-5">
+            <Link href="/#tool-search" className="mb-4 flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--page)] px-4 py-3 text-sm font-semibold text-[var(--text-secondary)] no-underline">
+              <Search className="h-4 w-4" /> Search tools
+            </Link>
+            <MegaMenu groups={TOOL_GROUPS} onNavigate={() => setMobileOpen(false)} />
+            <div className="mt-3 grid grid-cols-2 gap-3 border-t border-[var(--border)] pt-5">
+              <Link href="/blog" onClick={() => setMobileOpen(false)} className="pdfnova-secondary-button !min-h-11">Blog</Link>
+              <Link href="/login" onClick={() => setMobileOpen(false)} className="pdfnova-primary-button !min-h-11">Log in</Link>
+            </div>
+            <div className="mt-4 sm:hidden"><LanguageSwitcher /></div>
+          </Container>
+        </div>
+      ) : null}
     </header>
   );
 }

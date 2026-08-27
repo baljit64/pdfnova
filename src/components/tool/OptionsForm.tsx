@@ -19,8 +19,12 @@ export default function OptionsForm({ fields, values, onChange, disabled }: Prop
   if (fields.length === 0) return null;
 
   return (
-    <fieldset className="mt-6 border-0 p-0" disabled={disabled}>
+    <fieldset className="mt-7 rounded-2xl border border-[var(--border)] bg-[var(--page)] p-5 sm:p-6" disabled={disabled}>
       <legend className="sr-only">Options</legend>
+      <div className="mb-5">
+        <h2 className="text-sm font-bold text-[var(--text-primary)]">Customize your output</h2>
+        <p className="mt-1 text-xs text-[var(--text-muted)]">Choose the settings that fit this document.</p>
+      </div>
       <div className="grid gap-5 sm:grid-cols-2">
         {fields.map((field) => {
           const controlId = `option-${field.key}`;
@@ -34,7 +38,7 @@ export default function OptionsForm({ fields, values, onChange, disabled }: Prop
             >
               <label
                 htmlFor={controlId}
-                className="mb-1 block text-sm font-medium text-gray-700"
+                className="mb-1.5 block text-sm font-semibold text-[var(--text-primary)]"
               >
                 {field.label}
               </label>
@@ -111,7 +115,7 @@ export default function OptionsForm({ fields, values, onChange, disabled }: Prop
               )}
 
               {field.help && (
-                <p id={helpId} className="mt-1 text-xs text-gray-500">
+                <p id={helpId} className="mt-1.5 text-xs leading-5 text-[var(--text-muted)]">
                   {field.help}
                 </p>
               )}
@@ -168,7 +172,7 @@ function SignatureInput({
         width={700}
         height={180}
         aria-label="Draw your signature"
-        className="h-28 w-full touch-none rounded-lg border border-gray-300 bg-white"
+        className="h-28 w-full touch-none rounded-xl border border-[var(--border-strong)] bg-white"
         onPointerDown={(event) => {
           if (disabled) return;
           const canvas = canvasRef.current;
@@ -197,7 +201,7 @@ function SignatureInput({
       />
       <div className="flex flex-wrap items-center gap-2">
         <Button size="small" onClick={clear} disabled={disabled}>Clear drawing</Button>
-        <label className="cursor-pointer text-xs font-medium text-blue-700 hover:underline">
+        <label className="cursor-pointer text-xs font-semibold text-[var(--secondary)] hover:underline">
           Or upload PNG/JPG
           <input
             type="file"

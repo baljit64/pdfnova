@@ -1,9 +1,186 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary: #083CCC;
-  --color-secondary: #FFFFFF;
+  --primary: #cc4435;
+  --primary-hover: #b63a2e;
+  --primary-soft: #fff2ef;
+  --secondary: #1c398d;
+  --secondary-hover: #172f78;
+  --secondary-soft: #eef3ff;
+  --page: #f8fafc;
+  --surface: #ffffff;
+  --text-primary: #101828;
+  --text-secondary: #667085;
+  --text-muted: #98a2b3;
+  --border: #eaecf0;
+  --border-strong: #d0d5dd;
+  --success: #079455;
+  --success-soft: #ecfdf3;
+  --warning: #dc6803;
+  --warning-soft: #fffaeb;
+  --dark: #101828;
+  --shadow-xs: 0 1px 2px rgb(16 24 40 / 0.05);
+  --shadow-sm: 0 2px 8px rgb(16 24 40 / 0.07);
+  --shadow-md: 0 12px 28px -8px rgb(16 24 40 / 0.16);
+  --shadow-lg: 0 22px 45px -14px rgb(16 24 40 / 0.22);
 }
+
+@theme inline {
+  --font-sans: var(--font-geist);
+  --color-pdfnova-primary: var(--primary);
+  --color-pdfnova-secondary: var(--secondary);
+  --color-pdfnova-page: var(--page);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  top: 0 !important;
+  margin: 0;
+  background: var(--page);
+  color: var(--text-primary);
+  font-family: var(--font-geist), Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+button, input, select, textarea { font: inherit; }
+::selection { background: #f8cfc8; color: var(--dark); }
+:focus-visible { outline: 3px solid rgb(204 68 53 / 0.28); outline-offset: 2px; }
+
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  border: 1px solid #f4c7c0;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  padding: 0.25rem 0.75rem;
+  color: var(--primary-hover);
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  line-height: 1rem;
+  text-transform: uppercase;
+}
+
+.pdfnova-primary-button,
+.pdfnova-secondary-button {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--shadow-xs);
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.pdfnova-primary-button {
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: white;
+}
+
+.pdfnova-primary-button:hover {
+  border-color: var(--primary-hover);
+  background: var(--primary-hover);
+  color: white;
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.pdfnova-secondary-button {
+  border: 1px solid var(--border-strong);
+  background: white;
+  color: var(--text-primary);
+}
+
+.pdfnova-secondary-button:hover {
+  border-color: #98a2b3;
+  color: var(--primary-hover);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.pdfnova-workspace .ant-card,
+.pdfnova-workspace.ant-card {
+  border-color: var(--border) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.pdfnova-workspace .ant-btn {
+  min-height: 2.75rem;
+  border-radius: 0.625rem;
+  font-weight: 700;
+}
+
+.pdfnova-workspace .ant-btn-primary {
+  border-color: var(--primary) !important;
+  background: var(--primary) !important;
+  box-shadow: none !important;
+}
+
+.pdfnova-workspace .ant-btn-primary:hover {
+  border-color: var(--primary-hover) !important;
+  background: var(--primary-hover) !important;
+}
+
+.pdfnova-workspace .ant-radio-wrapper,
+.pdfnova-workspace .ant-checkbox-wrapper,
+.pdfnova-workspace .ant-form-item-label > label { color: var(--text-primary); }
+
+.pdfnova-workspace .ant-radio-checked .ant-radio-inner,
+.pdfnova-workspace .ant-checkbox-checked .ant-checkbox-inner {
+  border-color: var(--primary) !important;
+  background-color: var(--primary) !important;
+}
+
+.pdfnova-workspace .ant-input,
+.pdfnova-workspace .ant-input-number,
+.pdfnova-workspace .ant-select-selector {
+  border-color: var(--border-strong) !important;
+  border-radius: 0.625rem !important;
+}
+
+.pdfnova-content-page > h1,
+.pdfnova-form-page > h1 {
+  margin-bottom: 1rem !important;
+  color: var(--text-primary) !important;
+  font-size: clamp(2.25rem, 5vw, 3.25rem) !important;
+  letter-spacing: -0.035em;
+}
+
+.pdfnova-content-page > div,
+.pdfnova-content-page > section {
+  margin-top: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: white;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  box-shadow: var(--shadow-xs);
+}
+
+.pdfnova-content-page section + section { margin-top: 2rem; }
+.pdfnova-content-page h2 { color: var(--text-primary) !important; font-weight: 750 !important; }
+.pdfnova-content-page p { color: var(--text-secondary) !important; line-height: 1.75; }
+.pdfnova-content-page a,
+.pdfnova-form-page a { color: var(--primary) !important; }
+.pdfnova-form-page > p { color: var(--text-secondary) !important; }
+.pdfnova-form-page .ant-form-item-label > label { color: var(--text-primary); font-weight: 650; }
+.pdfnova-form-page .ant-input,
+.pdfnova-form-page .ant-input-affix-wrapper {
+  border-color: var(--border-strong);
+  border-radius: 0.625rem;
+}
+.pdfnova-form-page .ant-btn-primary { border-color: var(--primary) !important; background: var(--primary) !important; }
+.pdfnova-form-page .ant-btn-primary:hover { border-color: var(--primary-hover) !important; background: var(--primary-hover) !important; }
+
 /* The Google Translate control is driven by PDFNova's custom language menu. */
 #pdfnova-google-translate,
 .goog-te-banner-frame,
@@ -20,17 +197,18 @@
   border: 0 !important;
 }
 
-body {
-  top: 0 !important;
-}
-
-.goog-text-highlight {
-  background: inherit !important;
-  box-shadow: none !important;
-}
+.goog-text-highlight { background: inherit !important; box-shadow: none !important; }
 
 @media (max-width: 639px) {
-  .pdfnova-language-popover {
-    inset-inline-start: 4vw !important;
+  .pdfnova-language-popover { inset-inline-start: 4vw !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

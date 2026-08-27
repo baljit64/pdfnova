@@ -38,7 +38,7 @@ type Phase = "idle" | "running" | "done" | "error";
 const PdfPageOrganizer = dynamic(() => import("./PdfPageOrganizer"), {
   ssr: false,
   loading: () => (
-    <div className="mt-6 flex items-center gap-2 text-sm text-gray-600" role="status">
+    <div className="mt-6 flex items-center gap-2 text-sm text-[var(--text-secondary)]" role="status">
       <Spin size="small" />
       <span>Loading page organizer…</span>
     </div>
@@ -444,7 +444,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
   const running = phase === "running";
 
   return (
-    <Card className="rounded-xl shadow-lg">
+    <Card className="pdfnova-workspace !rounded-2xl !border-[var(--border)] !shadow-[var(--shadow-md)]" styles={{ body: { padding: 28 } }}>
       <ProcessingBadge type={tool.processingType} />
       <FileDropzone
         tool={tool}
@@ -488,7 +488,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
       {organizerMode &&
         (organizerMode === "split" ? files.length === 1 : files.length >= 2) &&
         organizer.loading && (
-          <div className="mt-6 flex items-center gap-2 text-sm text-gray-600" role="status">
+          <div className="mt-6 flex items-center gap-2 text-sm text-[var(--text-secondary)]" role="status">
             <Spin size="small" />
             <span>Preparing page previews…</span>
           </div>
@@ -545,13 +545,13 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
       <div aria-live="polite" aria-atomic="true" className={running ? "mt-6" : "sr-only"}>
         {running && (
           <>
-            <Progress percent={percent} status="active" strokeColor="#ef4444" />
-            <p className="mt-1 text-sm text-gray-600">{status || "Working…"}</p>
+            <Progress percent={percent} status="active" strokeColor="#cc4435" trailColor="#eaecf0" />
+            <p className="mt-1 text-sm font-medium text-[var(--text-secondary)]">{status || "Working…"}</p>
           </>
         )}
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
+      <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-[var(--border)] pt-6">
         <Button
           type="primary"
           danger
@@ -573,13 +573,13 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
       </div>
 
       {files.length > 0 && files.length < tool.minFiles && (
-        <p className="mt-3 text-sm text-gray-500">
+        <p className="mt-3 text-sm text-[var(--text-muted)]">
           Add at least {tool.minFiles} files to continue.
         </p>
       )}
 
       {missingRequired && files.length > 0 && (
-        <p className="mt-3 text-sm text-gray-500">
+        <p className="mt-3 text-sm text-[var(--text-muted)]">
           Fill in the required option above to continue.
         </p>
       )}

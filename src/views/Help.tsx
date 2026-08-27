@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Help() {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-16">
+    <div className="pdfnova-content-page max-w-3xl mx-auto px-6 py-16 sm:py-20">
       <h1 className="text-3xl font-bold text-blue-900 mb-6">Help & FAQ</h1>
 
       <section className="space-y-8 text-gray-700">

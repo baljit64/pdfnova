@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -12,6 +13,12 @@ import {
   HOME_URL,
   SITE_URL,
 } from "../seo/config";
+
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   applicationName: "PDFNova",
@@ -65,7 +72,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col">
+      <body className={`${geist.variable} flex min-h-screen flex-col`}>
         <JsonLd />
         <Navbar />
         <main className="flex-1">{children}</main>

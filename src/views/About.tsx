@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function About() {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-16">
+    <div className="pdfnova-content-page max-w-3xl mx-auto px-6 py-16 sm:py-20">
       <h1 className="text-3xl font-bold text-blue-900 mb-6">About PDFNova</h1>
 
       <div className="prose prose-gray max-w-none text-gray-700 space-y-6">

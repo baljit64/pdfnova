@@ -13,9 +13,11 @@ async function pdfFixture(label: string, pageCount = 1): Promise<Buffer> {
 
 test("homepage exposes functional tool links", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Free Online PDF Tools");
-  await expect(page.getByRole("link", { name: "Merge PDFs" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "PDF to PNG" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "Everything you need to work with PDFs."
+  );
+  await expect(page.getByRole("link", { name: /Merge PDF/ }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /PDF to PNG/ }).first()).toBeVisible();
 });
 
 test("merge tool produces a downloadable PDF", async ({ page }) => {

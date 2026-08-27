@@ -1,7 +1,7 @@
  "use client";
 
 import Link from "next/link";
-import { Button } from "antd";
+import { Clock3 } from "lucide-react";
 
 interface ComingSoonProps {
   title: string;
@@ -10,15 +10,15 @@ interface ComingSoonProps {
 
 export default function ComingSoon({ title, description }: ComingSoonProps) {
   return (
-    <div className="max-w-xl mx-auto px-6 py-16 text-center">
-      <h1 className="text-3xl font-bold text-blue-900 mb-4">{title}</h1>
-      <p className="text-gray-600 mb-6">{description}</p>
-      <p className="text-gray-500 text-sm mb-8">
+    <div className="mx-auto max-w-xl px-6 py-20 text-center sm:py-28">
+      <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[var(--primary-soft)] text-[var(--primary)]"><Clock3 className="h-7 w-7" /></span>
+      <p className="section-eyebrow mt-6">Coming soon</p>
+      <h1 className="mb-4 mt-4 text-4xl font-bold tracking-tight text-[var(--text-primary)]">{title}</h1>
+      <p className="mb-6 text-lg leading-7 text-[var(--text-secondary)]">{description}</p>
+      <p className="mb-8 text-sm leading-6 text-[var(--text-muted)]">
         This tool requires server-side processing. We&apos;re working on bringing it to you soon.
       </p>
-      <Link href="/">
-        <Button type="primary" danger>Back to all tools</Button>
-      </Link>
+      <Link href="/#all-tools" className="pdfnova-primary-button">Back to all tools</Link>
     </div>
   );
 }
