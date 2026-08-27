@@ -143,7 +143,7 @@ export default function Navbar() {
             <Search className="h-5 w-5" />
           </Link>
           <div className="hidden sm:block"><LanguageSwitcher /></div>
-          <Link href="/login" className="pdfnova-primary-button hidden !min-h-10 !rounded-lg !px-4 lg:inline-flex">
+          <Link href="/login" className="pdfnova-primary-button hidden !h-10 !min-h-10 !rounded-lg !px-4 !py-0 lg:inline-flex">
             Log in
           </Link>
           <button
