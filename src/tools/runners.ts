@@ -28,6 +28,7 @@ const RUNNERS: Record<ToolId, ToolRunner> = {
       outputs: await mergePDFs({
         files: ctx.files,
         rotations: ctx.rotations,
+        pagePlan: ctx.pagePlan,
         signal: ctx.signal,
         onProgress: ctx.onProgress,
       }),
@@ -41,6 +42,7 @@ const RUNNERS: Record<ToolId, ToolRunner> = {
       file: ctx.files[0],
       mode,
       ranges: str(ctx, "ranges"),
+      pagePlan: ctx.pagePlan,
       signal: ctx.signal,
       onProgress: ctx.onProgress,
     });

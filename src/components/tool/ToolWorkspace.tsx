@@ -1,10 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Button, Card, Progress } from "antd";
+import dynamic from "next/dynamic";
+import { Alert, Button, Card, Progress, Spin } from "antd";
 import { getRunner } from "../../tools/runners";
 import { defaultOptions } from "../../tools/registry";
 import { formatBytes } from "../../tools/engine/blob";
+import {
+  applyPageRangeExpression,
+  formatSelectedPageRange,
+} from "../../tools/page-organizer";
 import { track } from "../../analytics/track";
 import FileDropzone from "./FileDropzone";
 import OptionsForm from "./OptionsForm";
@@ -12,6 +17,7 @@ import ResultPanel from "./ResultPanel";
 import SelectedFiles from "./SelectedFiles";
 import ProcessingBadge from "./ProcessingBadge";
 import PdfPageSelector from "./PdfPageSelector";
+import { usePdfPageOrganizer } from "./usePdfPageOrganizer";
 import type {
   OptionValue,
   OptionValues,
@@ -29,6 +35,16 @@ interface Props {
 
 type Phase = "idle" | "running" | "done" | "error";
 
+const PdfPageOrganizer = dynamic(() => import("./PdfPageOrganizer"), {
+  ssr: false,
+  loading: () => (
+    <div className="mt-6 flex items-center gap-2 text-sm text-gray-600" role="status">
+      <Spin size="small" />
+      <span>Loading page organizer…</span>
+    </div>
+  ),
+});
+
 const ROTATION_STEPS = [0, 90, 180, 270];
 
 /**
@@ -38,6 +54,11 @@ const ROTATION_STEPS = [0, 90, 180, 270];
  * tool descriptor, so a landing page is never a degraded copy of the real tool.
  */
 export default function ToolWorkspace({ tool, page, variation }: Props) {
+  const organizerMode = tool.id === "merge-pdf"
+    ? "merge"
+    : tool.id === "split-pdf"
+      ? "split"
+      : null;
   const [files, setFiles] = useState<File[]>([]);
   const [rotations, setRotations] = useState<number[]>([]);
   const [options, setOptions] = useState<OptionValues>(() => defaultOptions(tool));
@@ -50,10 +71,16 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
   const [rejection, setRejection] = useState<string | null>(null);
   const [archiveBusy, setArchiveBusy] = useState(false);
   const [archivePercent, setArchivePercent] = useState(0);
+  const [rangeError, setRangeError] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
+  const initializedSplitSource = useRef<string | null>(null);
   const urlsRef = useRef<string[]>([]);
   const [urls, setUrls] = useState<string[]>([]);
+  const organizer = usePdfPageOrganizer(
+    files,
+    Boolean(organizerMode) && files.length > 0
+  );
 
   const analyticsBase = useMemo(
     () => ({ tool: tool.id, page, variation }),
@@ -119,6 +146,11 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
       if (accepted.length === 0) return;
 
       const next = tool.multiple ? [...base, ...accepted] : accepted.slice(0, 1);
+      if (organizerMode === "split") {
+        setOptions(defaultOptions(tool));
+        setRangeError(null);
+        initializedSplitSource.current = null;
+      }
       setFiles(next);
       setRotations(next.map((_, index) => rotations[index] ?? 0));
       setError(null);
@@ -133,7 +165,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
         totalBytes: next.reduce((sum, file) => sum + file.size, 0),
       });
     },
-    [analyticsBase, files, releaseUrls, rotations, tool.multiple, validate]
+    [analyticsBase, files, organizerMode, releaseUrls, rotations, tool, validate]
   );
 
   const moveFile = useCallback((from: number, to: number) => {
@@ -178,11 +210,37 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
     [options, tool.options]
   );
 
-  const canRun = files.length >= tool.minFiles && !missingRequired && phase !== "running";
+  useEffect(() => {
+    if (
+      organizerMode !== "split" ||
+      !organizer.ready ||
+      initializedSplitSource.current === organizer.sourceSignature
+    ) {
+      return;
+    }
+
+    initializedSplitSource.current = organizer.sourceSignature;
+    const ranges = formatSelectedPageRange(organizer.pages);
+    setOptions((current) => ({ ...current, ranges }));
+    setRangeError(null);
+  }, [organizer.pages, organizer.ready, organizer.sourceSignature, organizerMode]);
+
+  const selectedOrganizerPageCount = organizer.pages.filter((pageItem) => pageItem.selected).length;
+  const organizerCanRun = !organizerMode || (
+    organizer.ready &&
+    !organizer.error &&
+    !rangeError &&
+    selectedOrganizerPageCount > 0
+  );
+  const canRun =
+    files.length >= tool.minFiles &&
+    !missingRequired &&
+    organizerCanRun &&
+    phase !== "running";
 
   const run = useCallback(
     async (isRetry: boolean) => {
-      if (files.length < tool.minFiles) return;
+      if (!canRun) return;
 
       const controller = new AbortController();
       abortRef.current = controller;
@@ -207,6 +265,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
           files,
           options,
           rotations,
+          pagePlan: organizerMode ? organizer.pages : undefined,
           signal: controller.signal,
           onProgress: (value, message) => {
             setPercent(Math.max(0, Math.min(100, Math.round(value))));
@@ -259,7 +318,18 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
         abortRef.current = null;
       }
     },
-    [analyticsBase, files, options, releaseUrls, rotations, tool.id, tool.minFiles, tool.verb]
+    [
+      analyticsBase,
+      canRun,
+      files,
+      options,
+      organizer.pages,
+      organizerMode,
+      releaseUrls,
+      rotations,
+      tool.id,
+      tool.verb,
+    ]
   );
 
   const download = useCallback(
@@ -327,13 +397,33 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
     setStatus("");
     setArchiveBusy(false);
     setArchivePercent(0);
+    setRangeError(null);
+    initializedSplitSource.current = null;
     setPhase("idle");
     track("tool_reset", analyticsBase);
   }, [analyticsBase, releaseUrls, tool]);
 
   const updateOption = useCallback((key: string, value: OptionValue) => {
     setOptions((current) => ({ ...current, [key]: value }));
-  }, []);
+    if (organizerMode !== "split" || key !== "ranges" || !organizer.ready) return;
+
+    try {
+      const nextPages = applyPageRangeExpression(organizer.pages, String(value));
+      organizer.setPages(nextPages);
+      setRangeError(null);
+    } catch (caught) {
+      setRangeError(caught instanceof Error ? caught.message : "Could not read that page range.");
+    }
+  }, [organizer, organizerMode]);
+
+  const updateOrganizerPages = useCallback((nextPages: typeof organizer.pages) => {
+    organizer.setPages(nextPages);
+    if (organizerMode !== "split") return;
+
+    const ranges = formatSelectedPageRange(nextPages);
+    setOptions((current) => ({ ...current, ranges }));
+    setRangeError(ranges ? null : "Select at least one page.");
+  }, [organizer, organizerMode]);
 
   if (phase === "done" && outputs.length > 0) {
     return (
@@ -373,7 +463,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
         files={files}
         rotations={rotations}
         controls={tool.fileListControls}
-        minFiles={tool.minFiles}
+        minFiles={organizerMode === "merge" ? 0 : tool.minFiles}
         disabled={running}
         onMove={moveFile}
         onRemove={removeFile}
@@ -388,6 +478,42 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
           disabled={running}
         />
       )}
+
+      {rangeError && organizerMode === "split" && (
+        <div className="mt-4">
+          <Alert type="error" showIcon message="Check the page selection" description={rangeError} />
+        </div>
+      )}
+
+      {organizerMode &&
+        (organizerMode === "split" ? files.length === 1 : files.length >= 2) &&
+        organizer.loading && (
+          <div className="mt-6 flex items-center gap-2 text-sm text-gray-600" role="status">
+            <Spin size="small" />
+            <span>Preparing page previews…</span>
+          </div>
+        )}
+
+      {organizerMode &&
+        (organizerMode === "split" ? files.length === 1 : files.length >= 2) &&
+        organizer.error && (
+          <div className="mt-6">
+            <Alert type="error" showIcon message={organizer.error} />
+          </div>
+        )}
+
+      {organizerMode &&
+        (organizerMode === "split" ? files.length === 1 : files.length >= 2) &&
+        organizer.ready &&
+        !organizer.error && (
+          <PdfPageOrganizer
+            mode={organizerMode}
+            pages={organizer.pages}
+            thumbnailUrls={organizer.thumbnailUrls}
+            disabled={running}
+            onChange={updateOrganizerPages}
+          />
+        )}
 
       {files.length === 1 &&
         tool.extensions.includes(".pdf") &&

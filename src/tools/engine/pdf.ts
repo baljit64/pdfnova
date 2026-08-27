@@ -6,7 +6,7 @@
  * tool actually needs it.
  */
 import { assertNotAborted, baseName, pdfBlob, toWinAnsiSafe } from "./blob";
-import type { ToolOutput } from "../types";
+import type { OrganizerPage, ToolOutput } from "../types";
 import type { PDFDocument, PDFImage } from "pdf-lib";
 
 type Progress = (percent: number, message?: string) => void;
@@ -43,16 +43,112 @@ export interface MergeParams {
   files: File[];
   /** Rotation applied to every page of the file at the same index. */
   rotations?: number[];
+  /** Optional visual page plan. When present, selected entries control output order. */
+  pagePlan?: OrganizerPage[];
   signal: AbortSignal;
   onProgress?: Progress;
+}
+
+function selectedPlan(pagePlan: OrganizerPage[]): OrganizerPage[] {
+  const selected = pagePlan.filter((page) => page.selected);
+  if (selected.length === 0) throw new Error("At least one selected page is required.");
+  return selected;
+}
+
+function sourceLabel(page: OrganizerPage, files: File[]): string {
+  return page.sourceName || files[page.fileIndex]?.name || `source ${String(page.fileIndex)}`;
+}
+
+function validatePlanInvariants(pagePlan: OrganizerPage[], files: File[]): OrganizerPage[] {
+  const plannedPages = selectedPlan(pagePlan);
+  const seenPageIds = new Set<string>();
+  const seenSourcePages = new Set<string>();
+  for (const page of plannedPages) {
+    const source = sourceLabel(page, files);
+    if (!Number.isInteger(page.fileIndex) || page.fileIndex < 0 || page.fileIndex >= files.length) {
+      throw new Error(`${source}: file index ${String(page.fileIndex)} is not available.`);
+    }
+    if (seenPageIds.has(page.id)) throw new Error(`Page plan contains duplicate page id "${page.id}".`);
+    seenPageIds.add(page.id);
+    const key = `${page.fileIndex}:${page.sourcePageIndex}`;
+    if (seenSourcePages.has(key)) throw new Error(`${source}: page ${page.sourcePageIndex + 1} appears more than once in the page plan.`);
+    seenSourcePages.add(key);
+  }
+  return plannedPages;
+}
+
+function validatePlannedPageBounds(page: OrganizerPage, files: File[], pageCount: number): void {
+  const source = sourceLabel(page, files);
+  if (!Number.isInteger(page.sourcePageIndex) || page.sourcePageIndex < 0 || page.sourcePageIndex >= pageCount) {
+    throw new Error(`${source}: page ${Number(page.sourcePageIndex) + 1} does not exist — the PDF has ${pageCount} pages.`);
+  }
 }
 
 export async function mergePDFs({
   files,
   rotations = [],
+  pagePlan,
   signal,
   onProgress = noopProgress,
 }: MergeParams): Promise<ToolOutput[]> {
+  if (pagePlan !== undefined) {
+    assertNotAborted(signal);
+    const plannedPages = validatePlanInvariants(pagePlan, files);
+    const pagesBySource = new Map<number, OrganizerPage[]>();
+    for (const page of plannedPages) {
+      const sourcePages = pagesBySource.get(page.fileIndex) ?? [];
+      sourcePages.push(page);
+      pagesBySource.set(page.fileIndex, sourcePages);
+    }
+    const sourceIndices = [...pagesBySource.keys()].sort((a, b) => a - b);
+    assertNotAborted(signal);
+    const { PDFDocument, degrees } = await import("pdf-lib");
+    assertNotAborted(signal);
+    const merged = await PDFDocument.create();
+    const copiedBySourcePage = new Map<string, Awaited<ReturnType<typeof merged.copyPages>>[number]>();
+    const totalProgressSteps = sourceIndices.length + plannedPages.length;
+    let completedProgressSteps = 0;
+    onProgress(0, "Preparing selected pages");
+
+    for (const fileIndex of sourceIndices) {
+      const sourcePages = pagesBySource.get(fileIndex)!;
+      assertNotAborted(signal);
+      const bytes = await files[fileIndex].arrayBuffer();
+      assertNotAborted(signal);
+      const source = await PDFDocument.load(bytes);
+      assertNotAborted(signal);
+      preserveFormAppearance(source);
+      for (const page of sourcePages) validatePlannedPageBounds(page, files, source.getPageCount());
+      if (fileIndex === plannedPages[0].fileIndex) copyMetadata(source, merged);
+      assertNotAborted(signal);
+      const copied = await merged.copyPages(source, sourcePages.map((page) => page.sourcePageIndex));
+      assertNotAborted(signal);
+      sourcePages.forEach((page, index) => copiedBySourcePage.set(`${page.fileIndex}:${page.sourcePageIndex}`, copied[index]));
+      completedProgressSteps++;
+      onProgress(Math.round((completedProgressSteps / totalProgressSteps) * 90), `Copied selected pages from ${files[fileIndex].name}`);
+    }
+
+    for (const page of plannedPages) {
+      assertNotAborted(signal);
+      const copied = copiedBySourcePage.get(`${page.fileIndex}:${page.sourcePageIndex}`);
+      if (!copied) throw new Error(`${sourceLabel(page, files)}: page ${page.sourcePageIndex + 1} could not be copied.`);
+      merged.addPage(copied);
+      if (page.rotation !== 0) {
+        copied.setRotation(degrees((copied.getRotation().angle + page.rotation) % 360));
+      }
+      completedProgressSteps++;
+      onProgress(Math.round((completedProgressSteps / totalProgressSteps) * 90), `Adding page ${page.sourcePageIndex + 1} from ${sourceLabel(page, files)}`);
+    }
+
+    assertNotAborted(signal);
+    onProgress(95, "Writing merged PDF");
+    const bytes = await merged.save();
+    assertNotAborted(signal);
+    const blob = pdfBlob(bytes);
+    onProgress(100);
+    return [{ name: "merged.pdf", blob, kind: "pdf", size: blob.size }];
+  }
+
   const { PDFDocument, degrees } = await import("pdf-lib");
   const merged = await PDFDocument.create();
 
@@ -90,6 +186,8 @@ export interface SplitParams {
   mode: "each" | "range";
   /** Page range expression such as "1-3, 7, 9-12". 1-based, inclusive. */
   ranges?: string;
+  /** Optional visual page plan. When present, selected entries override `ranges`. */
+  pagePlan?: OrganizerPage[];
   signal: AbortSignal;
   onProgress?: Progress;
 }
@@ -139,9 +237,71 @@ export async function splitPDF({
   file,
   mode,
   ranges,
+  pagePlan,
   signal,
   onProgress = noopProgress,
 }: SplitParams): Promise<ToolOutput[]> {
+  if (pagePlan !== undefined) {
+    assertNotAborted(signal);
+    const plannedPages = validatePlanInvariants(pagePlan, [file]);
+    assertNotAborted(signal);
+    const { PDFDocument, degrees } = await import("pdf-lib");
+    assertNotAborted(signal);
+    const sourceBytes = await file.arrayBuffer();
+    assertNotAborted(signal);
+    const source = await PDFDocument.load(sourceBytes);
+    assertNotAborted(signal);
+    preserveFormAppearance(source);
+    const pageCount = source.getPageCount();
+    const stem = baseName(file.name);
+    for (const page of plannedPages) validatePlannedPageBounds(page, [file], pageCount);
+    onProgress(0, "Preparing selected pages");
+
+    if (mode === "range") {
+      const doc = await PDFDocument.create();
+      copyMetadata(source, doc);
+      assertNotAborted(signal);
+      const pages = await doc.copyPages(source, plannedPages.map((page) => page.sourcePageIndex));
+      assertNotAborted(signal);
+      onProgress(30, "Copied selected pages");
+      pages.forEach((page, index) => {
+        assertNotAborted(signal);
+        const rotation = plannedPages[index].rotation;
+        if (rotation !== 0) page.setRotation(degrees((page.getRotation().angle + rotation) % 360));
+        doc.addPage(page);
+        onProgress(Math.round(30 + ((index + 1) / pages.length) * 60), `Adding page ${plannedPages[index].sourcePageIndex + 1}`);
+      });
+      assertNotAborted(signal);
+      onProgress(95, "Writing extracted pages");
+      const blob = pdfBlob(await doc.save());
+      assertNotAborted(signal);
+      onProgress(100);
+      return [{ name: `${stem}-pages.pdf`, blob, kind: "pdf", size: blob.size }];
+    }
+
+    const outputs: ToolOutput[] = [];
+    onProgress(10, "Loaded selected pages");
+    for (let i = 0; i < plannedPages.length; i++) {
+      const plannedPage = plannedPages[i];
+      assertNotAborted(signal);
+      const doc = await PDFDocument.create();
+      copyMetadata(source, doc);
+      assertNotAborted(signal);
+      const [page] = await doc.copyPages(source, [plannedPage.sourcePageIndex]);
+      assertNotAborted(signal);
+      if (plannedPage.rotation !== 0) page.setRotation(degrees((page.getRotation().angle + plannedPage.rotation) % 360));
+      doc.addPage(page);
+      assertNotAborted(signal);
+      const blob = pdfBlob(await doc.save());
+      assertNotAborted(signal);
+      outputs.push({ name: `${stem}-page-${plannedPage.sourcePageIndex + 1}.pdf`, blob, kind: "pdf", size: blob.size });
+      onProgress(Math.round(10 + ((i + 1) / plannedPages.length) * 80), `Extracted page ${plannedPage.sourcePageIndex + 1} of ${pageCount}`);
+    }
+    onProgress(95, "Finalizing split PDF");
+    onProgress(100);
+    return outputs;
+  }
+
   const { PDFDocument } = await import("pdf-lib");
   const source = await PDFDocument.load(await file.arrayBuffer());
   preserveFormAppearance(source);

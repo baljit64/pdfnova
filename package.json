@@ -17,12 +17,16 @@
     "verify:seo": "tsx scripts/verify-p0-seo.mts",
     "verify:engine": "tsx scripts/verify-engine.mts",
     "verify:excel": "tsx scripts/verify-excel-to-pdf.mts",
+    "verify:organizer": "tsx scripts/verify-page-organizer.mts",
     "verify:e2e": "npm run build && playwright test",
-    "verify": "npm run verify:engine && npm run verify:excel && npm run verify:landing && npm run verify:seo",
+    "verify": "npm run verify:organizer && npm run verify:engine && npm run verify:excel && npm run verify:landing && npm run verify:seo",
     "seo:check": "npm run build && tsx scripts/verify-seo-live.mts"
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@supabase/supabase-js": "^2.87.2",
     "@vercel/analytics": "^2.0.1",
     "antd": "^6.1.3",

@@ -57,12 +57,23 @@ export interface OptionField {
 
 export type OptionValues = Record<string, OptionValue>;
 
+export interface OrganizerPage {
+  id: string;
+  fileIndex: number;
+  sourcePageIndex: number;
+  sourceName: string;
+  rotation: 0 | 90 | 180 | 270;
+  selected: boolean;
+}
+
 /** Everything a runner needs. Files arrive in the order the user arranged them. */
 export interface RunContext {
   files: File[];
   options: OptionValues;
   /** Per-file rotation in degrees, aligned to `files`. Only used by tools that opt in. */
   rotations: number[];
+  /** Optional visual page plan for tools that support page-level organization. */
+  pagePlan?: OrganizerPage[];
   signal: AbortSignal;
   /** `percent` is 0–100; `message` is surfaced to screen readers. */
   onProgress: (percent: number, message?: string) => void;

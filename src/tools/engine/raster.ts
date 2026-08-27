@@ -7,6 +7,7 @@
  */
 import { assertNotAborted, baseName, pdfBlob } from "./blob";
 import { parsePageRanges } from "./pdf";
+import { assertOrganizerPageLimit } from "../page-organizer";
 import type { ToolOutput } from "../types";
 
 type Progress = (percent: number, message?: string) => void;
@@ -14,6 +15,8 @@ type Progress = (percent: number, message?: string) => void;
 const noopProgress: Progress = () => {};
 
 type PdfJs = typeof import("pdfjs-dist");
+type PdfLoadingTask = ReturnType<PdfJs["getDocument"]>;
+type PdfDocument = Awaited<PdfLoadingTask["promise"]>;
 
 /**
  * Keep these hardening options in one non-literal value. Some pdf.js type
@@ -71,7 +74,13 @@ async function renderPage(
   canvas.height = Math.max(1, Math.floor(viewport.height));
   context.fillStyle = "#ffffff";
   context.fillRect(0, 0, canvas.width, canvas.height);
-  await page.render({ canvasContext: context, viewport, canvas }).promise;
+  try {
+    await page.render({ canvasContext: context, viewport, canvas }).promise;
+  } catch (error) {
+    canvas.width = 0;
+    canvas.height = 0;
+    throw error;
+  }
   return canvas;
 }
 
@@ -137,6 +146,164 @@ export async function pdfToImages({
 export interface PdfThumbnail {
   pageNumber: number;
   blob: Blob;
+}
+
+export interface PdfOrganizerInput {
+  file: File;
+  fileKey: string;
+  fileIndex: number;
+}
+
+export interface PdfOrganizerThumbnail {
+  id: string;
+  fileIndex: number;
+  sourcePageIndex: number;
+  sourceName: string;
+  blob: Blob;
+}
+
+function isAbortError(error: unknown): boolean {
+  return typeof error === "object" && error !== null && "name" in error && error.name === "AbortError";
+}
+
+function organizerReadError(file: File, error: unknown): Error {
+  if (isAbortError(error)) throw error;
+  const detail = error instanceof Error && error.message
+    ? ` ${error.message}`
+    : " Please check that it is a valid, unencrypted PDF.";
+  return new Error(`Could not read ${file.name}.${detail}`);
+}
+
+async function withOrganizerPdf<T>(
+  file: File,
+  signal: AbortSignal,
+  renderPdf: (pdf: PdfDocument) => Promise<T> | T,
+  preserveError?: (error: unknown) => boolean
+): Promise<T> {
+  let loadingTask: PdfLoadingTask | undefined;
+  let destroyPromise: Promise<void> | undefined;
+  let hasPrimaryError = false;
+  let cleanupError: unknown;
+  let hasCleanupError = false;
+  let result: T;
+
+  const destroyLoadingTask = (): Promise<void> => {
+    if (!loadingTask) return Promise.resolve();
+    if (!destroyPromise) {
+      try {
+        destroyPromise = Promise.resolve(loadingTask.destroy());
+      } catch (error) {
+        destroyPromise = Promise.reject(error);
+      }
+    }
+    return destroyPromise;
+  };
+  const abortLoadingTask = () => {
+    void destroyLoadingTask().catch(() => {});
+  };
+
+  try {
+    assertNotAborted(signal);
+    const pdfjs = await loadPdfJs();
+    assertNotAborted(signal);
+    const data = new Uint8Array(await file.arrayBuffer());
+    assertNotAborted(signal);
+    loadingTask = pdfjs.getDocument(pdfDocumentOptions(data));
+    signal.addEventListener("abort", abortLoadingTask, { once: true });
+    assertNotAborted(signal);
+    const pdf = await loadingTask.promise;
+    assertNotAborted(signal);
+    result = await renderPdf(pdf);
+  } catch (error) {
+    if (preserveError?.(error)) {
+      hasPrimaryError = true;
+      throw error;
+    }
+    if (isAbortError(error)) {
+      hasPrimaryError = true;
+      throw error;
+    }
+    if (signal.aborted) {
+      try {
+        assertNotAborted(signal);
+      } catch (abortError) {
+        hasPrimaryError = true;
+        throw abortError;
+      }
+    }
+    const reported = organizerReadError(file, error);
+    hasPrimaryError = true;
+    throw reported;
+  } finally {
+    signal.removeEventListener("abort", abortLoadingTask);
+    try {
+      await destroyLoadingTask();
+    } catch (error) {
+      if (!hasPrimaryError) {
+        cleanupError = error;
+        hasCleanupError = true;
+      }
+    }
+  }
+
+  if (hasCleanupError) {
+    if (signal.aborted) assertNotAborted(signal);
+    throw organizerReadError(file, cleanupError);
+  }
+  return result;
+}
+
+/**
+ * Render all organizer previews only after a sequential count pass proves the
+ * complete job is within the visual organizer's page cap. This intentionally
+ * reloads each source in the second pass: pdf.js owns its input buffer.
+ */
+export async function renderPdfOrganizerThumbnails(
+  inputs: PdfOrganizerInput[],
+  signal: AbortSignal
+): Promise<PdfOrganizerThumbnail[]> {
+  let totalPages = 0;
+
+  for (const { file } of inputs) {
+    let pageLimitError: unknown;
+    await withOrganizerPdf(file, signal, (pdf) => {
+      totalPages += pdf.numPages;
+      try {
+        assertOrganizerPageLimit(totalPages);
+      } catch (error) {
+        pageLimitError = error;
+        throw error;
+      }
+    }, (error) => error === pageLimitError);
+  }
+
+  const thumbnails: PdfOrganizerThumbnail[] = [];
+  for (const { file, fileKey, fileIndex } of inputs) {
+    await withOrganizerPdf(file, signal, async (pdf) => {
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+        assertNotAborted(signal);
+        const canvas = await renderPage(pdf, pageNumber, 0.28);
+        try {
+          assertNotAborted(signal);
+          const blob = await canvasToBlob(canvas, "image/jpeg", 0.72);
+          assertNotAborted(signal);
+          const sourcePageIndex = pageNumber - 1;
+          thumbnails.push({
+            id: `${fileKey}:${sourcePageIndex}`,
+            fileIndex,
+            sourcePageIndex,
+            sourceName: file.name,
+            blob,
+          });
+        } finally {
+          canvas.width = 0;
+          canvas.height = 0;
+        }
+      }
+    });
+  }
+
+  return thumbnails;
 }
 
 /** Low-resolution page previews used by page-selecting tools. */
