@@ -1,6 +1,6 @@
 /**
  * Per-tool source copy. Everything specific and factual about a tool lives here
- * once; variations in `variations.ts` add their own angle on top.
+ * once and is rendered on that tool's canonical landing page.
  *
  * Keep this honest — a landing page that overpromises is worse than no page.
  */
@@ -10,7 +10,7 @@ import type { ContentBlock, FaqItem, ListItem } from "./types";
 export interface ToolContent {
   /** Two paragraphs introducing the tool itself. */
   intro: string[];
-  /** Tool-specific advantages, merged with the variation's own list. */
+  /** Tool-specific advantages. */
   benefits: ListItem[];
   steps: ListItem[];
   features: ListItem[];

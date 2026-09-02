@@ -34,7 +34,7 @@ export function buildMetadata(path: string): Metadata {
   };
 }
 
-/** Metadata for canonical tool pages and their preserved variation routes. */
+/** Metadata for canonical, working tool pages. */
 export function buildLandingMetadata(page: LandingPage): Metadata {
   const url = `${SITE_URL}${page.path}`;
 
@@ -58,9 +58,7 @@ export function buildLandingMetadata(page: LandingPage): Metadata {
       description: page.description,
       images: [OG_IMAGE],
     },
-    // Variation routes remain usable and crawlable, but P0 indexing is limited
-    // to the canonical functional tool page for each tool.
-    robots: { index: page.isCanonical, follow: true },
+    robots: { index: true, follow: true },
     metadataBase: new URL(SITE_URL),
   };
 }

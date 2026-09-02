@@ -1,30 +1,18 @@
 /**
  * The landing page generator.
  *
- * Composes a tool definition, its source copy and a variation into a fully
- * resolved `LandingPage`. Adding pages is a matter of editing `variations.ts`
- * or a tool's `related` list — nothing here needs to change.
+ * Composes a tool definition, its source copy and canonical search metadata
+ * into a fully resolved `LandingPage`.
  */
 import { HOME_URL, SITE_URL } from "../config";
 import { AVAILABLE_TOOL_IDS, TOOLS, getTool } from "../../tools/registry";
 import type { ToolDefinition, ToolId } from "../../tools/types";
 import { getToolContent } from "./toolContent";
-import { VARIATIONS, getVariation, variationAppliesTo } from "./variations";
 import type { ContentBlock, LandingPage, ListItem, RelatedLink } from "./types";
+import { getToolSeo } from "./toolSeo";
 
-/** Marks the parent tool route, which is its own canonical. */
+/** Identifies the canonical tool experience in analytics. */
 export const CANONICAL_VARIATION = "canonical";
-
-const SITE_SUFFIX = " | PDFNova";
-const MAX_TITLE_LENGTH = 65;
-
-/** Sibling variation links per page. Enough that every page has inbound links. */
-const SIBLING_LINK_COUNT = 6;
-
-/** Append the brand only when it does not push the title past a sensible length. */
-function withBrand(title: string): string {
-  return title.length + SITE_SUFFIX.length <= MAX_TITLE_LENGTH ? `${title}${SITE_SUFFIX}` : title;
-}
 
 function privacySection(tool: ToolDefinition): ContentBlock {
   if (tool.processingType !== "client") {
@@ -83,22 +71,8 @@ function limitationsSection(tool: ToolDefinition): ContentBlock {
   };
 }
 
-function buildRelated(
-  tool: ToolDefinition,
-  variationId: string,
-  slugsForTool: string[]
-): RelatedLink[] {
+function buildRelated(tool: ToolDefinition): RelatedLink[] {
   const links: RelatedLink[] = [];
-
-  // Always point back at the parent tool so no landing page is an orphan.
-  if (variationId !== CANONICAL_VARIATION) {
-    links.push({
-      label: tool.name,
-      href: `/${tool.slug}`,
-      description: `The main ${tool.name.toLowerCase()} page, with the same tool and every option.`,
-    });
-  }
-
   for (const relatedId of tool.related) {
     const related = TOOLS[relatedId];
     if (!related?.available) continue;
@@ -109,36 +83,7 @@ function buildRelated(
     });
   }
 
-  // Sibling variations, taken as a window that rotates with this page's own
-  // position. A fixed window would leave every variation past the first few with
-  // no inbound links at all; rotating means each one is linked from several
-  // others, so the whole set is reachable by crawling rather than only via the
-  // sitemap.
-  const ownSlug = `${tool.slug}${variationSuffix(variationId)}`;
-  const start = Math.max(0, slugsForTool.indexOf(ownSlug)) + 1;
-
-  for (let offset = 0; offset < SIBLING_LINK_COUNT && offset < slugsForTool.length; offset++) {
-    const sibling = slugsForTool[(start + offset) % slugsForTool.length];
-    if (sibling === ownSlug) continue;
-
-    const variation = VARIATIONS.find(
-      (candidate) => `${tool.slug}${candidate.slugSuffix}` === sibling
-    );
-    if (!variation) continue;
-
-    links.push({
-      label: `${tool.name} — ${variation.label}`,
-      href: `/${sibling}`,
-      description: variation.description(tool),
-    });
-  }
-
   return links;
-}
-
-function variationSuffix(variationId: string): string {
-  if (variationId === CANONICAL_VARIATION) return "";
-  return getVariation(variationId)?.slugSuffix ?? "";
 }
 
 function countWords(page: Omit<LandingPage, "wordCount">): number {
@@ -161,8 +106,9 @@ function flattenList(items: ListItem[]): string[] {
 }
 
 /** Build the parent tool page — the canonical page for a tool. */
-function buildCanonicalPage(tool: ToolDefinition, slugsForTool: string[]): LandingPage {
+function buildCanonicalPage(tool: ToolDefinition): LandingPage {
   const content = getToolContent(tool.id);
+  const seo = getToolSeo(tool.id);
 
   const draft: Omit<LandingPage, "wordCount"> = {
     slug: tool.slug,
@@ -171,9 +117,9 @@ function buildCanonicalPage(tool: ToolDefinition, slugsForTool: string[]): Landi
     variationId: CANONICAL_VARIATION,
     isCanonical: true,
     targetKeyword: tool.keywords[0],
-    title: withBrand(`${tool.name} Online Free — ${tool.acceptLabel} Tool`),
-    description: `${tool.blurb} Free, no signup, no watermark. ${tool.processingType !== "client" ? "Uses a server-assisted conversion and returns a DOCX." : "Runs in your browser — the tool does not upload your file."}`,
-    h1: tool.name,
+    title: seo.title,
+    description: seo.description,
+    h1: seo.h1,
     intro: content.intro,
     sections: [
       content.technical,
@@ -186,75 +132,21 @@ function buildCanonicalPage(tool: ToolDefinition, slugsForTool: string[]): Landi
     features: content.features,
     useCases: content.useCases,
     faqs: content.faqs,
-    related: buildRelated(tool, CANONICAL_VARIATION, slugsForTool),
+    related: buildRelated(tool),
     breadcrumbs: [
       { name: "Home", url: HOME_URL },
+      { name: "PDF Tools", url: `${SITE_URL}/#all-tools` },
       { name: tool.name, url: `${SITE_URL}/${tool.slug}` },
     ],
   };
 
   return { ...draft, wordCount: countWords(draft) };
-}
-
-/** Build one variation page for a tool. */
-function buildVariationPage(
-  tool: ToolDefinition,
-  variationId: string,
-  slugsForTool: string[]
-): LandingPage | null {
-  const variation = getVariation(variationId);
-  if (!variation || !variationAppliesTo(variation, tool)) return null;
-
-  const content = getToolContent(tool.id);
-  const slug = `${tool.slug}${variation.slugSuffix}`;
-
-  const draft: Omit<LandingPage, "wordCount"> = {
-    slug,
-    path: `/${slug}`,
-    toolId: tool.id,
-    variationId: variation.id,
-    isCanonical: false,
-    targetKeyword: variation.keyword(tool),
-    title: withBrand(variation.titlePrefix(tool)),
-    description: variation.description(tool),
-    h1: variation.h1(tool),
-    // The variation's angle leads; the tool's own introduction follows it.
-    intro: [...variation.lead(tool), ...content.intro],
-    sections: [
-      variation.section(tool),
-      content.technical,
-      privacySection(tool),
-      securitySection(tool),
-      limitationsSection(tool),
-    ],
-    // Variation-specific advantages first — they are what this page is about.
-    benefits: [...variation.benefits(tool), ...content.benefits],
-    steps: content.steps,
-    features: content.features,
-    useCases: content.useCases,
-    faqs: [...variation.faqs(tool), ...content.faqs],
-    related: buildRelated(tool, variation.id, slugsForTool),
-    breadcrumbs: [
-      { name: "Home", url: HOME_URL },
-      { name: tool.name, url: `${SITE_URL}/${tool.slug}` },
-      { name: variation.label, url: `${SITE_URL}/${slug}` },
-    ],
-  };
-
-  return { ...draft, wordCount: countWords(draft) };
-}
-
-/** Every variation slug that applies to a tool, in catalogue order. */
-function variationSlugsFor(tool: ToolDefinition): string[] {
-  return VARIATIONS.filter((variation) => variationAppliesTo(variation, tool)).map(
-    (variation) => `${tool.slug}${variation.slugSuffix}`
-  );
 }
 
 let cachedPages: LandingPage[] | null = null;
 let cachedIndex: Map<string, LandingPage> | null = null;
 
-/** Every landing page in the site, canonical tool pages included. Built once. */
+/** Every canonical tool landing page in the site. Built once. */
 export function getAllLandingPages(): LandingPage[] {
   if (cachedPages) return cachedPages;
 
@@ -262,14 +154,7 @@ export function getAllLandingPages(): LandingPage[] {
 
   for (const toolId of AVAILABLE_TOOL_IDS) {
     const tool = getTool(toolId);
-    const slugsForTool = variationSlugsFor(tool);
-
-    pages.push(buildCanonicalPage(tool, slugsForTool));
-
-    for (const variation of VARIATIONS) {
-      const page = buildVariationPage(tool, variation.id, slugsForTool);
-      if (page) pages.push(page);
-    }
+    pages.push(buildCanonicalPage(tool));
   }
 
   cachedPages = pages;
@@ -287,14 +172,9 @@ export function getLandingPage(slug: string): LandingPage | undefined {
   return index().get(slug);
 }
 
-/** Variation pages only — the slugs the dynamic `[slug]` route serves. */
-export function getVariationLandingPages(): LandingPage[] {
-  return getAllLandingPages().filter((page) => !page.isCanonical);
-}
-
 /** Canonical pages for working tools — the tool URLs eligible for indexing. */
 export function getCanonicalLandingPages(): LandingPage[] {
-  return getAllLandingPages().filter((page) => page.isCanonical);
+  return getAllLandingPages();
 }
 
 export function getLandingPagesForTool(toolId: ToolId): LandingPage[] {

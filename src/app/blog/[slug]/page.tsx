@@ -93,7 +93,7 @@ export default async function BlogPostPage({ params }: RouteParams) {
   return (
     <div className="bg-white">
       <JsonLdScript schemas={schemas} id="blog-post-jsonld" />
-      <main>
+      <div>
         <header className="border-b border-[var(--border)] bg-[var(--page)]">
           <div className="mx-auto max-w-4xl px-6 pb-14 pt-10 text-center md:pb-20 md:pt-14">
             <nav aria-label="Breadcrumb" className="mb-8 text-sm text-[var(--text-muted)]">
@@ -192,7 +192,7 @@ export default async function BlogPostPage({ params }: RouteParams) {
             </div>
           </Container>
         </section>
-      </main>
+      </div>
     </div>
   );
 }

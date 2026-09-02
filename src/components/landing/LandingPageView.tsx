@@ -13,7 +13,7 @@ interface Props {
   page: LandingPage;
 }
 
-/** Shared server-rendered template behind every tool and landing-page variation. */
+/** Shared server-rendered template behind every canonical tool page. */
 export default function LandingPageView({ page }: Props) {
   const tool = getTool(page.toolId);
   const relatedGuides = BLOG_POSTS.filter((post) => post.tool.href === `/${tool.slug}`);
@@ -58,7 +58,7 @@ export default function LandingPageView({ page }: Props) {
         </Container>
       </div>
 
-      <main className="bg-white pb-20">
+      <div className="bg-white pb-20">
         <Container className="relative -mt-8 max-w-5xl sm:-mt-10">
           <ToolWorkspace tool={tool} page={page.path} variation={page.variationId} />
         </Container>
@@ -156,7 +156,7 @@ export default function LandingPageView({ page }: Props) {
           </section>
 
           <section className="mt-16" aria-labelledby="related">
-            <h2 id="related" className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Related tools and pages</h2>
+            <h2 id="related" className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Related PDF tools</h2>
             <ul className="mt-7 grid gap-4 p-0 sm:grid-cols-2">
               {page.related.map((link) => (
                 <li key={link.href} className="list-none">
@@ -192,7 +192,7 @@ export default function LandingPageView({ page }: Props) {
             </section>
           ) : null}
         </Container>
-      </main>
+      </div>
     </>
   );
 }

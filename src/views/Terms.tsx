@@ -60,10 +60,10 @@ export default function Terms() {
         <section>
           <h2 className="text-xl font-semibold text-blue-900">Third-party processing</h2>
           <p>
-            Most tools run in the browser. PDF to Word uses CloudConvert for server-assisted
-            conversion and is subject to that provider&apos;s availability and terms. The tool page and
-            Privacy Policy identify this difference so you can decide whether it is appropriate for
-            a particular document.
+            Most tools run in the browser. PDF to Word and Word to PDF use CloudConvert for
+            server-assisted conversion and are subject to that provider&apos;s availability and terms.
+            The tool pages and Privacy Policy identify this difference so you can decide whether
+            it is appropriate for a particular document.
           </p>
         </section>
         <section>

@@ -4,7 +4,8 @@ import { BLOG_POSTS } from "../src/blog/posts";
 import sitemap from "../src/app/sitemap";
 import robots from "../src/app/robots";
 import { BRAND_ASSETS, ROUTE_META, SITE_URL } from "../src/seo/config";
-import { getAllLandingPages, getVariationLandingPages } from "../src/seo/landing/generate";
+import { getAllLandingPages } from "../src/seo/landing/generate";
+import { LEGACY_TOOL_REDIRECTS } from "../src/seo/legacyRedirects";
 import { buildLandingMetadata, buildMetadata } from "../src/seo/nextMetadata";
 
 type RobotsValue = { index?: boolean; follow?: boolean } | string | null | undefined;
@@ -32,10 +33,10 @@ const checks: Array<[string, () => void | Promise<void>]> = [
       assert.equal(isNoIndex(robotsValue(buildMetadata(path))), true, path);
     }
   }],
-  ["marks generated variation pages noindex, follow", () => {
-    const variation = getVariationLandingPages()[0];
-    assert.ok(variation);
-    assert.equal(isNoIndex(robotsValue(buildLandingMetadata(variation))), true);
+  ["keeps canonical working tools indexable", () => {
+    for (const page of getAllLandingPages()) {
+      assert.equal(isNoIndex(robotsValue(buildLandingMetadata(page))), false, page.path);
+    }
   }],
   ["sitemap contains canonical functional pages and blog posts only", () => {
     const urls = sitemap().map((entry) => entry.url);
@@ -45,7 +46,7 @@ const checks: Array<[string, () => void | Promise<void>]> = [
     const expectedBlogUrls = BLOG_POSTS.map((post) => `${SITE_URL}/blog/${post.slug}`);
 
     for (const url of [...expectedToolUrls, ...expectedBlogUrls]) assert.ok(urls.includes(url), url);
-    assert.equal(urls.some((url) => getVariationLandingPages().some((page) => url === `${SITE_URL}${page.path}`)), false);
+    assert.equal(urls.some((url) => LEGACY_TOOL_REDIRECTS.some((redirect) => url === `${SITE_URL}/${redirect.slug}`)), false);
     for (const path of ["/login", "/pdf-to-excel", "/pdf-to-powerpoint", "/powerpoint-to-pdf"]) {
       assert.equal(urls.includes(`${SITE_URL}${path}`), false, path);
     }

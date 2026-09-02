@@ -1,9 +1,8 @@
 /**
  * Wiring for the parent tool routes (/merge-pdf, /compress-pdf, …).
  *
- * These render exactly the same template as the generated landing pages, using
- * the canonical page from the generator — so the parent route and every
- * variation share one implementation and one tool.
+ * Each working tool route resolves its centralized SEO copy and renders the
+ * shared server template with the shared tool workspace.
  */
 import { notFound } from "next/navigation";
 import LandingPageView from "./LandingPageView";

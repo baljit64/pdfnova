@@ -1,7 +1,7 @@
 /**
  * Structured data builders.
  *
- * Every landing page emits Breadcrumb, FAQ, SoftwareApplication/WebApplication
+ * Every canonical tool page emits Breadcrumb, FAQ, SoftwareApplication/WebApplication
  * and HowTo markup, generated from the same content the page renders — so the
  * markup can never drift out of sync with what a visitor actually sees.
  */
@@ -111,7 +111,7 @@ export function howToSchema(page: LandingPage, tool: ToolDefinition): Schema {
   };
 }
 
-/** Everything a landing page emits, in one array. */
+/** Everything a canonical tool page emits, in one array. */
 export function landingPageSchemas(page: LandingPage, tool: ToolDefinition): Schema[] {
   return [
     breadcrumbSchema(page),

@@ -6,8 +6,8 @@ import { BLOG_POSTS } from "../src/blog/posts";
 import { INDEXABLE_STATIC_PATHS, ROUTE_META, SITE_URL } from "../src/seo/config";
 import {
   getCanonicalLandingPages,
-  getVariationLandingPages,
 } from "../src/seo/landing/generate";
+import { LEGACY_TOOL_REDIRECTS } from "../src/seo/legacyRedirects";
 
 interface PageExpectation {
   path: string;
@@ -157,7 +157,6 @@ const noindexPaths = [
   "/pdf-to-excel",
   "/pdf-to-powerpoint",
   "/powerpoint-to-pdf",
-  ...getVariationLandingPages().map((page) => page.path),
 ];
 
 const port = await reservePort();
@@ -202,6 +201,13 @@ try {
     assert.equal(metaContent(html, "robots").some((value) => /noindex/i.test(value) && /follow/i.test(value)), true, path);
   });
   console.log(`ok - ${noindexPaths.length} preserved non-SEO routes emit noindex, follow`);
+
+  await mapInBatches(LEGACY_TOOL_REDIRECTS, 20, async (redirect) => {
+    const response = await fetch(`${origin}/${redirect.slug}`, { redirect: "manual" });
+    assert.equal(response.status, 308, redirect.slug);
+    assert.equal(response.headers.get("location"), redirect.destination, redirect.slug);
+  });
+  console.log(`ok - ${LEGACY_TOOL_REDIRECTS.length} legacy variation URLs permanently redirect to canonical tools`);
 
   const representativePaths = [
     "/",
@@ -266,6 +272,9 @@ try {
   console.log("ok - robots.txt allows public crawling and references the canonical sitemap");
 
   const homeHtml = await (await fetch(origin)).text();
+  assert.match(homeHtml, /<h1[^>]*>\s*Free Online/);
+  assert.match(homeHtml, /Free online PDF tools for everyday document tasks/i);
+  assert.match(homeHtml, /Frequently asked questions/i);
   const homeHrefs = new Set(tags(homeHtml, "a").map((tag) => attribute(tag, "href")));
   for (const tool of canonicalTools) assert.ok(homeHrefs.has(tool.path), tool.path);
   console.log(`ok - homepage links to all ${canonicalTools.length} functional tools with anchors`);
@@ -304,7 +313,12 @@ try {
   assert.equal(redirectResponse.statusCode, 308);
   assert.equal(redirectResponse.headers.location, `${SITE_URL}/merge-pdf`);
   redirectResponse.resume();
-  console.log("ok - non-www host redirects directly to the preferred HTTPS origin");
+
+  const legacyHostRedirect = await requestWithHost(port, "/merge-pdf-online", "pdfnova.in");
+  assert.equal(legacyHostRedirect.statusCode, 308);
+  assert.equal(legacyHostRedirect.headers.location, `${SITE_URL}/merge-pdf`);
+  legacyHostRedirect.resume();
+  console.log("ok - non-www canonical and legacy URLs redirect directly to their preferred HTTPS URL");
 
   if (process.env.GOOGLE_SITE_VERIFICATION) {
     assert.deepEqual(metaContent(homeHtml, "google-site-verification"), [process.env.GOOGLE_SITE_VERIFICATION]);

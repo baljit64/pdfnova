@@ -10,6 +10,7 @@ type ToolCardProps = {
   badge?: string;
   unavailable?: boolean;
   compact?: boolean;
+  hidden?: boolean;
 };
 
 export default function ToolCard({
@@ -20,6 +21,7 @@ export default function ToolCard({
   badge,
   unavailable = false,
   compact = false,
+  hidden = false,
 }: ToolCardProps) {
   const content = (
     <>
@@ -49,11 +51,11 @@ export default function ToolCard({
   const classes = `group block h-full rounded-2xl border border-[var(--border)] bg-white ${compact ? "p-5" : "p-6"} text-left no-underline shadow-[var(--shadow-xs)] transition duration-200 hover:-translate-y-1 hover:border-[var(--primary)]/30 hover:shadow-[var(--shadow-md)]`;
 
   if (unavailable) {
-    return <article className={`${classes} cursor-default opacity-75`}>{content}</article>;
+    return <article hidden={hidden} className={`${classes} cursor-default opacity-75`}>{content}</article>;
   }
 
   return (
-    <Link href={href} className={classes}>
+    <Link href={href} hidden={hidden} className={classes}>
       {content}
     </Link>
   );

@@ -23,7 +23,13 @@ import ToolCard from "../../components/tools/ToolCard";
 import Container from "../../components/ui/Container";
 import SectionHeading from "../../components/ui/SectionHeading";
 
-type Category = "All tools" | "Organize" | "Optimize" | "Convert" | "Edit & sign";
+type Category =
+  | "All tools"
+  | "Organize PDF"
+  | "Optimize PDF"
+  | "Convert from PDF"
+  | "Convert to PDF"
+  | "Edit PDF";
 
 type HomeTool = {
   id: string;
@@ -33,25 +39,32 @@ type HomeTool = {
   unavailable?: boolean;
 };
 
-const CATEGORIES: Category[] = ["All tools", "Organize", "Optimize", "Convert", "Edit & sign"];
+const CATEGORIES: Category[] = [
+  "All tools",
+  "Organize PDF",
+  "Optimize PDF",
+  "Convert from PDF",
+  "Convert to PDF",
+  "Edit PDF",
+];
 
 const TOOLS: HomeTool[] = [
-  { id: "merge-pdf", title: "Merge PDF", category: "Organize", description: "Combine PDFs into one file in the exact order you choose." },
-  { id: "split-pdf", title: "Split PDF", category: "Organize", description: "Extract selected pages or create a separate PDF for each page." },
-  { id: "compress-pdf", title: "Compress PDF", category: "Optimize", description: "Reduce file size with balanced, strong, or target-size options." },
-  { id: "rotate-pdf", title: "Rotate PDF", category: "Organize", description: "Turn all or selected pages and save the corrected document." },
-  { id: "pdf-to-word", title: "PDF to Word", category: "Convert", description: "Turn PDF content into an editable DOCX document." },
-  { id: "word-to-pdf", title: "Word to PDF", category: "Convert", description: "Convert DOC and DOCX files into shareable PDF documents." },
-  { id: "pdf-to-jpg", title: "PDF to JPG", category: "Convert", description: "Render selected PDF pages as clear JPG images." },
-  { id: "pdf-to-image", title: "PDF to PNG", category: "Convert", description: "Export PDF pages as high-quality PNG image files." },
-  { id: "jpg-to-pdf", title: "JPG to PDF", category: "Convert", description: "Arrange images and combine them into one polished PDF." },
-  { id: "excel-to-pdf", title: "Excel to PDF", category: "Convert", description: "Lay out spreadsheet data as clean, readable PDF tables." },
-  { id: "edit-pdf", title: "Edit PDF", category: "Edit & sign", description: "Add text and annotations to the page you choose." },
-  { id: "sign-pdf", title: "Sign PDF", category: "Edit & sign", description: "Place a signature on a selected PDF page." },
-  { id: "watermark", title: "Watermark PDF", category: "Edit & sign", description: "Add text or image watermarks with precise placement." },
-  { id: "pdf-to-powerpoint", title: "PDF to PowerPoint", category: "Convert", description: "Turn PDF pages into an editable presentation.", unavailable: true },
-  { id: "pdf-to-excel", title: "PDF to Excel", category: "Convert", description: "Extract PDF tables into spreadsheet-ready data.", unavailable: true },
-  { id: "powerpoint-to-pdf", title: "PowerPoint to PDF", category: "Convert", description: "Convert presentations into dependable PDF files.", unavailable: true },
+  { id: "merge-pdf", title: "Merge PDF", category: "Organize PDF", description: "Combine PDFs into one file in the exact order you choose." },
+  { id: "split-pdf", title: "Split PDF", category: "Organize PDF", description: "Extract selected pages or create a separate PDF for each page." },
+  { id: "compress-pdf", title: "Compress PDF", category: "Optimize PDF", description: "Reduce file size with balanced, strong, or target-size options." },
+  { id: "rotate-pdf", title: "Rotate PDF", category: "Organize PDF", description: "Turn all or selected pages and save the corrected document." },
+  { id: "pdf-to-word", title: "PDF to Word", category: "Convert from PDF", description: "Turn PDF content into an editable DOCX document." },
+  { id: "word-to-pdf", title: "Word to PDF", category: "Convert to PDF", description: "Convert DOC and DOCX files into shareable PDF documents." },
+  { id: "pdf-to-jpg", title: "PDF to JPG", category: "Convert from PDF", description: "Render selected PDF pages as clear JPG images." },
+  { id: "pdf-to-image", title: "PDF to PNG", category: "Convert from PDF", description: "Export PDF pages as high-quality PNG image files." },
+  { id: "jpg-to-pdf", title: "JPG to PDF", category: "Convert to PDF", description: "Arrange images and combine them into one polished PDF." },
+  { id: "excel-to-pdf", title: "Excel to PDF", category: "Convert to PDF", description: "Lay out spreadsheet data as clean, readable PDF tables." },
+  { id: "edit-pdf", title: "Edit PDF", category: "Edit PDF", description: "Add text and annotations to the page you choose." },
+  { id: "sign-pdf", title: "Sign PDF", category: "Edit PDF", description: "Place a signature on a selected PDF page." },
+  { id: "watermark", title: "Watermark PDF", category: "Edit PDF", description: "Add text or image watermarks with precise placement." },
+  { id: "pdf-to-powerpoint", title: "PDF to PowerPoint", category: "Convert from PDF", description: "Turn PDF pages into an editable presentation.", unavailable: true },
+  { id: "pdf-to-excel", title: "PDF to Excel", category: "Convert from PDF", description: "Extract PDF tables into spreadsheet-ready data.", unavailable: true },
+  { id: "powerpoint-to-pdf", title: "PowerPoint to PDF", category: "Convert to PDF", description: "Convert presentations into dependable PDF files.", unavailable: true },
 ];
 
 const POPULAR_IDS = ["merge-pdf", "compress-pdf", "pdf-to-word", "jpg-to-pdf", "split-pdf", "edit-pdf"];
@@ -88,7 +101,7 @@ export default function Home() {
             <Sparkles className="h-3.5 w-3.5" /> Free, fast and privacy-first
           </span>
           <h1 className="mx-auto mt-6 max-w-4xl text-4xl font-bold tracking-[-0.04em] text-[var(--text-primary)] sm:text-6xl lg:text-7xl">
-            Everything you need to work with <span className="text-[var(--primary)]">PDFs.</span>
+            Free Online <span className="text-[var(--primary)]">PDF Tools</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-[var(--text-secondary)] sm:text-xl">
             Merge, split, compress, convert, edit and sign documents with focused tools that work
@@ -151,13 +164,12 @@ export default function Home() {
       <section className="border-y border-[var(--border)] bg-[var(--page)] py-20 sm:py-24" id="all-tools">
         <Container>
           <SectionHeading eyebrow="Toolbox" title="All PDF tools" description="Choose a category or search by the result you need." />
-          <div className="mt-9 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Filter tools by category">
+          <div className="mt-9 flex flex-wrap justify-center gap-2" role="group" aria-label="Filter tools by category">
             {CATEGORIES.map((item) => (
               <button
                 key={item}
                 type="button"
-                role="tab"
-                aria-selected={category === item}
+                aria-pressed={category === item}
                 onClick={() => setCategory(item)}
                 className={`min-h-10 rounded-full border px-4 text-sm font-bold transition ${category === item ? "border-[var(--secondary)] bg-[var(--secondary)] text-white" : "border-[var(--border-strong)] bg-white text-[var(--text-secondary)] hover:border-[var(--secondary)] hover:text-[var(--secondary)]"}`}
               >
@@ -166,7 +178,7 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredTools.map((tool) => (
+            {TOOLS.map((tool) => (
               <ToolCard
                 key={tool.id}
                 id={tool.id}
@@ -176,6 +188,7 @@ export default function Home() {
                 badge={tool.unavailable ? "Planned" : undefined}
                 unavailable={tool.unavailable}
                 compact
+                hidden={!filteredTools.some((match) => match.id === tool.id)}
               />
             ))}
           </div>
@@ -285,6 +298,65 @@ export default function Home() {
                   <Link href={`/blog/${post.slug}`} className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--primary)] no-underline">Read guide <ArrowRight className="h-4 w-4" /></Link>
                 </div>
               </article>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      <section className="bg-white py-20 sm:py-24" aria-labelledby="about-pdfnova-tools">
+        <Container className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="section-eyebrow">A practical PDF toolbox</p>
+            <h2 id="about-pdfnova-tools" className="mt-4 text-3xl font-bold tracking-tight text-[var(--text-primary)] sm:text-4xl">
+              Free online PDF tools for everyday document tasks
+            </h2>
+          </div>
+          <div className="space-y-4 leading-8 text-[var(--text-secondary)]">
+            <p>
+              PDFNova brings common document jobs into one clear workspace. You can merge PDF
+              files into a chosen order, split out the pages you need, compress a PDF for an
+              upload limit, rotate scans, add a watermark, edit a PDF with new text, or sign a
+              document. Conversion tools cover PDF to Word, PDF to JPG, PDF to PNG, JPG to PDF,
+              Word to PDF, and spreadsheet to PDF workflows.
+            </p>
+            <p>
+              Each working tool has its own page with relevant options, step-by-step guidance,
+              realistic limitations, and links to useful next steps. Most tools process files on
+              your device. PDF to Word and Word to PDF use a clearly labelled server-assisted
+              conversion because preserving editable document structure and office layouts needs
+              a dedicated conversion service.
+            </p>
+            <p>
+              No account is required for the public tools. Choose the task that matches your
+              file, review the processing notice, and preview the result before downloading it.
+              If you are unsure which workflow to use, the PDF guides explain common choices in
+              plain language.
+            </p>
+          </div>
+        </Container>
+      </section>
+
+      <section className="border-y border-[var(--border)] bg-[var(--page)] py-20 sm:py-24" aria-labelledby="home-faq">
+        <Container className="max-w-4xl">
+          <p className="section-eyebrow">Helpful answers</p>
+          <h2 id="home-faq" className="mt-4 text-3xl font-bold tracking-tight text-[var(--text-primary)] sm:text-4xl">
+            Frequently asked questions
+          </h2>
+          <div className="mt-8 divide-y divide-[var(--border)] overflow-hidden rounded-2xl border border-[var(--border)] bg-white">
+            {[
+              ["Are PDFNova's PDF tools free?", "Yes. The working public tools can be used without creating an account or entering payment details."],
+              ["Do my files get uploaded?", "Most tools process files in your browser. PDF to Word and Word to PDF use server-assisted CloudConvert processing, and those pages show that before you begin."],
+              ["Which PDF tasks can I complete?", "You can merge, split, compress, rotate, watermark, sign, annotate, and convert supported PDF, image, Word, and spreadsheet files."],
+              ["Can I use PDFNova on a phone or tablet?", "Yes. The interface works in current mobile browsers, although large files and page-heavy jobs are usually faster on a computer with more memory."],
+              ["How do I choose between JPG and PNG?", "JPG is usually smaller and suits photos. PNG preserves sharp edges and text more clearly, but its files are often larger."],
+            ].map(([question, answer], index) => (
+              <details key={question} className="group" open={index === 0}>
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 font-bold text-[var(--text-primary)] marker:content-none sm:px-6">
+                  {question}
+                  <span aria-hidden="true" className="text-xl text-[var(--primary)] transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p className="px-5 pb-5 leading-7 text-[var(--text-secondary)] sm:px-6">{answer}</p>
+              </details>
             ))}
           </div>
         </Container>

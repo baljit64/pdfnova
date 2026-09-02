@@ -15,7 +15,7 @@ export default function ConvertPDF() {
   return (
     <div className="bg-[var(--page)] py-16 sm:py-20">
       <Container>
-        <SectionHeading eyebrow="Convert" title="Convert files to and from PDF" description="Choose the format you have and the result you need." />
+        <SectionHeading level="h1" eyebrow="Convert" title="Convert files to and from PDF" description="Choose the format you have and the result you need." />
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {CONVERTERS.map((tool) => (
             <ToolCard key={tool.id} id={tool.id} href={`/${tool.id}`} title={tool.title} description={tool.description} />
