@@ -95,6 +95,11 @@ export const ROUTE_META: Record<string, RouteMeta> = {
     description: "Access the PDFNova login page.",
     indexable: false,
   },
+  "/signup": {
+    title: "Create Your PDFNova Account",
+    description: "Create an optional PDFNova account using your email address.",
+    indexable: false,
+  },
   "/pdf-to-excel": {
     title: "PDF to Excel Converter – Coming Soon | PDFNova",
     description:

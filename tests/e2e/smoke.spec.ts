@@ -75,3 +75,31 @@ test("unknown routes return the custom 404", async ({ page }) => {
   expect(response?.status()).toBe(404);
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Page not found");
 });
+
+test("signup exposes accessible validation", async ({ page }) => {
+  await page.goto("/signup");
+
+  await expect(page.getByRole("heading", { name: "Create your account" })).toBeVisible();
+  await expect(page.getByLabel("Full name")).toHaveAttribute("autocomplete", "name");
+  await expect(page.getByLabel("Email")).toHaveAttribute("autocomplete", "email");
+  await expect(page.getByLabel("Password", { exact: true })).toHaveAttribute(
+    "autocomplete",
+    "new-password"
+  );
+  await expect(page.getByLabel("Confirm password")).toHaveAttribute(
+    "autocomplete",
+    "new-password"
+  );
+
+  await page.getByLabel("Password", { exact: true }).fill("12345678");
+  await page.getByLabel("Confirm password").fill("87654321");
+  await page.getByRole("button", { name: "Create Account" }).click();
+
+  await expect(page.getByText("Enter your full name.")).toBeVisible();
+  await expect(page.getByText("Enter a valid email address.")).toBeVisible();
+  await expect(page.getByText("Passwords do not match.")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in" })).toHaveAttribute(
+    "href",
+    "/login"
+  );
+});

@@ -28,8 +28,8 @@ const checks: Array<[string, () => void | Promise<void>]> = [
     assert.equal(new Set(entries.map((entry) => entry.description)).size, entries.length);
     assert.equal(entries.some((entry) => /100% secure/i.test(entry.description)), false);
   }],
-  ["marks login and unfinished tools noindex, follow", () => {
-    for (const path of ["/login", "/pdf-to-excel", "/pdf-to-powerpoint", "/powerpoint-to-pdf"]) {
+  ["marks auth entry pages and unfinished tools noindex, follow", () => {
+    for (const path of ["/login", "/signup", "/pdf-to-excel", "/pdf-to-powerpoint", "/powerpoint-to-pdf"]) {
       assert.equal(isNoIndex(robotsValue(buildMetadata(path))), true, path);
     }
   }],
@@ -47,7 +47,7 @@ const checks: Array<[string, () => void | Promise<void>]> = [
 
     for (const url of [...expectedToolUrls, ...expectedBlogUrls]) assert.ok(urls.includes(url), url);
     assert.equal(urls.some((url) => LEGACY_TOOL_REDIRECTS.some((redirect) => url === `${SITE_URL}/${redirect.slug}`)), false);
-    for (const path of ["/login", "/pdf-to-excel", "/pdf-to-powerpoint", "/powerpoint-to-pdf"]) {
+    for (const path of ["/login", "/signup", "/pdf-to-excel", "/pdf-to-powerpoint", "/powerpoint-to-pdf"]) {
       assert.equal(urls.includes(`${SITE_URL}${path}`), false, path);
     }
     assert.ok(urls.includes(`${SITE_URL}/`));

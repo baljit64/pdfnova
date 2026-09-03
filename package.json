@@ -18,8 +18,9 @@
     "verify:engine": "tsx scripts/verify-engine.mts",
     "verify:excel": "tsx scripts/verify-excel-to-pdf.mts",
     "verify:organizer": "tsx scripts/verify-page-organizer.mts",
+    "verify:auth": "tsx scripts/verify-auth.mts",
     "verify:e2e": "npm run build && playwright test",
-    "verify": "npm run verify:organizer && npm run verify:engine && npm run verify:excel && npm run verify:landing && npm run verify:seo",
+    "verify": "npm run verify:organizer && npm run verify:engine && npm run verify:excel && npm run verify:landing && npm run verify:auth && npm run verify:seo",
     "seo:check": "npm run build && tsx scripts/verify-seo-live.mts"
   },
   "dependencies": {
@@ -27,7 +28,8 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@supabase/supabase-js": "^2.87.2",
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.115.0",
     "@vercel/analytics": "^2.0.1",
     "antd": "^6.1.3",
     "jspdf": "^2.5.2",
