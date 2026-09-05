@@ -112,7 +112,7 @@ function AccountIdentity({ user, compact = false, large = false }: { user: User;
   );
 }
 
-function UserMenu({ user, mobile = false }: { user: User; mobile?: boolean }) {
+function UserMenu({ user }: { user: User }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -142,7 +142,7 @@ function UserMenu({ user, mobile = false }: { user: User; mobile?: boolean }) {
 
   return (
     <div
-      className={mobile ? "relative lg:hidden" : "relative hidden lg:block"}
+      className="relative hidden lg:block"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       onFocus={() => setOpen(true)}
@@ -154,9 +154,7 @@ function UserMenu({ user, mobile = false }: { user: User; mobile?: boolean }) {
         aria-haspopup="menu"
         aria-label={`Open ${name}'s account menu`}
         onClick={() => setOpen((current) => !current)}
-        className={mobile
-          ? "flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-[var(--shadow-xs)] transition hover:border-slate-400 hover:bg-slate-50"
-          : "flex h-11 max-w-52 items-center gap-2 rounded-full border border-[var(--border)] bg-white py-1 pl-1 pr-3 text-sm font-semibold text-[var(--text-primary)] shadow-[var(--shadow-xs)] transition hover:border-slate-400 hover:bg-slate-50"}
+        className="flex h-11 max-w-52 items-center gap-2 rounded-full border border-[var(--border)] bg-white py-1 pl-1 pr-3 text-sm font-semibold text-[var(--text-primary)] shadow-[var(--shadow-xs)] transition hover:border-slate-400 hover:bg-slate-50"
       >
         <AccountIdentity user={user} />
       </button>
@@ -164,7 +162,7 @@ function UserMenu({ user, mobile = false }: { user: User; mobile?: boolean }) {
         <div
           role="menu"
           aria-label="Account menu"
-          className={`absolute right-0 top-full z-[60] w-72 pt-2 text-left ${mobile ? "max-w-[calc(100vw-2.5rem)]" : ""}`}
+          className="absolute right-0 top-full z-[60] w-72 pt-2 text-left"
         >
           <div className="rounded-2xl border border-[var(--border)] bg-white p-4 shadow-[var(--shadow-lg)]">
             <div className="flex items-center gap-3">
@@ -194,7 +192,10 @@ function UserMenu({ user, mobile = false }: { user: User; mobile?: boolean }) {
 }
 
 export default function Navbar() {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [mobileLogoutBusy, setMobileLogoutBusy] = useState(false);
+  const [mobileLogoutError, setMobileLogoutError] = useState<string | null>(null);
   useEffect(() => {
     try {
       const { data: { subscription } } = createBrowserSupabaseClient().auth.onAuthStateChange((_event, session) => {
@@ -206,6 +207,23 @@ export default function Navbar() {
 
   const [openMenu, setOpenMenu] = useState<MenuName>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const signOutFromMobileNav = async () => {
+    if (mobileLogoutBusy) return;
+    setMobileLogoutBusy(true);
+    setMobileLogoutError(null);
+    try {
+      const { error } = await createBrowserSupabaseClient().auth.signOut();
+      if (error) throw error;
+      setMobileOpen(false);
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      setMobileLogoutError(authErrorMessage(error));
+    } finally {
+      setMobileLogoutBusy(false);
+    }
+  };
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -307,11 +325,29 @@ export default function Navbar() {
             <MegaMenu groups={TOOL_GROUPS} onNavigate={() => setMobileOpen(false)} />
             <div className="mt-3 grid grid-cols-2 gap-3 border-t border-[var(--border)] pt-5">
               <Link href="/blog" onClick={() => setMobileOpen(false)} className="pdfnova-secondary-button !min-h-11">Blog</Link>
-              {user ? <UserMenu user={user} mobile /> : (
+              {user ? (
+                <div className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--text-primary)]">
+                  <AccountIdentity user={user} compact />
+                  <span className="truncate">{userDisplayName(user)}</span>
+                </div>
+              ) : (
                 <Link href="/login" onClick={() => setMobileOpen(false)} className="pdfnova-primary-button !min-h-11">Log in</Link>
               )}
             </div>
-            <div className="mt-4 sm:hidden"><LanguageSwitcher /></div>
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <div className="sm:hidden"><LanguageSwitcher /></div>
+              {user ? (
+                <button
+                  type="button"
+                  disabled={mobileLogoutBusy}
+                  onClick={() => void signOutFromMobileNav()}
+                  className="pdfnova-secondary-button !min-h-11 !px-5 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {mobileLogoutBusy ? "Signing out..." : "Log out"}
+                </button>
+              ) : null}
+            </div>
+            {mobileLogoutError ? <p role="alert" className="mt-3 text-sm text-red-800">{mobileLogoutError}</p> : null}
           </Container>
         </div>
       ) : null}
