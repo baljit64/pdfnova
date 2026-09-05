@@ -9,14 +9,6 @@ import {
 } from "../../lib/auth/oauth";
 import { createBrowserSupabaseClient } from "../../lib/supabase/client";
 
-function AppleIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
-      <path d="M17.05 12.54c-.03-3.1 2.53-4.61 2.65-4.68a5.7 5.7 0 0 0-4.49-2.43c-1.89-.2-3.73 1.13-4.69 1.13-.98 0-2.46-1.11-4.06-1.08a5.96 5.96 0 0 0-5.02 3.06c-2.18 3.77-.55 9.31 1.53 12.36 1.04 1.5 2.25 3.17 3.85 3.11 1.56-.06 2.14-1 4.02-1s2.4 1 4.03.96c1.68-.03 2.73-1.5 3.73-3.02a12.3 12.3 0 0 0 1.71-3.48 5.35 5.35 0 0 1-3.26-4.93ZM13.98 3.42A5.42 5.42 0 0 0 15.22-.47a5.5 5.5 0 0 0-3.56 1.85 5.17 5.17 0 0 0-1.28 3.75 4.55 4.55 0 0 0 3.6-1.71Z" />
-    </svg>
-  );
-}
-
 function GoogleIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -36,8 +28,7 @@ function FacebookIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-const ICONS: Record<SocialAuthProvider["provider"], typeof AppleIcon> = {
-  apple: AppleIcon,
+const ICONS: Record<SocialAuthProvider["provider"], typeof GoogleIcon> = {
   google: GoogleIcon,
   facebook: FacebookIcon,
 };

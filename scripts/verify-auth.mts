@@ -105,11 +105,10 @@ check("translates authentication errors without leaking internals", () => {
   );
 });
 
-check("keeps the approved social provider order", () => {
+check("keeps only the free social providers in the approved order", () => {
   assert.deepEqual(
     SOCIAL_AUTH_PROVIDERS.map(({ provider, label }) => [provider, label]),
     [
-      ["apple", "Continue with Apple"],
       ["google", "Continue with Google"],
       ["facebook", "Continue with Facebook"],
     ]

@@ -108,17 +108,16 @@ test("login and signup put social sign-in before email and password", async ({ p
   for (const path of ["/login", "/signup"]) {
     await page.goto(path);
 
-    const apple = page.getByRole("button", { name: "Continue with Apple" });
     const google = page.getByRole("button", { name: "Continue with Google" });
     const facebook = page.getByRole("button", { name: "Continue with Facebook" });
     const email = page.getByLabel("Email");
 
-    await expect(apple).toBeVisible();
+    await expect(page.getByRole("button", { name: "Continue with Apple" })).toHaveCount(0);
     await expect(google).toBeVisible();
     await expect(facebook).toBeVisible();
     await expect(page.getByText("or continue with email")).toBeVisible();
 
-    for (const button of [apple, google, facebook]) {
+    for (const button of [google, facebook]) {
       expect(
         await button.evaluate((element, inputId) => {
           const input = document.getElementById(inputId);

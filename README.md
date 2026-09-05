@@ -57,7 +57,7 @@ In Supabase Authentication → URL Configuration, set the Site URL to
 - `https://www.pdfnova.in/auth/callback`
 - `http://localhost:3000/auth/callback`
 
-Enable Email plus the Apple, Google, and Facebook providers under Authentication → Providers.
+Enable Email plus the Google and Facebook providers under Authentication → Providers.
 For every social provider, copy the Supabase callback shown in that provider panel—normally
 `https://<project-ref>.supabase.co/auth/v1/callback`—into its external developer console. That
 provider callback is different from PDFNova's application callback above.
@@ -68,10 +68,6 @@ provider callback is different from PDFNova's application callback above.
 - Facebook: configure Facebook Login, request the `email` permission, add the exact Supabase
   provider callback under Valid OAuth Redirect URIs, and switch the app to Live mode before public
   production use.
-- Apple: create an Apple App ID, web Services ID, and signing key; configure the Supabase domain
-  and provider callback on the Services ID. Store the signing key securely and rotate the generated
-  Apple client secret every six months.
-
 Provider secrets belong only in the provider panels and secret stores. Do not put them in this
 repository or in `NEXT_PUBLIC_` environment variables.
 
