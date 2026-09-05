@@ -42,7 +42,7 @@ export default function PasswordRecoveryForm({ reset = false }: { reset?: boolea
 
   if (success) return <div className="space-y-5">
     <p role="status">{reset ? "Your password has been updated." : "If an account exists for this email, you will receive a password reset link. Open it in this browser."}</p>
-    <Link className="font-semibold" href={reset ? "/account" : "/login"}>{reset ? "Continue to your account" : "Back to sign in"}</Link>
+    <Link className="font-semibold" href={reset ? "/" : "/login"}>{reset ? "Continue to PDFNova" : "Back to sign in"}</Link>
   </div>;
 
   return <form onSubmit={submit} noValidate className="space-y-5">

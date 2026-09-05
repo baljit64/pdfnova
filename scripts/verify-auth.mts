@@ -121,11 +121,11 @@ check("builds a PKCE OAuth callback with a safe destination", () => {
   assert.deepEqual(
     buildOAuthOptions({
       origin: "https://www.pdfnova.in",
-      destination: "/account?tab=profile",
+      destination: "/profile?tab=profile",
     }),
     {
       redirectTo:
-        "https://www.pdfnova.in/auth/callback?next=%2Faccount%3Ftab%3Dprofile",
+        "https://www.pdfnova.in/auth/callback?next=%2Fprofile%3Ftab%3Dprofile",
     }
   );
   assert.equal(
@@ -133,7 +133,7 @@ check("builds a PKCE OAuth callback with a safe destination", () => {
       origin: "https://www.pdfnova.in",
       destination: "https://evil.example",
     }).redirectTo,
-    "https://www.pdfnova.in/auth/callback?next=%2Faccount"
+    "https://www.pdfnova.in/auth/callback?next=%2F"
   );
 });
 
@@ -142,12 +142,12 @@ check("builds signup metadata and an internal confirmation destination", () => {
     buildSignupOptions({
       fullName: "  Baljit Singh  ",
       origin: "https://www.pdfnova.in",
-      destination: "/account?tab=files",
+      destination: "/profile?tab=files",
     }),
     {
       data: { full_name: "Baljit Singh" },
       emailRedirectTo:
-        "https://www.pdfnova.in/auth/callback?next=%2Faccount%3Ftab%3Dfiles",
+        "https://www.pdfnova.in/auth/callback?next=%2Fprofile%3Ftab%3Dfiles",
     }
   );
   assert.equal(
@@ -156,15 +156,15 @@ check("builds signup metadata and an internal confirmation destination", () => {
       origin: "https://www.pdfnova.in",
       destination: "https://evil.example",
     }).emailRedirectTo,
-    "https://www.pdfnova.in/auth/callback?next=%2Faccount"
+    "https://www.pdfnova.in/auth/callback?next=%2F"
   );
 });
 
 check("rejects external and control-character redirect destinations", () => {
   for (const destination of ["https://evil.example", "//evil.example", "/\\evil.example", "/\t/evil.example", "/\n/evil.example", "/safe/..//evil.example", "/%2e//evil.example", "javascript:alert(1)"]) {
-    assert.equal(safeRedirectPath(destination), "/account");
+    assert.equal(safeRedirectPath(destination), "/");
   }
-  assert.equal(safeRedirectPath("/account?tab=profile#name"), "/account?tab=profile#name");
+  assert.equal(safeRedirectPath("/profile?tab=profile#name"), "/profile?tab=profile#name");
 });
 
 check("handles absent and malformed optional profile metadata", () => {

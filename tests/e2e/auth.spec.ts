@@ -1,9 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("account requires server-side authentication and invalid callbacks stay internal", async ({ request }) => {
-  const account = await request.get("/account", { maxRedirects: 0 });
-  expect(account.status()).toBe(307);
-  expect(account.headers().location).toBe("/login?redirect=/account");
+test("invalid callbacks stay internal", async ({ request }) => {
   const callback = await request.get("/auth/callback?error=access_denied&next=https://evil.example", { maxRedirects: 0 });
   expect(callback.status()).toBe(307);
   expect(new URL(callback.headers().location).pathname).toBe("/login");
@@ -22,7 +19,7 @@ test("both forms start the same PKCE flow for Google and Facebook", async ({ pag
       expect(url.searchParams.get("code_challenge")).toBeTruthy();
       const callback = new URL(url.searchParams.get("redirect_to")!);
       expect(callback.pathname).toBe("/auth/callback");
-      expect(callback.searchParams.get("next")).toBe("/account");
+      expect(callback.searchParams.get("next")).toBe("/");
       await page.waitForLoadState();
     }
   }

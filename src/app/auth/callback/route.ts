@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from "../../../lib/supabase/server";
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
-  const destination = safeRedirectPath(requestUrl.searchParams.get("next"), "/account");
+  const destination = safeRedirectPath(requestUrl.searchParams.get("next"), "/");
   const code = requestUrl.searchParams.get("code");
   let target = new URL("/login?error=oauth_failed", requestUrl.origin);
   try {

@@ -1,6 +1,6 @@
 export function safeRedirectPath(
   value: string | null | undefined,
-  fallback = "/account"
+  fallback = "/"
 ): string {
   if (
     !value ||

@@ -162,26 +162,28 @@ function UserMenu({ user }: { user: User }) {
         <div
           role="menu"
           aria-label="Account menu"
-          className="absolute right-0 top-[calc(100%+0.5rem)] z-60 w-72 rounded-2xl border border-[var(--border)] bg-white p-4 text-left shadow-[var(--shadow-lg)]"
+          className="absolute right-0 top-full z-[60] w-72 pt-2 text-left"
         >
-          <div className="flex items-center gap-3">
-            <AccountIdentity user={user} large compact />
-            <div className="min-w-0">
-              <p className="truncate font-semibold text-[var(--text-primary)]">{name}</p>
-              <p className="truncate text-sm text-[var(--text-secondary)]">{user.email ?? "Email not provided"}</p>
+          <div className="rounded-2xl border border-[var(--border)] bg-white p-4 shadow-[var(--shadow-lg)]">
+            <div className="flex items-center gap-3">
+              <AccountIdentity user={user} large compact />
+              <div className="min-w-0">
+                <p className="truncate font-semibold text-[var(--text-primary)]">{name}</p>
+                <p className="truncate text-sm text-[var(--text-secondary)]">{user.email ?? "Email not provided"}</p>
+              </div>
             </div>
-          </div>
-          <div className="mt-4 border-t border-[var(--border)] pt-3">
-            <button
-              type="button"
-              role="menuitem"
-              disabled={busy}
-              onClick={() => void signOut()}
-              className="pdfnova-secondary-button w-full disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {busy ? "Signing out..." : "Log out"}
-            </button>
-            {error ? <p role="alert" className="mt-2 text-sm text-red-800">{error}</p> : null}
+            <div className="mt-4 border-t border-[var(--border)] pt-3">
+              <button
+                type="button"
+                role="menuitem"
+                disabled={busy}
+                onClick={() => void signOut()}
+                className="pdfnova-secondary-button w-full disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {busy ? "Signing out..." : "Log out"}
+              </button>
+              {error ? <p role="alert" className="mt-2 text-sm text-red-800">{error}</p> : null}
+            </div>
           </div>
         </div>
       ) : null}
