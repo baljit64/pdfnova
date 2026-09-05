@@ -55,7 +55,7 @@ export default function LoginForm() {
       if (error) throw error;
 
       const search = new URLSearchParams(window.location.search);
-      router.replace(safeRedirectPath(search.get("redirect"), "/"));
+      router.replace(safeRedirectPath(search.get("redirect")));
       router.refresh();
     } catch (error) {
       setFormError(authErrorMessage(error));
@@ -104,6 +104,8 @@ export default function LoginForm() {
           error={errors.password}
           onChange={(event) => updateValue("password", event.target.value)}
         />
+
+        <div className="text-right text-sm"><Link href="/forgot-password" className="font-semibold">Forgot password?</Link></div>
 
         {formError ? (
           <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">

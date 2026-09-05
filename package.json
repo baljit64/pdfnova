@@ -11,7 +11,7 @@
     "clean": "node scripts/clean-next.mjs",
     "build": "npm run clean && next build",
     "build:incremental": "next build",
-    "lint": "next lint",
+    "lint": "eslint .",
     "start": "next start",
     "verify:landing": "tsx scripts/verify-seo.mts",
     "verify:seo": "tsx scripts/verify-p0-seo.mts",

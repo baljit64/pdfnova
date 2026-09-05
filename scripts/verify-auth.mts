@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { safeRedirectPath } from "../src/lib/auth/redirect";
+import { avatarUrl, profileText } from "../src/lib/auth/profile";
 import { getPublicSupabaseConfig } from "../src/lib/supabase/config";
 import { authErrorMessage } from "../src/lib/auth/errors";
 import {
@@ -131,7 +133,7 @@ check("builds a PKCE OAuth callback with a safe destination", () => {
       origin: "https://www.pdfnova.in",
       destination: "https://evil.example",
     }).redirectTo,
-    "https://www.pdfnova.in/auth/callback?next=%2F"
+    "https://www.pdfnova.in/auth/callback?next=%2Faccount"
   );
 });
 
@@ -158,4 +160,24 @@ check("builds signup metadata and an internal confirmation destination", () => {
   );
 });
 
-console.log("\n9 authentication checks passed.");
+check("rejects external and control-character redirect destinations", () => {
+  for (const destination of ["https://evil.example", "//evil.example", "/\\evil.example", "/\t/evil.example", "/\n/evil.example", "/safe/..//evil.example", "/%2e//evil.example", "javascript:alert(1)"]) {
+    assert.equal(safeRedirectPath(destination), "/account");
+  }
+  assert.equal(safeRedirectPath("/account?tab=profile#name"), "/account?tab=profile#name");
+});
+
+check("handles absent and malformed optional profile metadata", () => {
+  assert.equal(profileText({}, [], null, "", " Person "), "Person");
+  assert.equal(profileText(undefined), null);
+  assert.equal(avatarUrl("javascript:alert(1)"), null);
+  assert.equal(avatarUrl("https://example.com/photo.png"), "https://example.com/photo.png");
+});
+
+check("explains unconfirmed email and password errors", () => {
+  assert.match(authErrorMessage({ code: "email_not_confirmed" }), /verify your email/);
+  assert.match(authErrorMessage({ code: "same_password" }), /different/);
+  assert.match(authErrorMessage({ message: "Failed to fetch" }), /connection/);
+});
+
+console.log("\n12 authentication checks passed.");

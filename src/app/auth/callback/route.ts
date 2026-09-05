@@ -1,25 +1,24 @@
 import { NextResponse } from "next/server";
 import { safeRedirectPath } from "../../../lib/auth/redirect";
+import { logAuthError } from "../../../lib/auth/errors";
 import { createServerSupabaseClient } from "../../../lib/supabase/server";
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
+  const destination = safeRedirectPath(requestUrl.searchParams.get("next"), "/account");
   const code = requestUrl.searchParams.get("code");
-  const destination = safeRedirectPath(requestUrl.searchParams.get("next"), "/");
-
-  if (requestUrl.searchParams.has("error")) {
-    const loginUrl = new URL("/login", requestUrl.origin);
-    loginUrl.searchParams.set("error", "oauth_failed");
-    return NextResponse.redirect(loginUrl);
+  let target = new URL("/login?error=oauth_failed", requestUrl.origin);
+  try {
+    if (code && !requestUrl.searchParams.has("error")) {
+      const supabase = await createServerSupabaseClient();
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) throw error;
+      target = new URL(destination, requestUrl.origin);
+    }
+  } catch (error) {
+    logAuthError("Authentication callback", error);
   }
-
-  if (code) {
-    const supabase = await createServerSupabaseClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(new URL(destination, requestUrl.origin));
-  }
-
-  const loginUrl = new URL("/login", requestUrl.origin);
-  loginUrl.searchParams.set("error", "confirmation_failed");
-  return NextResponse.redirect(loginUrl);
+  const response = NextResponse.redirect(target);
+  response.headers.set("Cache-Control", "private, no-store");
+  return response;
 }

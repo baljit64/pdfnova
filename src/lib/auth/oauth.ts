@@ -21,7 +21,7 @@ export function buildOAuthOptions({
   destination,
 }: OAuthOptionsInput): { redirectTo: string } {
   const callback = new URL("/auth/callback", origin);
-  callback.searchParams.set("next", safeRedirectPath(destination, "/"));
+  callback.searchParams.set("next", safeRedirectPath(destination));
 
   return { redirectTo: callback.toString() };
 }

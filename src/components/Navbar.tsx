@@ -1,6 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import type { User } from "@supabase/supabase-js";
+import { createBrowserSupabaseClient } from "../lib/supabase/client";
+import { logAuthError } from "../lib/auth/errors";
+import { userDisplayName } from "../lib/auth/profile";
 import Link from "next/link";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -78,6 +82,16 @@ function MegaMenu({ groups, onNavigate }: { groups: typeof TOOL_GROUPS; onNaviga
 }
 
 export default function Navbar() {
+  const [user, setUser] = useState<User | null>(null);
+  useEffect(() => {
+    try {
+      const { data: { subscription } } = createBrowserSupabaseClient().auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null);
+      });
+      return () => subscription.unsubscribe();
+    } catch (error) { logAuthError("Navbar authentication", error); }
+  }, []);
+
   const [openMenu, setOpenMenu] = useState<MenuName>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -143,8 +157,8 @@ export default function Navbar() {
             <Search className="h-5 w-5" />
           </Link>
           <div className="hidden sm:block"><LanguageSwitcher /></div>
-          <Link href="/login" className="pdfnova-primary-button hidden !h-10 !min-h-10 !rounded-lg !px-4 !py-0 lg:inline-flex">
-            Log in
+          <Link href={user ? "/account" : "/login"} title={user ? userDisplayName(user) : undefined} className="pdfnova-primary-button hidden !h-10 !min-h-10 !rounded-lg !px-4 !py-0 lg:inline-flex">
+            {user ? "My account" : "Log in"}
           </Link>
           <button
             type="button"
@@ -179,7 +193,7 @@ export default function Navbar() {
             <MegaMenu groups={TOOL_GROUPS} onNavigate={() => setMobileOpen(false)} />
             <div className="mt-3 grid grid-cols-2 gap-3 border-t border-[var(--border)] pt-5">
               <Link href="/blog" onClick={() => setMobileOpen(false)} className="pdfnova-secondary-button !min-h-11">Blog</Link>
-              <Link href="/login" onClick={() => setMobileOpen(false)} className="pdfnova-primary-button !min-h-11">Log in</Link>
+              <Link href={user ? "/account" : "/login"} onClick={() => setMobileOpen(false)} className="pdfnova-primary-button !min-h-11">{user ? "My account" : "Log in"}</Link>
             </div>
             <div className="mt-4 sm:hidden"><LanguageSwitcher /></div>
           </Container>

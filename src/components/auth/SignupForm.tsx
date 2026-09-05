@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { authErrorMessage } from "../../lib/auth/errors";
 import { buildSignupOptions } from "../../lib/auth/signup";
@@ -22,6 +23,7 @@ const INITIAL_VALUES: SignupValues = {
 };
 
 export default function SignupForm() {
+  const router = useRouter();
   const [values, setValues] = useState(INITIAL_VALUES);
   const [errors, setErrors] = useState<FieldErrors<SignupValues>>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -45,9 +47,9 @@ export default function SignupForm() {
     setSubmitting(true);
     try {
       const search = new URLSearchParams(window.location.search);
-      const destination = safeRedirectPath(search.get("redirect"), "/");
+      const destination = safeRedirectPath(search.get("redirect"));
       const supabase = createBrowserSupabaseClient();
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: values.email.trim(),
         password: values.password,
         options: buildSignupOptions({
@@ -58,7 +60,12 @@ export default function SignupForm() {
       });
 
       if (error) throw error;
-      setSubmittedEmail(values.email.trim());
+      if (data.session) {
+        router.replace(destination);
+        router.refresh();
+      } else {
+        setSubmittedEmail(values.email.trim());
+      }
     } catch (error) {
       setFormError(authErrorMessage(error));
     } finally {
@@ -74,7 +81,7 @@ export default function SignupForm() {
         </div>
         <h2 className="mt-4 text-2xl font-bold text-[var(--text-primary)]">Check your email</h2>
         <p className="mt-2 leading-7 text-[var(--text-secondary)]">
-          We&apos;ve sent a confirmation link to <strong>{submittedEmail}</strong>.
+          Please check <strong>{submittedEmail}</strong> for a verification link. If you already have an account, sign in or reset your password.
         </p>
       </div>
     );

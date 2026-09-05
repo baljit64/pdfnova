@@ -6,6 +6,7 @@ export function safeRedirectPath(
     !value ||
     !value.startsWith("/") ||
     value.startsWith("//") ||
+    [...value].some((character) => character.charCodeAt(0) <= 32 || character.charCodeAt(0) === 127) ||
     value.includes("\\")
   ) {
     return fallback;
@@ -13,7 +14,7 @@ export function safeRedirectPath(
 
   try {
     const parsed = new URL(value, "https://www.pdfnova.in");
-    return parsed.origin === "https://www.pdfnova.in"
+    return parsed.origin === "https://www.pdfnova.in" && !parsed.pathname.startsWith("//")
       ? `${parsed.pathname}${parsed.search}${parsed.hash}`
       : fallback;
   } catch {
