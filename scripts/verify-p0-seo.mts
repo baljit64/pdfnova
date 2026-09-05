@@ -32,6 +32,18 @@ const checks: Array<[string, () => void | Promise<void>]> = [
       "google-adsense-account": "ca-pub-6001922368771371",
     });
   }],
+  ["loads the configured Google Analytics tag and discloses analytics use", async () => {
+    const [layout, privacy] = await Promise.all([
+      readFile(new URL("../src/app/layout.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../src/views/Privacy.tsx", import.meta.url), "utf8"),
+    ]);
+
+    assert.match(layout, /G-CR1LR4LDL9/);
+    assert.match(layout, /googletagmanager\.com\/gtag\/js/);
+    assert.match(layout, /gtag\('config', '\$\{GOOGLE_ANALYTICS_ID\}'\)/);
+    assert.match(privacy, /Google Analytics/);
+    assert.doesNotMatch(privacy, /does not currently include Google Analytics/);
+  }],
   ["uses the preferred production origin", () => {
     assert.equal(SITE_URL, "https://www.pdfnova.in");
   }],

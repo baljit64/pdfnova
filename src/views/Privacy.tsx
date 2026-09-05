@@ -5,7 +5,7 @@ export default function Privacy() {
     <div className="pdfnova-content-page max-w-3xl mx-auto px-6 py-16 sm:py-20">
       <h1 className="text-3xl font-bold text-blue-900 mb-6">Privacy Policy</h1>
       <p className="text-sm text-gray-500 mb-8">
-        Last updated: <time dateTime="2026-08-25">August 25, 2026</time>
+        Last updated: <time dateTime="2026-09-06">September 6, 2026</time>
       </p>
 
       <div className="prose prose-gray max-w-none text-gray-700 space-y-6">
@@ -35,22 +35,26 @@ export default function Privacy() {
         <section>
           <h2 className="text-xl font-semibold text-blue-900">Site usage and technical data</h2>
           <p>
-            PDFNova uses Vercel for hosting and Vercel Analytics for site-usage measurement. The
-            application may measure the page and tool used, file count, aggregate byte size,
-            processing duration, output count and a generic success or failure category. PDFNova&apos;s
+            PDFNova uses Vercel for hosting and uses Vercel Analytics and Google Analytics for
+            site-usage measurement. The application may measure the page and tool used, file count,
+            aggregate byte size, processing duration, output count and a generic success or failure
+            category. Google Analytics may also process browser and device information, general
+            interaction data and approximate location derived from network information. PDFNova&apos;s
             tool event code does not intentionally include selected filenames or document contents.
-            Hosting providers may also process standard request information needed to operate and
-            protect the website, such as timestamps, browser information and network identifiers.
+            Hosting and analytics providers may process standard request information needed to
+            operate, measure and protect the website, such as timestamps, browser information and
+            network identifiers.
           </p>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold text-blue-900">Cookies and analytics</h2>
           <p>
-            PDFNova does not currently include Google Analytics, Google Tag Manager, AdSense or
-            advertising scripts in the application. The site does not intentionally set
-            advertising cookies. Browser storage or cookies may still be used where technically
-            necessary by enabled platform services, and you can control them through your browser.
+            PDFNova includes Google Analytics for site measurement. Google Analytics may use
+            cookies or similar browser identifiers to distinguish visits and understand aggregate
+            usage. PDFNova does not currently include an AdSense advertising script and does not
+            intentionally use analytics events to send selected filenames or document contents.
+            You can restrict or clear cookies using your browser settings.
           </p>
         </section>
 
