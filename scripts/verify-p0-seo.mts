@@ -20,6 +20,13 @@ function isNoIndex(value: RobotsValue): boolean {
 }
 
 const checks: Array<[string, () => void | Promise<void>]> = [
+  ["publishes the authorized AdSense seller record", async () => {
+    const adsTxt = await readFile(new URL("../public/ads.txt", import.meta.url), "utf8");
+    assert.equal(
+      adsTxt.trim(),
+      "google.com, pub-6001922368771371, DIRECT, f08c47fec0942fa0",
+    );
+  }],
   ["publishes the Google AdSense account metadata", () => {
     assert.deepEqual(ADSENSE_METADATA, {
       "google-adsense-account": "ca-pub-6001922368771371",
