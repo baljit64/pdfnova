@@ -1,8 +1,9 @@
 import Link from "next/link";
+import Container from "../components/ui/Container";
 
 export default function About() {
   return (
-    <div className="pdfnova-content-page max-w-3xl mx-auto px-6 py-16 sm:py-20">
+    <Container as="main" className="pdfnova-content-page py-16 sm:py-20">
       <h1 className="text-3xl font-bold text-blue-900 mb-6">About PDFNova</h1>
 
       <div className="prose prose-gray max-w-none text-gray-700 space-y-6">
@@ -84,6 +85,6 @@ export default function About() {
         <Link href="/" className="text-red-500 font-medium hover:underline">Explore PDF tools</Link>
         <Link href="/blog" className="text-red-500 font-medium hover:underline">Read PDF guides</Link>
       </div>
-    </div>
+    </Container>
   );
 }

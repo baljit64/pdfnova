@@ -1,8 +1,9 @@
 import Link from "next/link";
+import Container from "../components/ui/Container";
 
 export default function Privacy() {
   return (
-    <div className="pdfnova-content-page max-w-3xl mx-auto px-6 py-16 sm:py-20">
+    <Container as="main" className="pdfnova-content-page py-16 sm:py-20">
       <h1 className="text-3xl font-bold text-blue-900 mb-6">Privacy Policy</h1>
       <p className="text-sm text-gray-500 mb-8">
         Last updated: <time dateTime="2026-09-06">September 6, 2026</time>
@@ -128,6 +129,6 @@ export default function Privacy() {
       <div className="mt-12">
         <Link href="/" className="text-red-500 font-medium hover:underline">← Back to home</Link>
       </div>
-    </div>
+    </Container>
   );
 }
