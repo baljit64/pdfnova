@@ -103,3 +103,46 @@ test("signup exposes accessible validation", async ({ page }) => {
     "/login"
   );
 });
+
+test("login and signup put social sign-in before email and password", async ({ page }) => {
+  for (const path of ["/login", "/signup"]) {
+    await page.goto(path);
+
+    const apple = page.getByRole("button", { name: "Continue with Apple" });
+    const google = page.getByRole("button", { name: "Continue with Google" });
+    const facebook = page.getByRole("button", { name: "Continue with Facebook" });
+    const email = page.getByLabel("Email");
+
+    await expect(apple).toBeVisible();
+    await expect(google).toBeVisible();
+    await expect(facebook).toBeVisible();
+    await expect(page.getByText("or continue with email")).toBeVisible();
+
+    for (const button of [apple, google, facebook]) {
+      expect(
+        await button.evaluate((element, inputId) => {
+          const input = document.getElementById(inputId);
+          return Boolean(
+            input &&
+              element.compareDocumentPosition(input) &
+                Node.DOCUMENT_POSITION_FOLLOWING
+          );
+        }, path === "/login" ? "login-email" : "signup-email")
+      ).toBe(true);
+    }
+  }
+});
+
+test("login exposes accessible email and password validation", async ({ page }) => {
+  await page.goto("/login");
+
+  await expect(page.getByLabel("Email")).toHaveAttribute("autocomplete", "email");
+  await expect(page.getByLabel("Password", { exact: true })).toHaveAttribute(
+    "autocomplete",
+    "current-password"
+  );
+  await page.getByRole("button", { name: "Sign In" }).click();
+
+  await expect(page.getByText("Enter a valid email address.")).toBeVisible();
+  await expect(page.getByText("Enter your password.")).toBeVisible();
+});

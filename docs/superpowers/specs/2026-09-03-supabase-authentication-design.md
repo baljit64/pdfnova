@@ -1,7 +1,7 @@
 # PDFNova Supabase Authentication Design
 
 **Date:** 3 September 2026  
-**Status:** Approved in chat; awaiting written-spec review  
+**Status:** Approved; social-login extension approved 5 September 2026
 **Scope:** Optional account authentication and profile foundation
 
 ## Goal
@@ -15,6 +15,7 @@ This phase includes:
 - Supabase SSR browser, server, middleware, and server-only client utilities
 - Email/password signup with full-name metadata and email confirmation
 - Email/password login
+- Apple, Google, and Facebook OAuth login on both login and signup pages
 - Secure PKCE confirmation callback
 - Forgot-password and reset-password flows
 - Logout
@@ -27,7 +28,7 @@ This phase includes:
 
 This phase does not include:
 
-- Google or other OAuth providers
+- OAuth providers other than Apple, Google, and Facebook
 - File uploads, output history, quotas, or retention cleanup
 - A global application-wide auth provider
 - Any requirement to sign in before using a PDF tool
@@ -109,7 +110,15 @@ It calls `supabase.auth.signUp()` with `full_name` in user metadata and an envir
 
 ### Login
 
-`/login` collects email and password and calls `signInWithPassword()`. After success it navigates to the validated internal redirect or `/account` and refreshes the router so Navbar state updates without a manual page reload.
+`/login` collects email and password and calls `signInWithPassword()`. After success it navigates to the validated internal redirect and refreshes the router. Until `/account` is delivered, the default destination is `/`, avoiding a post-login 404.
+
+### Social login
+
+Both `/login` and `/signup` show OAuth actions in this exact order: Apple, Google, then Facebook. A divider labelled “or continue with email” separates those actions from the existing email/password form below.
+
+A shared client component calls `signInWithOAuth()` using only those three allow-listed provider identifiers. It sends users back to `/auth/callback` through the existing PKCE flow and preserves only validated same-origin destinations. Until `/account` is delivered, an absent or rejected destination falls back to `/`, avoiding a post-login 404. Buttons prevent duplicate submissions, expose a provider-specific loading state, and render provider failures as user-safe messages.
+
+The callback treats provider cancellation or rejection as `oauth_failed`; raw provider descriptions never enter the application URL or UI. Google and Facebook profile metadata may populate a profile name. Apple OAuth does not provide a full name, so `full_name` remains optional and can be collected later in the profile flow.
 
 ### Password recovery
 
@@ -158,7 +167,7 @@ The Navbar keeps its current dimensions, colors, spacing, and responsive behavio
 
 ## Auth-page UI and accessibility
 
-Login, signup, recovery, and reset pages reuse the existing Navbar, Footer, container widths, design tokens, buttons, borders, radii, shadows, and form styling. No standalone dashboard theme or redesign is introduced.
+Login, signup, recovery, and reset pages reuse the existing Navbar, Footer, container widths, design tokens, buttons, borders, radii, shadows, and form styling. OAuth buttons use recognizable provider marks and appear above the email/password fields. No standalone dashboard theme or redesign is introduced.
 
 All fields have visible associated labels, correct `autocomplete` values, keyboard-accessible controls, visible focus treatment, inline validation, and `aria-live` error/status regions. Password fields have text-labelled show/hide buttons; icons are not the only accessible name. Submit buttons expose the requested loading labels and remain disabled during submission.
 
@@ -213,8 +222,11 @@ After implementation, configure Supabase Auth with:
   - `https://www.pdfnova.in/auth/callback`
   - `http://localhost:3000/auth/callback`
 - Email/password provider enabled
+- Apple, Google, and Facebook providers enabled with credentials from their respective developer consoles
 - Email confirmation enabled
 - Production SMTP configured before relying on confirmation or recovery email delivery
+
+Each provider console must use the Supabase Auth callback shown in the provider panel, normally `https://<project-ref>.supabase.co/auth/v1/callback`. This is distinct from PDFNova's `/auth/callback`, which belongs in Supabase's redirect allow list. Google also needs the PDFNova production and local origins configured. Facebook needs the `email` permission and Live mode before general production use. Apple needs a web Services ID and signing key; its client secret must be regenerated at least every six months.
 
 Add the public URL/key to local and Vercel environments. Add server-only secrets only to trusted server environments. Never paste them into chat or commit them.
 
@@ -234,7 +246,7 @@ The public Supabase anon/publishable key is intentionally browser-visible and is
 ## Acceptance criteria
 
 - Anonymous visitors can use every existing PDF tool exactly as before.
-- A visitor can sign up, confirm email, sign in, view/update their profile, recover a password, and sign out.
+- A visitor can authenticate with Apple, Google, Facebook, or email/password; email users can confirm email, recover a password, and sign out.
 - Protected pages reject anonymous access and never trust a client-supplied identity.
 - No open redirect is possible through login or callback parameters.
 - No secret or service-role key reaches browser code, source control, logs, or responses.

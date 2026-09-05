@@ -12,6 +12,7 @@ import {
 import { safeRedirectPath } from "../../lib/auth/redirect";
 import { createBrowserSupabaseClient } from "../../lib/supabase/client";
 import PasswordField from "./PasswordField";
+import SocialAuthButtons from "./SocialAuthButtons";
 
 const INITIAL_VALUES: SignupValues = {
   fullName: "",
@@ -84,6 +85,8 @@ export default function SignupForm() {
 
   return (
     <>
+      <SocialAuthButtons />
+
       <form noValidate onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label htmlFor="signup-name" className="mb-2 block text-sm font-semibold text-[var(--text-primary)]">

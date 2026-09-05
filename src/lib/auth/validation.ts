@@ -5,6 +5,11 @@ export interface SignupValues {
   confirmPassword: string;
 }
 
+export interface LoginValues {
+  email: string;
+  password: string;
+}
+
 export type FieldErrors<T> = Partial<Record<keyof T, string>>;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -35,6 +40,16 @@ export function validateSignup(
   if (values.confirmPassword !== values.password) {
     errors.confirmPassword = "Passwords do not match.";
   }
+
+  return errors;
+}
+
+export function validateLogin(values: LoginValues): FieldErrors<LoginValues> {
+  const errors: FieldErrors<LoginValues> = {};
+
+  const emailError = validateEmail(values.email);
+  if (emailError) errors.email = emailError;
+  if (!values.password) errors.password = "Enter your password.";
 
   return errors;
 }

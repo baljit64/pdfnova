@@ -1,8 +1,16 @@
 import assert from "node:assert/strict";
 import { getPublicSupabaseConfig } from "../src/lib/supabase/config";
 import { authErrorMessage } from "../src/lib/auth/errors";
+import {
+  buildOAuthOptions,
+  SOCIAL_AUTH_PROVIDERS,
+} from "../src/lib/auth/oauth";
 import { buildSignupOptions } from "../src/lib/auth/signup";
-import { validateEmail, validateSignup } from "../src/lib/auth/validation";
+import {
+  validateEmail,
+  validateLogin,
+  validateSignup,
+} from "../src/lib/auth/validation";
 
 function check(name: string, assertion: () => void) {
   assertion();
@@ -63,6 +71,17 @@ check("validates signup fields", () => {
   );
 });
 
+check("validates email and password login fields", () => {
+  assert.deepEqual(validateLogin({ email: "bad", password: "" }), {
+    email: "Enter a valid email address.",
+    password: "Enter your password.",
+  });
+  assert.deepEqual(
+    validateLogin({ email: "person@example.com", password: "secret" }),
+    {}
+  );
+});
+
 check("translates authentication errors without leaking internals", () => {
   assert.equal(
     authErrorMessage({ code: "user_already_exists" }),
@@ -75,6 +94,45 @@ check("translates authentication errors without leaking internals", () => {
   assert.equal(
     authErrorMessage(new Error("database internals")),
     "Something went wrong. Please try again."
+  );
+  assert.equal(
+    authErrorMessage({ code: "invalid_credentials" }),
+    "Incorrect email or password."
+  );
+  assert.equal(
+    authErrorMessage({ message: "Unsupported provider: provider is not enabled" }),
+    "This sign-in option is not available yet."
+  );
+});
+
+check("keeps the approved social provider order", () => {
+  assert.deepEqual(
+    SOCIAL_AUTH_PROVIDERS.map(({ provider, label }) => [provider, label]),
+    [
+      ["apple", "Continue with Apple"],
+      ["google", "Continue with Google"],
+      ["facebook", "Continue with Facebook"],
+    ]
+  );
+});
+
+check("builds a PKCE OAuth callback with a safe destination", () => {
+  assert.deepEqual(
+    buildOAuthOptions({
+      origin: "https://www.pdfnova.in",
+      destination: "/account?tab=profile",
+    }),
+    {
+      redirectTo:
+        "https://www.pdfnova.in/auth/callback?next=%2Faccount%3Ftab%3Dprofile",
+    }
+  );
+  assert.equal(
+    buildOAuthOptions({
+      origin: "https://www.pdfnova.in",
+      destination: "https://evil.example",
+    }).redirectTo,
+    "https://www.pdfnova.in/auth/callback?next=%2F"
   );
 });
 
@@ -101,4 +159,4 @@ check("builds signup metadata and an internal confirmation destination", () => {
   );
 });
 
-console.log("\n6 authentication checks passed.");
+console.log("\n9 authentication checks passed.");

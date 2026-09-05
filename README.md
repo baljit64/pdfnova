@@ -44,9 +44,36 @@ Keep real values in `.env` locally and in Vercel for deployments. Never commit t
 - `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` — optional server-only Redis REST
   credentials used for conversion rate limits shared across server instances. Without them, local
   development falls back to an in-memory limiter.
-- `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` — currently unused because login is
-  not connected. Leave them blank until authentication is implemented. These project values are
-  browser-visible; never use a Supabase service-role key in a `NEXT_PUBLIC_` variable.
+- `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — required for signup,
+  email/password login, and social login. `NEXT_PUBLIC_SUPABASE_ANON_KEY` remains a temporary
+  legacy-key fallback. These project values are browser-visible; never use a Supabase secret or
+  service-role key in a `NEXT_PUBLIC_` variable.
+
+## Supabase authentication setup
+
+In Supabase Authentication → URL Configuration, set the Site URL to
+`https://www.pdfnova.in` and allow these redirect URLs:
+
+- `https://www.pdfnova.in/auth/callback`
+- `http://localhost:3000/auth/callback`
+
+Enable Email plus the Apple, Google, and Facebook providers under Authentication → Providers.
+For every social provider, copy the Supabase callback shown in that provider panel—normally
+`https://<project-ref>.supabase.co/auth/v1/callback`—into its external developer console. That
+provider callback is different from PDFNova's application callback above.
+
+- Google: create a Web OAuth client, add `https://www.pdfnova.in` and
+  `http://localhost:3000` as authorized origins, then add the Supabase provider callback as an
+  authorized redirect URI.
+- Facebook: configure Facebook Login, request the `email` permission, add the exact Supabase
+  provider callback under Valid OAuth Redirect URIs, and switch the app to Live mode before public
+  production use.
+- Apple: create an Apple App ID, web Services ID, and signing key; configure the Supabase domain
+  and provider callback on the Services ID. Store the signing key securely and rotate the generated
+  Apple client secret every six months.
+
+Provider secrets belong only in the provider panels and secret stores. Do not put them in this
+repository or in `NEXT_PUBLIC_` environment variables.
 
 The canonical site URL is intentionally fixed in `src/seo/config.ts`; no `SITE_URL` environment
 variable is required.

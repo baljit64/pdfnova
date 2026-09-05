@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add optional, secure Supabase email/password authentication, password recovery, and owner-only profiles without changing anonymous PDF tools or existing SEO.
+**Goal:** Add optional, secure Supabase email/password plus Apple, Google, and Facebook authentication, password recovery, and owner-only profiles without changing anonymous PDF tools or existing SEO.
 
 **Architecture:** Use `@supabase/ssr` browser and request-scoped server clients with Next.js 15 middleware for cookie refresh and account-route protection. Keep public pages static by isolating client auth state in the Navbar, store profile data behind Supabase RLS, and route all post-auth navigation through one safe-relative-redirect validator.
 
@@ -18,7 +18,7 @@
 - Accept post-auth redirects only when they are relative same-origin paths.
 - Never expose, log, commit, or import server keys into client code.
 - Auth entry pages use `noindex, follow`; protected account pages use `noindex, nofollow`; none belongs in the sitemap.
-- Google OAuth is not rendered.
+- OAuth is limited to Apple, Google, and Facebook, in that visual order above email/password.
 - File history, Storage, quotas, retention, and cron cleanup are outside this plan.
 - All commits remain local. Do not push, deploy, or apply migrations to the hosted Supabase project.
 - The exposed Supabase service-role key, CloudConvert key, and cron secret must not be used.
@@ -39,6 +39,7 @@
 **Authentication domain**
 
 - Create `src/lib/auth/redirect.ts`: validate safe internal destinations.
+- Create `src/lib/auth/oauth.ts`: define the provider allow list and safe callback options.
 - Create `src/lib/auth/validation.ts`: deterministic form validation.
 - Create `src/lib/auth/errors.ts`: translate Supabase errors into user-safe messages.
 
@@ -47,6 +48,7 @@
 - Create `src/components/auth/AuthShell.tsx`: shared PDFNova auth-page frame.
 - Create `src/components/auth/PasswordField.tsx`: accessible show/hide password input.
 - Create `src/components/auth/LoginForm.tsx`, `SignupForm.tsx`, `ForgotPasswordForm.tsx`, `ResetPasswordForm.tsx`: client forms.
+- Create `src/components/auth/SocialAuthButtons.tsx`: shared Apple, Google, and Facebook OAuth controls.
 - Create `src/components/auth/AuthNav.tsx`: isolated Navbar auth state and signout.
 - Create `src/components/auth/ProfileForm.tsx`: owner profile editing.
 - Modify `src/views/Login.tsx`: render the real login form.
@@ -512,12 +514,14 @@ git commit -m "feat: add authentication form foundations"
 
 ---
 
-### Task 5: Login and signup flows
+### Task 5: Login, signup, and social OAuth flows
 
 **Files:**
 
 - Create: `src/components/auth/LoginForm.tsx`
 - Create: `src/components/auth/SignupForm.tsx`
+- Create: `src/components/auth/SocialAuthButtons.tsx`
+- Create: `src/lib/auth/oauth.ts`
 - Create: `src/views/Signup.tsx`
 - Create: `src/app/signup/page.tsx`
 - Modify: `src/views/Login.tsx`
@@ -566,7 +570,7 @@ Expected: FAIL because `/signup` and the real form behavior do not exist.
 Use controlled email/password state, field-level errors, one submit guard, and `createBrowserSupabaseClient().auth.signInWithPassword({ email, password })`. On success run:
 
 ```ts
-router.push(safeRedirectPath(searchParams.get("redirect")));
+  router.push(safeRedirectPath(searchParams.get("redirect"), "/"));
 router.refresh();
 ```
 
