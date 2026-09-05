@@ -4,6 +4,7 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { ADSENSE_METADATA } from "../seo/adsense";
 import JsonLd from "../seo/JsonLd";
 import {
   BRAND_ASSETS,
@@ -31,6 +32,7 @@ export const metadata: Metadata = {
   creator: "Baljit Singh",
   publisher: "PDFNova",
   category: "Utilities",
+  other: ADSENSE_METADATA,
   metadataBase: new URL(SITE_URL),
   manifest: "/manifest.webmanifest",
   icons: {

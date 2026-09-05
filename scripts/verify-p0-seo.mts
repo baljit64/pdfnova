@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { BLOG_POSTS } from "../src/blog/posts";
 import sitemap from "../src/app/sitemap";
 import robots from "../src/app/robots";
+import { ADSENSE_METADATA } from "../src/seo/adsense";
 import { BRAND_ASSETS, ROUTE_META, SITE_URL } from "../src/seo/config";
 import { getAllLandingPages } from "../src/seo/landing/generate";
 import { LEGACY_TOOL_REDIRECTS } from "../src/seo/legacyRedirects";
@@ -19,6 +20,11 @@ function isNoIndex(value: RobotsValue): boolean {
 }
 
 const checks: Array<[string, () => void | Promise<void>]> = [
+  ["publishes the Google AdSense account metadata", () => {
+    assert.deepEqual(ADSENSE_METADATA, {
+      "google-adsense-account": "ca-pub-6001922368771371",
+    });
+  }],
   ["uses the preferred production origin", () => {
     assert.equal(SITE_URL, "https://www.pdfnova.in");
   }],
