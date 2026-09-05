@@ -112,7 +112,7 @@ function AccountIdentity({ user, compact = false, large = false }: { user: User;
   );
 }
 
-function UserMenu({ user }: { user: User }) {
+function UserMenu({ user, mobile = false }: { user: User; mobile?: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -142,7 +142,7 @@ function UserMenu({ user }: { user: User }) {
 
   return (
     <div
-      className="relative hidden lg:block"
+      className={mobile ? "relative lg:hidden" : "relative hidden lg:block"}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       onFocus={() => setOpen(true)}
@@ -154,7 +154,9 @@ function UserMenu({ user }: { user: User }) {
         aria-haspopup="menu"
         aria-label={`Open ${name}'s account menu`}
         onClick={() => setOpen((current) => !current)}
-        className="flex h-11 max-w-52 items-center gap-2 rounded-full border border-[var(--border)] bg-white py-1 pl-1 pr-3 text-sm font-semibold text-[var(--text-primary)] shadow-[var(--shadow-xs)] transition hover:border-slate-400 hover:bg-slate-50"
+        className={mobile
+          ? "flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-[var(--shadow-xs)] transition hover:border-slate-400 hover:bg-slate-50"
+          : "flex h-11 max-w-52 items-center gap-2 rounded-full border border-[var(--border)] bg-white py-1 pl-1 pr-3 text-sm font-semibold text-[var(--text-primary)] shadow-[var(--shadow-xs)] transition hover:border-slate-400 hover:bg-slate-50"}
       >
         <AccountIdentity user={user} />
       </button>
@@ -162,7 +164,7 @@ function UserMenu({ user }: { user: User }) {
         <div
           role="menu"
           aria-label="Account menu"
-          className="absolute right-0 top-full z-[60] w-72 pt-2 text-left"
+          className={`absolute right-0 top-full z-[60] w-72 pt-2 text-left ${mobile ? "max-w-[calc(100vw-2.5rem)]" : ""}`}
         >
           <div className="rounded-2xl border border-[var(--border)] bg-white p-4 shadow-[var(--shadow-lg)]">
             <div className="flex items-center gap-3">
@@ -305,12 +307,7 @@ export default function Navbar() {
             <MegaMenu groups={TOOL_GROUPS} onNavigate={() => setMobileOpen(false)} />
             <div className="mt-3 grid grid-cols-2 gap-3 border-t border-[var(--border)] pt-5">
               <Link href="/blog" onClick={() => setMobileOpen(false)} className="pdfnova-secondary-button !min-h-11">Blog</Link>
-              {user ? (
-                <div className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--text-primary)]">
-                  <AccountIdentity user={user} compact />
-                  <span className="truncate">{userDisplayName(user)}</span>
-                </div>
-              ) : (
+              {user ? <UserMenu user={user} mobile /> : (
                 <Link href="/login" onClick={() => setMobileOpen(false)} className="pdfnova-primary-button !min-h-11">Log in</Link>
               )}
             </div>
