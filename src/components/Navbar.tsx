@@ -173,6 +173,14 @@ function UserMenu({ user }: { user: User }) {
               </div>
             </div>
             <div className="mt-4 border-t border-[var(--border)] pt-3">
+              <Link
+                href="/files"
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="pdfnova-secondary-button mb-2 w-full no-underline"
+              >
+                Saved files
+              </Link>
               <button
                 type="button"
                 role="menuitem"
@@ -333,6 +341,7 @@ export default function Navbar() {
               ) : (
                 <Link href="/login" onClick={() => setMobileOpen(false)} className="pdfnova-primary-button !min-h-11">Log in</Link>
               )}
+              {user ? <Link href="/files" onClick={() => setMobileOpen(false)} className="pdfnova-secondary-button col-span-2 !min-h-11">Saved files</Link> : null}
             </div>
             <div className="mt-4 flex items-center justify-between gap-3">
               <div className="sm:hidden"><LanguageSwitcher /></div>

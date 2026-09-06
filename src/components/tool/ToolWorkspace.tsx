@@ -11,6 +11,7 @@ import {
   formatSelectedPageRange,
 } from "../../tools/page-organizer";
 import { track } from "../../analytics/track";
+import { createBrowserSupabaseClient } from "../../lib/supabase/client";
 import FileDropzone from "./FileDropzone";
 import OptionsForm from "./OptionsForm";
 import ResultPanel from "./ResultPanel";
@@ -34,6 +35,7 @@ interface Props {
 }
 
 type Phase = "idle" | "running" | "done" | "error";
+type ArchiveStatus = "idle" | "saving" | "saved" | "failed";
 
 const PdfPageOrganizer = dynamic(() => import("./PdfPageOrganizer"), {
   ssr: false,
@@ -71,6 +73,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
   const [rejection, setRejection] = useState<string | null>(null);
   const [archiveBusy, setArchiveBusy] = useState(false);
   const [archivePercent, setArchivePercent] = useState(0);
+  const [archiveStatus, setArchiveStatus] = useState<ArchiveStatus>("idle");
   const [rangeError, setRangeError] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
@@ -92,6 +95,30 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
     urlsRef.current = [];
     setUrls([]);
   }, []);
+
+  const archiveResults = useCallback(async (completedOutputs: ToolOutput[]) => {
+    try {
+      const { data: { user } } = await createBrowserSupabaseClient().auth.getUser();
+      if (!user) return;
+
+      setArchiveStatus("saving");
+      const saved = await Promise.allSettled(
+        completedOutputs.map(async (output) => {
+          const form = new FormData();
+          form.append("tool", tool.id);
+          form.append("file", new File([output.blob], output.name, {
+            type: output.blob.type || "application/octet-stream",
+          }));
+          const response = await fetch("/api/files", { method: "POST", body: form });
+          if (!response.ok) throw new Error("Archive request failed");
+        })
+      );
+      setArchiveStatus(saved.every((result) => result.status === "fulfilled") ? "saved" : "failed");
+    } catch {
+      // Saving is a signed-in convenience. A completed local download remains usable.
+      setArchiveStatus("failed");
+    }
+  }, [tool.id]);
 
   // Object URLs outlive a single render, so they are revoked explicitly.
   useEffect(() => releaseUrls, [releaseUrls]);
@@ -157,6 +184,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
       setPhase("idle");
       setOutputs([]);
       setNotice(undefined);
+      setArchiveStatus("idle");
       releaseUrls();
 
       track("upload_completed", {
@@ -284,6 +312,8 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
         setStatus("Finished");
         setPhase("done");
 
+        void archiveResults(result.outputs);
+
         track("processing_completed", {
           ...analyticsBase,
           fileCount: files.length,
@@ -320,6 +350,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
     },
     [
       analyticsBase,
+      archiveResults,
       canRun,
       files,
       options,
@@ -355,6 +386,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
     if (outputs.length === 0 || archiveBusy) return;
     setArchiveBusy(true);
     setArchivePercent(0);
+    setArchiveStatus("idle");
     try {
       const JSZip = (await import("jszip")).default;
       const archive = new JSZip();
@@ -397,6 +429,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
     setStatus("");
     setArchiveBusy(false);
     setArchivePercent(0);
+    setArchiveStatus("idle");
     setRangeError(null);
     initializedSplitSource.current = null;
     setPhase("idle");
@@ -436,6 +469,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
         onDownloadAll={downloadAll}
         archiveBusy={archiveBusy}
         archivePercent={archivePercent}
+        archiveStatus={archiveStatus}
         onReset={reset}
       />
     );

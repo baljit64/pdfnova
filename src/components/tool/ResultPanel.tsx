@@ -2,6 +2,7 @@
 
 import { Button, Card } from "antd";
 import { CheckCircle2, Download, FileText, RotateCcw } from "lucide-react";
+import Link from "next/link";
 import { formatBytes } from "../../tools/engine/blob";
 import type { ToolDefinition, ToolOutput } from "../../tools/types";
 
@@ -15,6 +16,7 @@ interface Props {
   onDownloadAll: () => void;
   archiveBusy: boolean;
   archivePercent: number;
+  archiveStatus: "idle" | "saving" | "saved" | "failed";
   onReset: () => void;
 }
 
@@ -31,6 +33,7 @@ export default function ResultPanel({
   onDownloadAll,
   archiveBusy,
   archivePercent,
+  archiveStatus,
   onReset,
 }: Props) {
   const showInlineViewer = outputs.length === 1 && outputs[0].kind === "pdf";
@@ -50,6 +53,9 @@ export default function ResultPanel({
               {outputs.length} file{outputs.length === 1 ? "" : "s"} · {formatBytes(totalBytes)}
               {notice ? ` · ${notice}` : ""}
             </p>
+            {archiveStatus === "saving" ? <p className="mt-2 text-sm text-[var(--text-secondary)]">Saving a private copy to your 30-day archive…</p> : null}
+            {archiveStatus === "saved" ? <p className="mt-2 text-sm text-[var(--success)]">Saved to your <Link href="/files" className="font-semibold underline">30-day archive</Link>.</p> : null}
+            {archiveStatus === "failed" ? <p className="mt-2 text-sm text-[var(--text-secondary)]">Your download is ready, but we could not save an archive copy.</p> : null}
             </div>
           </div>
 

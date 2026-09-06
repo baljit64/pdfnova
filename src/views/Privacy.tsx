@@ -16,8 +16,8 @@ export default function Privacy() {
             PDFNova processes files in your browser for tools such as merge, split, compress,
             rotate, watermark, sign, edit and image conversion. Those tool implementations do not
             send the selected document to PDFNova&apos;s API. Files remain in the current tab&apos;s
-            working memory and PDFNova does not create a server-side document history for these
-            local tools. Reloading or closing the tab clears that working state.
+            working memory. Reloading or closing the tab clears that working state for visitors
+            who are not signed in.
           </p>
         </section>
 
@@ -25,9 +25,8 @@ export default function Privacy() {
           <h2 className="text-xl font-semibold text-blue-900">Server-assisted document conversion</h2>
           <p>
             PDF to Word and Word to PDF send the selected document through a PDFNova API route to
-            CloudConvert over HTTPS and return the converted result to the browser. The PDFNova
-            route does not intentionally save the document to an application database or user
-            account, but CloudConvert processes the file under its own service and privacy terms.
+            CloudConvert over HTTPS and return the converted result to the browser. CloudConvert
+            processes the file under its own service and privacy terms.
             Do not use these converters when your document-handling requirements prohibit
             third-party processing.
           </p>
@@ -102,11 +101,12 @@ export default function Privacy() {
         <section>
           <h2 className="text-xl font-semibold text-blue-900">Retention and your choices</h2>
           <p>
-            Local tools do not have a PDFNova file-retention period because they do not create a
-            server copy. Server-assisted conversion and configured support services follow the
-            retention rules of their respective providers. You can avoid third-party document
-            processing by using only the tools labelled as on-device, and you can choose not to
-            submit the contact form.
+            When signed in, PDFNova saves completed tool results to a private account archive for
+            up to 30 days so you can download them again. We do not archive the original selected
+            files. Saved results are private to the account that created them and are permanently
+            deleted after 30 days. Visitors do not receive a PDFNova file archive. Server-assisted
+            conversion and configured support services follow the retention rules of their
+            respective providers.
           </p>
         </section>
 
