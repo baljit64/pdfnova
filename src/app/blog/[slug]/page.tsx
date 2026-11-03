@@ -72,7 +72,11 @@ export default async function BlogPostPage({ params }: RouteParams) {
       dateModified: post.updatedAt ?? post.publishedAt,
       mainEntityOfPage: url,
       image: BRAND_ASSETS.socialImage,
-      author: { "@type": "Organization", name: "PDFNova", url: HOME_URL },
+      author: {
+        "@type": "Person",
+        name: "Baljit Singh",
+        url: `${SITE_URL}/about`,
+      },
       publisher: { "@id": `${SITE_URL}/#organization` },
       articleSection: post.category,
       wordCount: [...post.introduction, ...post.sections.flatMap((section) => section.paragraphs)]
@@ -115,6 +119,9 @@ export default async function BlogPostPage({ params }: RouteParams) {
               {post.title}
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-xl leading-8 text-[var(--text-secondary)]">{post.excerpt}</p>
+            <p className="mx-auto mt-5 text-sm font-medium text-[var(--text-muted)]">
+              Written by <Link href="/about" className="text-[var(--primary)] underline-offset-4 hover:underline">Baljit Singh</Link>, creator of PDFNova
+            </p>
           </div>
         </header>
 
@@ -169,6 +176,9 @@ export default async function BlogPostPage({ params }: RouteParams) {
                 Published by PDFNova on {formatBlogDate(post.publishedAt)}. This guide provides
                 general information; follow your organisation's requirements for sensitive or
                 regulated documents.
+              </p>
+              <p className="mt-3">
+                Learn about our <Link href="/editorial-policy" className="text-[var(--primary)] underline-offset-4 hover:underline">editorial standards and correction process</Link>.
               </p>
             </div>
           </article>

@@ -4,7 +4,7 @@ import { BLOG_POSTS } from "../src/blog/posts";
 import sitemap from "../src/app/sitemap";
 import robots from "../src/app/robots";
 import { ADSENSE_METADATA } from "../src/seo/adsense";
-import { BRAND_ASSETS, ROUTE_META, SITE_URL } from "../src/seo/config";
+import { BRAND_ASSETS, INDEXABLE_STATIC_PATHS, ROUTE_META, SITE_URL } from "../src/seo/config";
 import { getAllLandingPages } from "../src/seo/landing/generate";
 import { LEGACY_TOOL_REDIRECTS } from "../src/seo/legacyRedirects";
 import { buildLandingMetadata, buildMetadata } from "../src/seo/nextMetadata";

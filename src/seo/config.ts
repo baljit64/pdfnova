@@ -72,6 +72,12 @@ export const ROUTE_META: Record<string, RouteMeta> = {
       "Learn about PDFNova and its collection of browser-based tools for merging, splitting, compressing, converting and editing PDFs.",
     indexable: true,
   },
+  "/editorial-policy": {
+    title: "Editorial Policy & Content Standards | PDFNova",
+    description:
+      "Learn who creates PDFNova's guides, how tool instructions are checked, how limitations are disclosed and how to report a correction.",
+    indexable: true,
+  },
   "/privacy": {
     title: "Privacy Policy | PDFNova",
     description:

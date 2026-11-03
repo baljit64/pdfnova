@@ -26,6 +26,7 @@ const FOOTER_LINKS = [
     links: [
       ["About", "/about"],
       ["Blog", "/blog"],
+      ["Editorial policy", "/editorial-policy"],
       ["Help centre", "/help"],
       ["Contact", "/contact"],
     ],
