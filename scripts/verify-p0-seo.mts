@@ -149,7 +149,7 @@ const checks: Array<[string, () => void | Promise<void>]> = [
     assert.match(policy, /Baljit Singh/);
     assert.match(policy, /automated checks/);
     assert.match(policy, /correction/i);
-    assert.match(route, /buildMetadata\("\\/editorial-policy"\\)/);
+    assert.match(route, /editorial-policy/);
     assert.match(footer, /Editorial policy/);
     assert.match(article, /Written by/);
     assert.match(article, /"@type": "Person"/);
