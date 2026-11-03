@@ -154,7 +154,7 @@ const checks: Array<[string, () => void | Promise<void>]> = [
     assert.match(article, /Written by/);
     assert.match(article, /"@type": "Person"/);
     assert.ok(INDEXABLE_STATIC_PATHS.includes("/editorial-policy"));
-    assert.ok(sitemap().some((entry) => entry.url === \`\${SITE_URL}/editorial-policy\`));
+    assert.ok(sitemap().some((entry) => entry.url === SITE_URL + "/editorial-policy"));
   }],
   ["help centre provides practical troubleshooting and links to editorial standards", async () => {
     const help = await readFile(new URL("../src/views/Help.tsx", import.meta.url), "utf8");
