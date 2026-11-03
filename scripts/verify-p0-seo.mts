@@ -4,7 +4,7 @@ import { BLOG_POSTS } from "../src/blog/posts";
 import sitemap from "../src/app/sitemap";
 import robots from "../src/app/robots";
 import { ADSENSE_METADATA } from "../src/seo/adsense";
-import { BRAND_ASSETS, ROUTE_META, SITE_URL } from "../src/seo/config";
+import { BRAND_ASSETS, INDEXABLE_STATIC_PATHS, ROUTE_META, SITE_URL } from "../src/seo/config";
 import { getAllLandingPages } from "../src/seo/landing/generate";
 import { LEGACY_TOOL_REDIRECTS } from "../src/seo/legacyRedirects";
 import { buildLandingMetadata, buildMetadata } from "../src/seo/nextMetadata";
@@ -138,6 +138,30 @@ const checks: Array<[string, () => void | Promise<void>]> = [
       assert.match(environment, new RegExp(`^${key}=\\s*$`, "m"), key);
     }
     assert.doesNotMatch(footer, /https:\/\/(facebook|twitter|youtube)\.com/);
+  }],
+  ["publishes a transparent editorial policy and visible article authorship", async () => {
+    const [policy, route, footer, article] = await Promise.all([
+      readFile(new URL("../src/views/EditorialPolicy.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../src/app/editorial-policy/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../src/components/Footer.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../src/app/blog/[slug]/page.tsx", import.meta.url), "utf8"),
+    ]);
+    assert.match(policy, /Baljit Singh/);
+    assert.match(policy, /automated checks/);
+    assert.match(policy, /correction/i);
+    assert.match(route, /editorial-policy/);
+    assert.match(footer, /Editorial policy/);
+    assert.match(article, /Written by/);
+    assert.match(article, /"@type": "Person"/);
+    assert.ok(INDEXABLE_STATIC_PATHS.includes("/editorial-policy"));
+    assert.ok(sitemap().some((entry) => entry.url === SITE_URL + "/editorial-policy"));
+  }],
+  ["help centre provides practical troubleshooting and links to editorial standards", async () => {
+    const help = await readFile(new URL("../src/views/Help.tsx", import.meta.url), "utf8");
+    assert.match(help, /Troubleshoot common problems/);
+    assert.match(help, /Where are my files processed/);
+    assert.match(help, /file-size/);
+    assert.match(help, /editorial-policy/);
   }],
 ];
 
