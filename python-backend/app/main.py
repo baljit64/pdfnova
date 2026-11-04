@@ -10,8 +10,8 @@ app = FastAPI(
     title=settings.app_name,
     version="0.1.0",
     description="PDF processing API for PDFNova.",
-    docs_url="/docs" if settings.environment != "production" else None,
-    redoc_url=None,
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
 app.add_middleware(

@@ -36,6 +36,15 @@ def test_health_check() -> None:
     assert response.json()["status"] == "ok"
 
 
+def test_api_documentation_routes() -> None:
+    assert app.docs_url == "/docs"
+    assert app.redoc_url == "/redoc"
+    assert app.openapi_url == "/openapi.json"
+    assert client.get("/docs").status_code == 200
+    assert client.get("/redoc").status_code == 200
+    assert client.get("/openapi.json").status_code == 200
+
+
 def test_merge_two_pdfs() -> None:
     pdf = make_pdf()
     response = client.post(
@@ -155,7 +164,7 @@ def test_health_response_exact_payload() -> None:
     }
 
 
-def test_production_disables_docs_and_cors_uses_configured_origins(monkeypatch) -> None:
+def test_production_keeps_docs_and_cors_uses_configured_origins(monkeypatch) -> None:
     from app.core.config import get_settings
 
     get_settings.cache_clear()
@@ -164,8 +173,12 @@ def test_production_disables_docs_and_cors_uses_configured_origins(monkeypatch) 
     try:
         import app.main as main_module
         configured_app = importlib.reload(main_module).app
-        assert configured_app.docs_url is None
+        assert configured_app.docs_url == "/docs"
+        assert configured_app.redoc_url == "/redoc"
         configured_client = TestClient(configured_app)
+        assert configured_client.get("/docs").status_code == 200
+        assert configured_client.get("/redoc").status_code == 200
+        assert configured_client.get("/openapi.json").status_code == 200
         allowed = configured_client.options(
             "/healthz",
             headers={"Origin": "https://pdfnova.in", "Access-Control-Request-Method": "GET"},
