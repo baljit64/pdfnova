@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Card } from "antd";
+import PdfResultViewer from "./PdfResultViewer";
 import { CheckCircle2, Download, FileText, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { formatBytes } from "../../tools/engine/blob";
@@ -81,14 +82,18 @@ export default function ResultPanel({
         </div>
 
         {showInlineViewer && (
-          <div className="mt-6 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--page)]">
-            <iframe
-              title={`Preview of ${outputs[0].name}`}
-              src={urls[0]}
-              className="h-[520px] w-full border-0"
-            />
-          </div>
-        )}
+          tool.id === "merge-pdf" ? (
+            <PdfResultViewer fileUrl={urls[0]} fileName={outputs[0].name} />
+          ) : (
+            <div className="mt-6 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--page)]">
+              <iframe
+                title={`Preview of ${outputs[0].name}`}
+                src={urls[0]}
+                className="h-[520px] w-full border-0"
+              />
+            </div>
+          )
+        )}}
       </Card>
 
       {outputs.length > 1 && (
