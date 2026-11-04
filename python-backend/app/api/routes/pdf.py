@@ -42,53 +42,50 @@ def merge_pdfs(files: list[UploadFile] = File(...)) -> StreamingResponse:
         )
 
     writer = PdfWriter()
+    source_files: list[SpooledTemporaryFile] = []
     total_bytes = 0
     total_pages = 0
 
     try:
         for upload in files:
-            # Use a spooled temporary file so larger uploads do not stay entirely in RAM.
-            with SpooledTemporaryFile(max_size=1024 * 1024, mode="w+b") as source:
-                remaining = settings.max_upload_bytes - total_bytes
-                total_bytes += _copy_upload(upload, source, remaining)
+            # Keep each source open until writer.write() finishes: pypdf may
+            # need to seek back into source streams while cloning page objects.
+            source = SpooledTemporaryFile(max_size=1024 * 1024, mode="w+b")
+            source_files.append(source)
+            remaining = settings.max_upload_bytes - total_bytes
+            total_bytes += _copy_upload(upload, source, remaining)
 
-                if total_bytes == 0:
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail="One or more uploaded files are empty.",
-                    )
+            if source.read(len(PDF_SIGNATURE)) != PDF_SIGNATURE:
+                raise HTTPException(
+                    status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+                    detail=f"{upload.filename or 'A file'} is not a valid PDF upload.",
+                )
+            source.seek(0)
 
-                if source.read(len(PDF_SIGNATURE)) != PDF_SIGNATURE:
-                    raise HTTPException(
-                        status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-                        detail=f"{upload.filename or 'A file'} is not a valid PDF upload.",
-                    )
-                source.seek(0)
-
-                try:
-                    reader = PdfReader(source, strict=True)
-                    if reader.is_encrypted:
-                        raise HTTPException(
-                            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="Password-protected PDFs are not supported yet.",
-                        )
-                    if not reader.pages:
-                        raise HTTPException(
-                            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="A PDF contains no pages.",
-                        )
-                    total_pages += len(reader.pages)
-                    if total_pages > settings.max_merge_pages:
-                        raise HTTPException(
-                            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                            detail="The combined PDF exceeds the page limit.",
-                        )
-                    writer.append(reader)
-                except (PdfReadError, ValueError, OSError) as exc:
+            try:
+                reader = PdfReader(source, strict=True)
+                if reader.is_encrypted:
                     raise HTTPException(
                         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                        detail=f"Could not read {upload.filename or 'an uploaded PDF'}.",
-                    ) from exc
+                        detail="Password-protected PDFs are not supported yet.",
+                    )
+                if not reader.pages:
+                    raise HTTPException(
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        detail="A PDF contains no pages.",
+                    )
+                total_pages += len(reader.pages)
+                if total_pages > settings.max_merge_pages:
+                    raise HTTPException(
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        detail="The combined PDF exceeds the page limit.",
+                    )
+                writer.append(reader)
+            except (PdfReadError, ValueError, OSError) as exc:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=f"Could not read {upload.filename or 'an uploaded PDF'}.",
+                ) from exc
 
         output = BytesIO()
         writer.write(output)
@@ -101,5 +98,7 @@ def merge_pdfs(files: list[UploadFile] = File(...)) -> StreamingResponse:
         )
     finally:
         writer.close()
+        for source in source_files:
+            source.close()
         for upload in files:
             upload.file.close()
