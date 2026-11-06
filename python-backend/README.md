@@ -41,6 +41,8 @@ python -m pytest -q
 | `MAX_UPLOAD_BYTES` | `20971520` | Maximum combined upload size in bytes. |
 | `MAX_MERGE_FILES` | `10` | Maximum number of files per merge. |
 | `MAX_MERGE_PAGES` | `500` | Maximum combined page count. |
+| `CLOUDCONVERT_API_KEY` | unset | Required for Office conversion endpoints. |
+| `CONTACT_FORM_ENDPOINT` | unset | HTTPS webhook used by the contact form. |
 
 The CORS value is a comma-separated string, not a JSON array. For example:
 `CORS_ORIGINS=https://pdfnova.in,https://www.pdfnova.in`. Pydantic Settings
@@ -106,3 +108,11 @@ curl -X POST http://localhost:8000/api/v1/pdf/merge \
 
 Current limits are intentionally conservative for Railway's small free
 instance. Encrypted PDFs are not supported in this first version.
+
+### Office conversion API
+
+The Python service provides `POST /api/v1/convert/pdf-to-word`,
+`/word-to-pdf`, `/pdf-to-excel`, `/pdf-to-powerpoint`, and
+`/powerpoint-to-pdf`. Each accepts a multipart `file` field. PDF-to-Word also
+accepts `ocr=on` and `ocrLanguage` (`eng`, `hin`, `spa`, `fra`, or `deu`).
+Set `CLOUDCONVERT_API_KEY` before calling these endpoints.
