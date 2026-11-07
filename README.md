@@ -4,6 +4,20 @@ Free online PDF tools: merge, split, compress, convert PDFs.
 
 ## Development
 
+To start the frontend and Python API together, use one terminal:
+
+```bash
+nvm use # Node.js 24
+./start.sh
+```
+
+The script installs missing dependencies on first run. It reads the frontend
+Supabase settings and backend service-role key from the root `.env`; keep that
+file private. Open the frontend at http://localhost:3000 and API docs at
+http://localhost:8000/docs. Press Ctrl+C to stop both services.
+
+To run only the frontend, use:
+
 ```bash
 npm install
 npm run dev
