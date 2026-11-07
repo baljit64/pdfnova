@@ -93,7 +93,7 @@ export default function ResultPanel({
               />
             </div>
           )
-        )}}
+        )}
       </Card>
 
       {outputs.length > 1 && (

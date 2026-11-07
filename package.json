@@ -4,12 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "npm run sync:pdfjs-assets && next dev",
     "clean": "node scripts/clean-next.mjs",
-    "build": "npm run clean && next build",
+    "build": "npm run clean && npm run sync:pdfjs-assets && next build",
+    "sync:pdfjs-assets": "node scripts/copy-pdfjs-assets.mjs",
     "build:incremental": "next build",
     "lint": "eslint .",
     "start": "next start",

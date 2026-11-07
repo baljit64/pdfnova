@@ -4,6 +4,20 @@ Free online PDF tools: merge, split, compress, convert PDFs.
 
 ## Development
 
+To start the frontend and Python API together, use one terminal:
+
+```bash
+nvm use # Node.js 24
+./start.sh
+```
+
+The script installs missing dependencies on first run. It reads the frontend
+Supabase settings and backend service-role key from the root `.env`; keep that
+file private. Open the frontend at http://localhost:3000 and API docs at
+http://localhost:8000/docs. Press Ctrl+C to stop both services.
+
+To run only the frontend, use:
+
 ```bash
 npm install
 npm run dev
@@ -35,8 +49,6 @@ To verify the site in Google Search Console, set `GOOGLE_SITE_VERIFICATION` in t
 Keep real values in `.env` locally and in Vercel for deployments. Never commit them to
 `.env.example`.
 
-- `CLOUDCONVERT_API_KEY` — server-only and required for PDF to Word (including OCR) and Word to PDF. Enable it for Production;
-  use separate credentials for Preview or local Development when those environments need the tool.
 - `GOOGLE_SITE_VERIFICATION` — optional, non-secret HTML-tag verification token for Google Search
   Console. Production is sufficient. Copy the tag's `content` value, not an HTML filename.
 - `CONTACT_FORM_ENDPOINT` — server-only HTTPS webhook that accepts the contact form JSON. Enable it
