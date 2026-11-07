@@ -2,7 +2,7 @@
 
 ## Environment and deployment
 
-Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` locally and in Vercel for each deployed environment. Redeploy after changing these build-time public variables. The existing `NEXT_PUBLIC_SUPABASE_ANON_KEY` fallback remains supported. Never expose a service-role key through a `NEXT_PUBLIC_` variable.
+Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` locally and in Vercel for each deployed environment. Redeploy after changing these build-time public variables. The existing `NEXT_PUBLIC_SUPABASE_ANON_KEY` fallback remains supported. Never expose a service-role key through a `NEXT_PUBLIC_` variable. In Railway, set `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` for the Python archive API.
 
 This project uses Next.js 15: `src/middleware.ts` refreshes cookies using `getUser()` and forwards cookie/cache headers. Public PDF tools remain public. The existing shared social buttons use the same OAuth flow for signup and login. One navbar listener synchronizes the displayed account state and unsubscribes on unmount. Hovering, focusing, or tapping the signed-in user control in the navbar shows the name, email, photo, and logout action.
 
@@ -21,12 +21,11 @@ No existing profile table or migration was found in this repository. The remote 
 
 When a signed-in user completes a tool, PDFNova uploads the resulting file to the private `user-files` bucket and creates an archive record. Source files are not archived. Users can retrieve results from `/files`; RLS prevents one user from listing or downloading another user’s files.
 
-Set these **server-only** values locally and in Vercel:
+Set these **server-only** values in Railway:
 
-- `SUPABASE_SERVICE_ROLE_KEY`: Supabase Dashboard → Project Settings → API → service_role key. This is used only by the cleanup route; never put it in a `NEXT_PUBLIC_` variable.
-- `CRON_SECRET`: a newly generated long random string. Vercel sends it to the scheduled cleanup route automatically.
+- `SUPABASE_SERVICE_ROLE_KEY`: Supabase Dashboard → Project Settings → API → service_role key. Store it only as a Railway secret for the Python archive API; never put it in a `NEXT_PUBLIC_` variable.
 
-`vercel.json` schedules `/api/cron/purge-user-files` daily at 03:00 UTC. It removes expired Storage objects and their database records in batches of 100. Verify the Vercel project has the cron enabled after deployment.
+There is currently no scheduled cleanup. Archived objects and records are retained after their `expires_at` date until cleanup is configured. The Python API filters expired records from the archive listing and refuses to download expired files.
 
 ## Supabase dashboard
 
@@ -77,7 +76,7 @@ Flow: Application → Google/Facebook → Supabase `/auth/v1/callback` → appli
 - Session refresh: revisit the site after token expiry and verify refreshed cookies are written.
 - RLS: with two ordinary authenticated users, verify each can select/update only their own profile and cannot insert/delete profiles or change identity/provider fields.
 - Callback: test provider cancellation, missing code, and external `next` values; they must never redirect outside the app.
-- Saved archive: while signed in, complete a local tool and confirm the result appears in `/files`; use a second account to confirm it cannot view or download it. Confirm an expired test record is removed by the scheduled cleanup route.
+- Saved archive: while signed in, complete a local tool and confirm the result appears in `/files`; use a second account to confirm it cannot view or download it. Confirm expired files are hidden and cannot be downloaded. No scheduled removal is configured.
 
 Local checks do not authenticate against real provider accounts or apply the SQL migration. Run the live checks after configuring the dashboards and applying the migration.
 

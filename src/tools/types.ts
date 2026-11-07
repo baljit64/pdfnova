@@ -35,9 +35,9 @@ export interface ToolOutput {
   size: number;
 }
 
-export type OptionValue = string | number | File;
+export type OptionValue = string | number | boolean | File;
 
-export type OptionFieldType = "text" | "number" | "radio" | "select" | "file" | "signature";
+export type OptionFieldType = "text" | "number" | "radio" | "select" | "file" | "signature" | "checkbox" | "color" | "position-grid";
 
 export interface OptionField {
   key: string;

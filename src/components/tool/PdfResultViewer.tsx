@@ -51,8 +51,8 @@ export default function PdfResultViewer({ fileUrl, fileName }: Props) {
         // PDF.js is served as a same-origin ESM asset to avoid bundling its
         // independent runtime into Next.js client chunks.
         // @ts-expect-error Runtime module served by the PDF.js asset route.
-        const pdfjs = await import(/* webpackIgnore: true */ "/api/pdfjs/pdf.mjs");
-        pdfjs.GlobalWorkerOptions.workerSrc = "/api/pdfjs/pdf.worker.min.mjs";
+        const pdfjs = await import(/* webpackIgnore: true */ "/pdfjs/pdf.mjs");
+        pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.mjs";
         const response = await fetch(fileUrl);
         if (!response.ok) throw new Error("The merged PDF could not be loaded.");
         const bytes = new Uint8Array(await response.arrayBuffer());

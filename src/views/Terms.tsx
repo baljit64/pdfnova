@@ -59,12 +59,12 @@ export default function Terms() {
           </p>
         </section>
         <section>
-          <h2 className="text-xl font-semibold text-blue-900">Third-party processing</h2>
+          <h2 className="text-xl font-semibold text-blue-900">Server-assisted processing</h2>
           <p>
-            Most tools run in the browser. PDF to Word and Word to PDF use CloudConvert for
-            server-assisted conversion and are subject to that provider&apos;s availability and terms.
-            The tool pages and Privacy Policy identify this difference so you can decide whether
-            it is appropriate for a particular document.
+            Most tools run in the browser. PDF to Word and Word to PDF use PDFNova&apos;s API for
+            server-assisted conversion.
+            Conversion results can vary with document structure and the installed fonts. The tool
+            pages and Privacy Policy identify when a file is sent to PDFNova&apos;s API.
           </p>
         </section>
         <section>

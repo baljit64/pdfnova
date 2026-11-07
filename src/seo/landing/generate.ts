@@ -19,8 +19,8 @@ function privacySection(tool: ToolDefinition): ContentBlock {
     return {
       heading: "Privacy",
       paragraphs: [
-        `${tool.name} uses server-assisted document conversion because preserving editable structure and office-document layout is not practical in a browser. Your file is sent to a conversion service, processed there, and returned to you.`,
-        "The file passes through PDFNova's API route and is submitted to CloudConvert for processing. The transfer uses HTTPS, but the document leaves your device and is handled by that third-party service, so review the privacy requirements that apply to your document before using this converter.",
+        `${tool.name} uses server-assisted document conversion because preserving editable structure and office-document layout is not practical in a browser. Your file is sent to PDFNova's API for processing and returned to you.`,
+        "The file is sent over HTTPS to PDFNova's API for conversion and then returned to your browser. The document leaves your device, so review the privacy requirements that apply to it before using this converter.",
         "If a document must not leave your device, avoid server-assisted tools and use one of the tools explicitly labelled as on-device.",
       ],
     };
@@ -42,7 +42,7 @@ function securitySection(tool: ToolDefinition): ContentBlock {
     return {
       heading: "Security",
       paragraphs: [
-        "The page is served over HTTPS, and the requests to and from CloudConvert use HTTPS. This protects the transfer in transit, but it does not make a server-assisted conversion equivalent to on-device processing.",
+        "The page and PDFNova's API use HTTPS. The conversion is handled by PDFNova's API, so this is not on-device processing.",
         `The API validates the submitted ${tool.acceptLabel} file and enforces the tool's ${tool.maxFileSizeMB} MB limit before forwarding it.`,
         "For documents where the transfer itself is the concern, use an on-device tool or a trusted desktop application instead.",
       ],

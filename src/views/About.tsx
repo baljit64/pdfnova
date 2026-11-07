@@ -39,8 +39,8 @@ export default function About() {
             Most PDFNova tools run locally in the browser after the page code loads. Those tools
             do not send the selected document to PDFNova&apos;s API. PDF to Word and Word to PDF are
             different because reconstructing editable content or preserving office-document layout
-            requires server software. Those pages send the selected file through PDFNova&apos;s API to
-            CloudConvert over HTTPS and clearly label the transfer.
+            requires server-assisted processing. Those pages send the selected file securely to
+            PDFNova&apos;s API for conversion and return the result to your browser.
           </p>
           <p>
             The processing notice on each tool is the source of truth. Read the full{" "}
@@ -54,7 +54,7 @@ export default function About() {
           <p>
             PDFNova is served over HTTPS. Browser-based tools keep selected files in the current
             browser session, while the server-assisted PDF to Word and Word to PDF tools transfer
-            the selected document to their conversion provider over HTTPS. Choose the processing
+            the selected document to PDFNova&apos;s API over HTTPS. Choose the processing
             model that fits your document-handling requirements, especially for confidential or
             regulated material.
           </p>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Alert, Button, Input, Form } from "antd";
 import Link from "next/link";
+import { pythonApi } from "../lib/python-api";
 
 const { TextArea } = Input;
 
@@ -23,13 +24,13 @@ export default function Contact() {
     setError(null);
 
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch(pythonApi("/contact"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-      const result = (await response.json().catch(() => null)) as { error?: string } | null;
-      if (!response.ok) throw new Error(result?.error || "We could not send your message.");
+      const result = (await response.json().catch(() => null)) as { error?: string; detail?: string } | null;
+      if (!response.ok) throw new Error(result?.error || result?.detail || "We could not send your message.");
 
       setSent(true);
     } catch (caught) {

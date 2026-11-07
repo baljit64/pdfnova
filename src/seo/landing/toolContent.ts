@@ -119,7 +119,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
     technical: {
       heading: "How the merge actually works",
       paragraphs: [
-        "When you press merge, each file is read into memory as an array of bytes and parsed with pdf-lib, an open-source PDF library that runs entirely in JavaScript. The tool creates an empty destination document and then copies page objects out of each source document into it, in the order you set on screen.",
+        "When you press merge, the files are read in your browser and combined in the order you set on screen. The resulting PDF is created locally and is not uploaded.",
         "Copying at the object level is what preserves quality. A page's text runs, embedded fonts, images and vector instructions are transferred as-is rather than being flattened into a picture. Rotation, when you apply it, is written as a page attribute on top of whatever rotation the page already carried, so a page that was already 90 degrees out and gets another 90 ends up at 180 rather than snapping back to zero.",
       ],
     },
@@ -996,8 +996,8 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
 
   "pdf-to-word": {
     intro: [
-      "Getting a PDF back into an editable Word document requires a dedicated conversion service. A PDF stores positioned glyphs, not paragraphs — reconstructing headings, columns, tables and lists from that requires layout analysis that browsers cannot reasonably do.",
-      "This tool sends your file to a dedicated conversion service and returns a DOCX you can open in Word, Google Docs, LibreOffice or Pages. Because it leaves your device, this is the one PDFNova tool where the privacy story is different, and we would rather say so plainly than bury it.",
+      "Getting a PDF back into an editable Word document requires document conversion that can reconstruct headings, columns, tables and lists from the PDF's page layout.",
+      "This tool sends your file to PDFNova's API and returns a DOCX you can open in Word, Google Docs, LibreOffice or Pages. Because it leaves your device, this is the one PDFNova tool where the privacy story is different, and we would rather say so plainly than bury it.",
     ],
     benefits: [
       {
@@ -1015,7 +1015,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
     ],
     steps: [
       { title: "Add your PDF", body: "Drop in the document you want to convert. The limit for this tool is 25 MB." },
-      { title: "Start the conversion", body: "Press Convert to Word. Your file is sent to the conversion service over an encrypted connection." },
+      { title: "Start the conversion", body: "Press Convert to Word. Your file is sent securely to PDFNova's API." },
       { title: "Wait for processing", body: "Progress is shown while the service works. A long or complex document can take up to a minute." },
       { title: "Download the DOCX", body: "The finished document downloads with the same name as your PDF." },
       { title: "Check the layout", body: "Open it and review the result. Complex layouts almost always need some tidying up." },
@@ -1023,7 +1023,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
     features: [
       { title: "True DOCX output", body: "A real Word document, not a PDF wrapped in one." },
       { title: "Structure recovery", body: "Headings, paragraphs, lists and simple tables are rebuilt." },
-      { title: "Encrypted transfer", body: "Files travel over HTTPS to the conversion service and back." },
+      { title: "Encrypted transfer", body: "Files travel over HTTPS to PDFNova's API and back." },
       { title: "Progress reporting", body: "Live status while the conversion runs, with no silent waiting." },
       { title: "Clear error messages", body: "If the service reports a problem, you see what it said rather than a generic failure." },
     ],
@@ -1049,7 +1049,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       {
         question: "Does this tool run on my device like the others?",
         answer:
-          "No. PDF to Word requires layout analysis that is not practical in a browser, so your file is sent over an encrypted connection to a conversion service, converted there, and returned.",
+          "No. PDF to Word requires layout analysis that is not practical in a browser, so your file is sent securely to PDFNova's API for conversion and returned.",
       },
       {
         question: "How accurate is the conversion?",
@@ -1064,7 +1064,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       {
         question: "Why is the file size limit lower for this tool?",
         answer:
-          "Because the file has to travel to a conversion service and back. The 25 MB limit keeps conversions from timing out. If your document is larger, compress it first or split it and convert the sections separately.",
+          "Because the file has to travel to PDFNova's API and back. The 25 MB limit keeps conversions from timing out. If your document is larger, compress it first or split it and convert the sections separately.",
       },
       {
         question: "What if the conversion fails?",
@@ -1075,12 +1075,12 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
     technical: {
       heading: "How PDF to Word works",
       paragraphs: [
-        "Your file is posted to PDFNova's own API route, which forwards it to a document conversion service over an encrypted connection and polls that service until the job finishes. The resulting DOCX is streamed back through the same route to your browser, where it is turned into a download.",
+        "Your file is sent to PDFNova's API over HTTPS for conversion. The resulting DOCX is returned to your browser as a download.",
         "The conversion itself involves interpreting the PDF's positioned text runs and reconstructing document structure from them — grouping glyphs into words and lines, lines into paragraphs, and detecting headings, lists and table cells from spacing and alignment. This inference is why simple layouts convert cleanly and complicated ones need review.",
       ],
     },
     limitations:
-      "This tool sends your file to an external conversion service rather than processing it on your device. OCR must be enabled for scanned PDFs, and complex layouts can still require manual correction afterwards.",
+      "This tool sends your file to PDFNova's API rather than processing it on your device. OCR must be enabled for scanned PDFs, and complex layouts can still require manual correction afterwards.",
   },
 
   "word-to-pdf": {
@@ -1152,7 +1152,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       {
         question: "Does my document leave my device?",
         answer:
-          "Yes. The document is sent over HTTPS to the dedicated conversion service and returned through PDFNova's API. Use another workflow when third-party processing is prohibited.",
+          "Yes. The document is sent over HTTPS to PDFNova's API for conversion. Use another workflow when remote processing is prohibited.",
       },
       {
         question: "Will long documents be split across pages correctly?",
@@ -1173,14 +1173,14 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
     technical: {
       heading: "How Word to PDF works",
       paragraphs: [
-        "The DOC or DOCX file is sent through PDFNova's protected conversion route to a dedicated document conversion service. That service uses a Word-compatible layout engine to produce the PDF.",
+        "The DOC or DOCX file is sent securely to PDFNova's API for conversion to PDF.",
         "The resulting PDF is streamed back to the browser. Text remains selectable, explicit page breaks are respected, and headers, footers and complex document layout are handled by the conversion engine.",
         "The API validates the filename and file-size limit before creating a conversion job. Requests are rate-limited, the API credential remains on the server, and the converted file is returned directly rather than being attached to a PDFNova account or document history.",
         "Font availability still matters. When a document uses a font unavailable to the conversion engine, a substitute with similar metrics may be selected, which can slightly change line endings. Embedded fonts and common office fonts give the most predictable result, so the preview should always be reviewed before the PDF is distributed as a final record.",
       ],
     },
     limitations:
-      "This tool requires a server upload and external conversion service. Unusual fonts or features specific to one Word version can still produce small layout differences.",
+      "This tool sends the document to PDFNova's API for conversion. Unusual fonts or features specific to one Word version can still produce small layout differences.",
   },
 
   "excel-to-pdf": {

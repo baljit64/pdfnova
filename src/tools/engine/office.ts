@@ -1,9 +1,9 @@
 /**
- * Office-format conversions. Excel and Word run entirely in the browser; PDF to
- * Word posts to the existing `/api/convert/pdf-to-word` route, whose behaviour is
- * unchanged.
+ * Office-format conversions. Excel rendering stays in the browser; Word and PDF
+ * conversions are handled by the Python API.
  */
 import { baseName } from "./blob";
+import { pythonApi } from "../../lib/python-api";
 import type { ToolOutput } from "../types";
 import {
   MINIMUM_FONT_SIZE_PT,
@@ -334,7 +334,7 @@ export async function wordToPDF({
   const body = new FormData();
   body.append("file", file);
   onProgress(20, "Uploading to the document converter");
-  const response = await fetch("/api/convert/word-to-pdf", { method: "POST", body, signal });
+  const response = await fetch(pythonApi("/convert/word-to-pdf"), { method: "POST", body, signal });
   if (!response.ok) throw new Error(await conversionError(response));
   onProgress(85, "Downloading the PDF");
   const blob = await response.blob();
@@ -363,7 +363,7 @@ export async function pdfToWord({
   body.append("ocrLanguage", ocrLanguage);
 
   onProgress(20, "Uploading to the converter");
-  const response = await fetch("/api/convert/pdf-to-word", { method: "POST", body, signal });
+  const response = await fetch(pythonApi("/convert/pdf-to-word"), { method: "POST", body, signal });
 
   if (!response.ok) {
     // The route answers with JSON on failure and a plain body on some errors.
@@ -380,7 +380,7 @@ async function conversionError(response: Response): Promise<string> {
   const raw = await response.text();
   try {
     const parsed = JSON.parse(raw);
-    if (parsed?.error) return parsed.error;
+    if (parsed?.error || parsed?.detail) return parsed.error || parsed.detail;
   } catch {
     // Keep a useful plain-text response when the server did not return JSON.
   }

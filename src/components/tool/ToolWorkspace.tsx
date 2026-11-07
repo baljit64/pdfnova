@@ -12,6 +12,7 @@ import {
 } from "../../tools/page-organizer";
 import { track } from "../../analytics/track";
 import { createBrowserSupabaseClient } from "../../lib/supabase/client";
+import { pythonApi } from "../../lib/python-api";
 import FileDropzone from "./FileDropzone";
 import OptionsForm from "./OptionsForm";
 import ResultPanel from "./ResultPanel";
@@ -98,8 +99,8 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
 
   const archiveResults = useCallback(async (completedOutputs: ToolOutput[]) => {
     try {
-      const { data: { user } } = await createBrowserSupabaseClient().auth.getUser();
-      if (!user) return;
+      const { data: { session } } = await createBrowserSupabaseClient().auth.getSession();
+      if (!session) return;
 
       setArchiveStatus("saving");
       const saved = await Promise.allSettled(
@@ -109,7 +110,11 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
           form.append("file", new File([output.blob], output.name, {
             type: output.blob.type || "application/octet-stream",
           }));
-          const response = await fetch("/api/files", { method: "POST", body: form });
+          const response = await fetch(pythonApi("/files"), {
+            method: "POST",
+            body: form,
+            headers: { Authorization: `Bearer ${session.access_token}` },
+          });
           if (!response.ok) throw new Error("Archive request failed");
         })
       );
@@ -470,6 +475,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
         archiveBusy={archiveBusy}
         archivePercent={archivePercent}
         archiveStatus={archiveStatus}
+        onEditSettings={tool.id === "watermark" ? () => setPhase("idle") : undefined}
         onReset={reset}
       />
     );
@@ -557,6 +563,23 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
             value={String(options.pages ?? "")}
             disabled={running}
             onChange={(value) => updateOption("pages", value)}
+            watermark={tool.id === "watermark" ? {
+              kind: options.kind === "image" ? "image" : "text",
+              text: String(options.text ?? "PDFNova"),
+              image: options.image instanceof File ? options.image : undefined,
+              position: String(options.position ?? "center"),
+              fontSize: Number(options.fontSize ?? 48),
+              fontFamily: String(options.fontFamily ?? "Helvetica"),
+              bold: Boolean(options.bold),
+              italic: Boolean(options.italic),
+              underline: Boolean(options.underline),
+              color: String(options.color ?? "#737373"),
+              opacity: Number(options.opacity ?? 0.3),
+              rotation: Number(options.rotation ?? 0),
+              imageWidth: Number(options.imageWidth ?? 35),
+              mosaic: Boolean(options.mosaic),
+              pages: String(options.pages ?? ""),
+            } : undefined}
           />
         )}
 
@@ -579,7 +602,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
       <div aria-live="polite" aria-atomic="true" className={running ? "mt-6" : "sr-only"}>
         {running && (
           <>
-            <Progress percent={percent} status="active" strokeColor="#cc4435" trailColor="#eaecf0" />
+            <Progress percent={percent} status="active" strokeColor="#cc4435" railColor="#eaecf0" />
             <p className="mt-1 text-sm font-medium text-[var(--text-secondary)]">{status || "Working…"}</p>
           </>
         )}
