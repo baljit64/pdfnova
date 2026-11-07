@@ -379,7 +379,15 @@ export interface WatermarkParams {
   pages?: string;
   opacity: number;
   fontSize: number;
-  position: "diagonal" | "center" | "bottom-right" | "top-left";
+  position: "diagonal" | "center" | "top-left" | "top-center" | "top-right" | "middle-left" | "middle-right" | "bottom-left" | "bottom-center" | "bottom-right";
+  fontFamily?: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  color?: string;
+  mosaic?: boolean;
+  rotation?: number;
+  layer?: "over" | "under";
   signal: AbortSignal;
   onProgress?: Progress;
 }
@@ -394,12 +402,26 @@ export async function watermarkPDF({
   opacity,
   fontSize,
   position,
+  fontFamily = "Helvetica",
+  bold = true,
+  italic = false,
+  underline = false,
+  color = "#737373",
+  mosaic = false,
+  rotation = position === "diagonal" ? 45 : 0,
+  layer = "over",
   signal,
   onProgress = noopProgress,
 }: WatermarkParams): Promise<ToolOutput[]> {
   const { PDFDocument, StandardFonts, degrees, rgb } = await import("pdf-lib");
   const doc = await PDFDocument.load(await file.arrayBuffer());
-  const font = await doc.embedFont(StandardFonts.HelveticaBold);
+  const fontNames: Record<string, { regular: string; bold: string; italic: string; boldItalic: string }> = {
+    Helvetica: { regular: StandardFonts.Helvetica, bold: StandardFonts.HelveticaBold, italic: StandardFonts.HelveticaOblique, boldItalic: StandardFonts.HelveticaBoldOblique },
+    "Times Roman": { regular: StandardFonts.TimesRoman, bold: StandardFonts.TimesRomanBold, italic: StandardFonts.TimesRomanItalic, boldItalic: StandardFonts.TimesRomanBoldItalic },
+    Courier: { regular: StandardFonts.Courier, bold: StandardFonts.CourierBold, italic: StandardFonts.CourierOblique, boldItalic: StandardFonts.CourierBoldOblique },
+  };
+  const fontSet = fontNames[fontFamily] ?? fontNames.Helvetica;
+  const font = await doc.embedFont(italic ? (bold ? fontSet.boldItalic : fontSet.italic) : (bold ? fontSet.bold : fontSet.regular));
   const safeText = toWinAnsiSafe(text).trim();
   if (kind === "text" && !safeText) throw new Error("Enter watermark text using standard Latin characters.");
 
@@ -425,6 +447,26 @@ export async function watermarkPDF({
     : null;
   const textWidth = font.widthOfTextAtSize(safeText, fontSize);
   const textHeight = font.heightAtSize(fontSize);
+  const match = /^#?([\da-f]{6})$/i.exec(color);
+  const hex = match?.[1] ?? "737373";
+  const watermarkColor = rgb(parseInt(hex.slice(0, 2), 16) / 255, parseInt(hex.slice(2, 4), 16) / 255, parseInt(hex.slice(4, 6), 16) / 255);
+
+  const place = (width: number, height: number, itemWidth: number, itemHeight: number) => {
+    const margin = 32;
+    const spots: Record<string, { x: number; y: number }> = {
+      "top-left": { x: margin, y: height - itemHeight - margin },
+      "top-center": { x: (width - itemWidth) / 2, y: height - itemHeight - margin },
+      "top-right": { x: width - itemWidth - margin, y: height - itemHeight - margin },
+      "middle-left": { x: margin, y: (height - itemHeight) / 2 },
+      center: { x: (width - itemWidth) / 2, y: (height - itemHeight) / 2 },
+      "middle-right": { x: width - itemWidth - margin, y: (height - itemHeight) / 2 },
+      "bottom-left": { x: margin, y: margin },
+      "bottom-center": { x: (width - itemWidth) / 2, y: margin },
+      "bottom-right": { x: width - itemWidth - margin, y: margin },
+      diagonal: { x: (width - itemWidth) / 2, y: (height - itemHeight) / 2 },
+    };
+    return spots[position] ?? spots.center;
+  };
 
   pages.forEach((page, index) => {
     if (targets && !targets.has(index)) return;
@@ -432,49 +474,49 @@ export async function watermarkPDF({
     onProgress(Math.round((index / pages.length) * 90), `Stamping page ${index + 1}`);
     const { width, height } = page.getSize();
 
+    page.node.normalize();
+    const content = page.node.Contents() as unknown as {
+      size?: () => number;
+      get?: (index: number) => unknown;
+      insert?: (index: number, object: unknown) => void;
+      remove?: (index: number) => unknown;
+    } | undefined;
+    const oldContentCount = content?.size?.() ?? 0;
+
+    const draw = () => {
     if (kind === "image" && image) {
       const drawWidth = width * Math.min(0.9, Math.max(0.05, imageWidthPercent / 100));
       const drawHeight = drawWidth * (image.height / image.width);
-      const placements = {
-        diagonal: { x: (width - drawWidth) / 2, y: (height - drawHeight) / 2, rotate: degrees(45) },
-        center: { x: (width - drawWidth) / 2, y: (height - drawHeight) / 2, rotate: degrees(0) },
-        "bottom-right": { x: Math.max(24, width - drawWidth - 32), y: 32, rotate: degrees(0) },
-        "top-left": { x: 32, y: Math.max(24, height - drawHeight - 32), rotate: degrees(0) },
-      } as const;
-      const placement = placements[position];
-      page.drawImage(image, {
-        x: placement.x,
-        y: placement.y,
-        width: drawWidth,
-        height: drawHeight,
-        opacity,
-        rotate: placement.rotate,
-      });
+      const points = mosaic
+        ? Array.from({ length: 9 }, (_, i) => ({ x: (width * ((i % 3) + 0.5)) / 3 - drawWidth / 2, y: (height * (Math.floor(i / 3) + 0.5)) / 3 - drawHeight / 2 }))
+        : [place(width, height, drawWidth, drawHeight)];
+      points.forEach((point) => page.drawImage(image!, { ...point, width: drawWidth, height: drawHeight, opacity, rotate: degrees(rotation) }));
       return;
     }
 
-    // Placement is measured from the text box so long words stay on the page.
-    const layouts = {
-      diagonal: {
-        x: width / 2 - (textWidth / 2) * Math.SQRT1_2,
-        y: height / 2 - (textWidth / 2) * Math.SQRT1_2,
-        rotate: degrees(45),
-      },
-      center: { x: width / 2 - textWidth / 2, y: height / 2 - textHeight / 2, rotate: degrees(0) },
-      "bottom-right": { x: Math.max(24, width - textWidth - 32), y: 32, rotate: degrees(0) },
-      "top-left": { x: 32, y: height - textHeight - 32, rotate: degrees(0) },
-    } as const;
-
-    const layout = layouts[position];
-    page.drawText(safeText, {
-      x: layout.x,
-      y: layout.y,
-      size: fontSize,
-      font,
-      color: rgb(0.45, 0.45, 0.45),
-      opacity,
-      rotate: layout.rotate,
+    const points = mosaic
+      ? Array.from({ length: 9 }, (_, i) => ({ x: (width * ((i % 3) + 0.5)) / 3 - textWidth / 2, y: (height * (Math.floor(i / 3) + 0.5)) / 3 - textHeight / 2 }))
+      : [place(width, height, textWidth, textHeight)];
+    points.forEach((point) => {
+      page.drawText(safeText, { ...point, size: fontSize, font, color: watermarkColor, opacity, rotate: degrees(rotation) });
+      if (underline) page.drawLine({ start: { x: point.x, y: point.y - 2 }, end: { x: point.x + textWidth, y: point.y - 2 }, thickness: Math.max(1, fontSize / 18), color: watermarkColor, opacity });
     });
+    };
+
+    draw();
+    if (layer === "under") {
+      const updated = page.node.Contents() as unknown as typeof content;
+      if (updated?.size && updated.get && updated.insert && updated.remove) {
+        const addedCount = updated.size() - oldContentCount;
+        for (let i = 0; i < addedCount; i += 1) {
+          const stream = updated.get(updated.size() - 1);
+          updated.remove(updated.size() - 1);
+          // Keep the page's graphics-state wrapper at index 0 and draw the
+          // watermark before the original page streams.
+          updated.insert(i + 1, stream);
+        }
+      }
+    }
   });
 
   const blob = pdfBlob(await doc.save());

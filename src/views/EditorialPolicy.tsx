@@ -62,7 +62,7 @@ export default function EditorialPolicy() {
           <section>
             <h2 className="text-2xl font-bold text-[var(--text-primary)]">Accuracy, limitations and updates</h2>
             <p className="mt-3 leading-8">
-              File formats, browser behaviour and third-party conversion services can change.
+              File formats, browser behaviour and PDFNova&apos;s API can change.
               We update instructions when a product change makes them inaccurate or when a reader
               reports a reproducible problem. A published guide may not cover every unusual PDF,
               font, scan or office-document layout.

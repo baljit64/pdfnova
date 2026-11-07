@@ -18,6 +18,7 @@ interface Props {
   archiveBusy: boolean;
   archivePercent: number;
   archiveStatus: "idle" | "saving" | "saved" | "failed";
+  onEditSettings?: () => void;
   onReset: () => void;
 }
 
@@ -35,6 +36,7 @@ export default function ResultPanel({
   archiveBusy,
   archivePercent,
   archiveStatus,
+  onEditSettings,
   onReset,
 }: Props) {
   const showInlineViewer = outputs.length === 1 && outputs[0].kind === "pdf";
@@ -61,6 +63,11 @@ export default function ResultPanel({
           </div>
 
           <div className="flex flex-wrap gap-3">
+            {onEditSettings && (
+              <Button size="large" onClick={onEditSettings}>
+                Edit settings
+              </Button>
+            )}
             <Button
               type="primary"
               danger

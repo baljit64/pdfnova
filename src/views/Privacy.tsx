@@ -24,11 +24,10 @@ export default function Privacy() {
         <section>
           <h2 className="text-xl font-semibold text-blue-900">Server-assisted document conversion</h2>
           <p>
-            PDF to Word and Word to PDF send the selected document to PDFNova's Python API on
-            Railway over HTTPS. The service processes files with open-source conversion software
-            and removes its temporary working files after the request. The converted result is
-            returned to your browser. Do not use these converters when your document-handling
-            requirements prohibit remote server processing.
+            PDF to Word and Word to PDF send the selected document to PDFNova&apos;s API over HTTPS
+            for conversion. The converted result is returned to your browser, and temporary
+            working files are removed after processing. Do not use these converters when your
+            document-handling requirements prohibit remote processing.
           </p>
         </section>
 
@@ -64,7 +63,7 @@ export default function Privacy() {
             PDFNova is delivered over HTTPS. We use reasonable technical and organisational
             measures appropriate to the service, but no internet transmission or browser storage
             method can be guaranteed perfectly secure. Keep original files and avoid sending
-            documents to server-assisted tools when third-party processing is not permitted.
+            documents to server-assisted tools when remote processing is not permitted.
           </p>
         </section>
 
@@ -106,8 +105,8 @@ export default function Privacy() {
             files. Saved results are private to the account that created them. After 30 days they
             are hidden from the archive and cannot be downloaded. Automatic removal from storage
             is not currently scheduled. Visitors do not receive a PDFNova file archive. Server-assisted
-            conversion and configured support services follow the retention rules of their
-            respective providers.
+            conversion and configured support services follow applicable handling and retention
+            practices.
           </p>
         </section>
 
