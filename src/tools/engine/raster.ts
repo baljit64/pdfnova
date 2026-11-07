@@ -40,8 +40,8 @@ async function loadPdfJs(): Promise<PdfJs> {
     // webpack nests two runtimes and causes `Object.defineProperty` failures in
     // Next's client chunk. Keep the module self-contained and load it natively.
     // @ts-expect-error This is a same-origin runtime module, not a source file.
-    pdfjsPromise = import(/* webpackIgnore: true */ "/api/pdfjs/pdf.mjs").then((lib) => {
-      lib.GlobalWorkerOptions.workerSrc = "/api/pdfjs/pdf.worker.min.mjs";
+    pdfjsPromise = import(/* webpackIgnore: true */ "/pdfjs/pdf.mjs").then((lib) => {
+      lib.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.mjs";
       return lib;
     });
   }

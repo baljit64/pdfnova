@@ -74,21 +74,12 @@ const legacyToolRedirects = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // These modules are loaded by the browser through the PDF.js asset routes.
-  // Explicit tracing keeps them inside Vercel's serverless function bundles.
-  outputFileTracingIncludes: {
-    "/api/pdfjs/[asset]": [
-      "./node_modules/pdfjs-dist/build/pdf.mjs",
-      "./node_modules/pdfjs-dist/build/pdf.worker.min.mjs",
-    ],
-    // Backwards-compatible alias for clients served by older cached bundles.
-    "/api/pdfs/[asset]": [
-      "./node_modules/pdfjs-dist/build/pdf.mjs",
-      "./node_modules/pdfjs-dist/build/pdf.worker.min.mjs",
-    ],
-  },
   async headers() {
     return [
+      {
+        source: "/pdfjs/:asset*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
       {
         source: "/:path*",
         headers: [

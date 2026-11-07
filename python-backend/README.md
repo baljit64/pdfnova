@@ -1,13 +1,16 @@
 # PDFNova Python API
 
-A FastAPI service that is developed alongside the existing Next.js application.
-This is the first step of a gradual migration; existing Next.js PDF tools remain
-the production implementation until each Python replacement is integrated and verified.
+A FastAPI service for PDFNova's HTTP API. The Next.js application remains the
+frontend; it calls this service for contact, conversion, PDF merge, and saved-file
+archive operations. Browser-only PDF tools continue to run in the frontend.
 
 ## Included in this phase
 
 - `GET /healthz` — Railway health check.
 - `POST /api/v1/pdf/merge` — merge 2–10 PDF files.
+- `POST /api/v1/contact` — submit the contact form.
+- `/api/v1/convert/*` — Office and PDF conversions.
+- `/api/v1/files*` — authenticated saved-file archive operations.
 - Bounded uploads (20 MiB combined by default), 500-page combined limit.
 - Spooled temporary files to reduce memory pressure.
 - CORS allowlist configured through environment variables.
@@ -43,6 +46,14 @@ python -m pytest -q
 | `MAX_MERGE_PAGES` | `500` | Maximum combined page count. |
 | `CLOUDCONVERT_API_KEY` | unset | Required for Office conversion endpoints. |
 | `CONTACT_FORM_ENDPOINT` | unset | HTTPS webhook used by the contact form. |
+| `SUPABASE_URL` | unset | Supabase project URL used by the private file archive. |
+| `SUPABASE_ANON_KEY` | unset | Public project key used to validate signed-in user access tokens. |
+| `SUPABASE_SERVICE_ROLE_KEY` | unset | Secret key used by the API to store and retrieve archive files. Set only as a Railway secret. |
+
+The browser calls the Railway API at `https://pdfnova-production.up.railway.app/api/v1`.
+Set Railway's `CORS_ORIGINS` to `https://pdfnova.in,https://www.pdfnova.in,http://localhost:3000`.
+Set `NEXT_PUBLIC_PYTHON_API_URL=https://pdfnova-production.up.railway.app/api/v1` in the frontend deployment.
+No scheduled archive cleanup is configured; archived objects remain in storage until a cleanup schedule is added.
 
 The CORS value is a comma-separated string, not a JSON array. For example:
 `CORS_ORIGINS=https://pdfnova.in,https://www.pdfnova.in`. Pydantic Settings
@@ -116,3 +127,16 @@ The Python service provides `POST /api/v1/convert/pdf-to-word`,
 `/powerpoint-to-pdf`. Each accepts a multipart `file` field. PDF-to-Word also
 accepts `ocr=on` and `ocrLanguage` (`eng`, `hin`, `spa`, `fra`, or `deu`).
 Set `CLOUDCONVERT_API_KEY` before calling these endpoints.
+
+### Saved file archive API
+
+The archive endpoints require `Authorization: Bearer <Supabase access token>`:
+
+- `POST /api/v1/files` — save a completed result (`file` and `tool` multipart fields).
+- `GET /api/v1/files` — list the signed-in user's unexpired saved results.
+- `GET /api/v1/files/{id}` — download one of that user's unexpired results.
+
+The API verifies each access token with Supabase Auth and scopes database and
+Storage operations to that verified user. No cleanup job is configured, so
+expired objects remain stored even though they are hidden and unavailable for
+download.

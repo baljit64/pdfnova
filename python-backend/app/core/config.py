@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     max_merge_pages: int = 500
     cloudconvert_api_key: str | None = None
     contact_form_endpoint: str | None = None
+    supabase_url: str | None = None
+    supabase_anon_key: str | None = None
+    supabase_service_role_key: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

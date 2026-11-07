@@ -85,7 +85,7 @@ const checks: Array<[string, () => void | Promise<void>]> = [
     const value = robots();
     assert.equal(value.sitemap, `${SITE_URL}/sitemap.xml`);
     assert.equal(value.host, SITE_URL);
-    assert.deepEqual(value.rules, [{ userAgent: "*", allow: "/", disallow: "/api/" }]);
+    assert.deepEqual(value.rules, [{ userAgent: "*", allow: "/" }]);
   }],
   ["homepage and converter expose normal crawlable links", async () => {
     const [home, converter, toolCard] = await Promise.all([

@@ -103,8 +103,9 @@ export default function Privacy() {
           <p>
             When signed in, PDFNova saves completed tool results to a private account archive for
             up to 30 days so you can download them again. We do not archive the original selected
-            files. Saved results are private to the account that created them and are permanently
-            deleted after 30 days. Visitors do not receive a PDFNova file archive. Server-assisted
+            files. Saved results are private to the account that created them. After 30 days they
+            are hidden from the archive and cannot be downloaded. Automatic removal from storage
+            is not currently scheduled. Visitors do not receive a PDFNova file archive. Server-assisted
             conversion and configured support services follow the retention rules of their
             respective providers.
           </p>

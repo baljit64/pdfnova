@@ -1,4 +1,4 @@
-const baseUrl = process.env.NEXT_PUBLIC_PYTHON_API_URL || "http://localhost:8000/api/v1";
+const baseUrl = process.env.NEXT_PUBLIC_PYTHON_API_URL || "https://pdfnova-production.up.railway.app/api/v1";
 
 /** Public FastAPI origin, without a trailing slash. */
 export const PYTHON_API_URL = baseUrl.replace(/\/$/, "");
