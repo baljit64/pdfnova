@@ -107,9 +107,9 @@ export default function Help() {
           <h2 id="privacy-processing" className="text-2xl font-bold text-[var(--text-primary)]">Where are my files processed?</h2>
           <p className="mt-4 leading-7 text-[var(--text-secondary)]">
             Processing depends on the tool. Most PDFNova operations run locally in the browser.
-            PDF to Word and Word to PDF use server-assisted conversion through PDFNova's API.
-            That means the selected file leaves your device and is processed on PDFNova's Railway
-            service using open-source software.
+            PDF to Word and Word to PDF send the selected file to PDFNova&apos;s API over HTTPS for
+            conversion. The file leaves your device and the converted result is returned to your
+            browser.
             Read the processing notice shown on the specific tool and the{" "}
             <Link href="/privacy" className={linkClass}>Privacy Policy</Link> before choosing a
             workflow for confidential or regulated documents.

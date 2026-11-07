@@ -475,6 +475,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
         archiveBusy={archiveBusy}
         archivePercent={archivePercent}
         archiveStatus={archiveStatus}
+        onEditSettings={tool.id === "watermark" ? () => setPhase("idle") : undefined}
         onReset={reset}
       />
     );
@@ -562,6 +563,23 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
             value={String(options.pages ?? "")}
             disabled={running}
             onChange={(value) => updateOption("pages", value)}
+            watermark={tool.id === "watermark" ? {
+              kind: options.kind === "image" ? "image" : "text",
+              text: String(options.text ?? "PDFNova"),
+              image: options.image instanceof File ? options.image : undefined,
+              position: String(options.position ?? "center"),
+              fontSize: Number(options.fontSize ?? 48),
+              fontFamily: String(options.fontFamily ?? "Helvetica"),
+              bold: Boolean(options.bold),
+              italic: Boolean(options.italic),
+              underline: Boolean(options.underline),
+              color: String(options.color ?? "#737373"),
+              opacity: Number(options.opacity ?? 0.3),
+              rotation: Number(options.rotation ?? 0),
+              imageWidth: Number(options.imageWidth ?? 35),
+              mosaic: Boolean(options.mosaic),
+              pages: String(options.pages ?? ""),
+            } : undefined}
           />
         )}
 

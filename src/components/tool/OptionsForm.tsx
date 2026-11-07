@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Button, Input, InputNumber, Radio, Select } from "antd";
+import { Button, Checkbox, Input, InputNumber, Radio, Select } from "antd";
 import type { OptionField, OptionValue, OptionValues } from "../../tools/types";
 
 interface Props {
@@ -26,22 +26,26 @@ export default function OptionsForm({ fields, values, onChange, disabled }: Prop
         <p className="mt-1 text-xs text-[var(--text-muted)]">Choose the settings that fit this document.</p>
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
-        {fields.map((field) => {
-          const controlId = `option-${field.key}`;
-          const helpId = field.help ? `${controlId}-help` : undefined;
-          const value = values[field.key] ?? field.defaultValue;
+        {fields
+          .filter((field) => !(field.key === "mosaic" && fields.some((item) => item.type === "position-grid")))
+          .map((field) => {
+            const controlId = `option-${field.key}`;
+            const helpId = field.help ? `${controlId}-help` : undefined;
+            const value = values[field.key] ?? field.defaultValue;
 
-          return (
-            <div
-              key={field.key}
-              className={field.type === "radio" ? "sm:col-span-2" : undefined}
-            >
-              <label
-                htmlFor={controlId}
-                className="mb-1.5 block text-sm font-semibold text-[var(--text-primary)]"
+            return (
+              <div
+                key={field.key}
+                className={field.type === "radio" || field.type === "position-grid" ? "sm:col-span-2" : undefined}
               >
-                {field.label}
-              </label>
+              {field.type !== "checkbox" && (
+                <label
+                  htmlFor={controlId}
+                  className="mb-1.5 block text-sm font-semibold text-[var(--text-primary)]"
+                >
+                  {field.label}
+                </label>
+              )}
 
               {field.type === "text" && (
                 <Input
@@ -51,6 +55,81 @@ export default function OptionsForm({ fields, values, onChange, disabled }: Prop
                   aria-describedby={helpId}
                   onChange={(event) => onChange(field.key, event.target.value)}
                 />
+              )}
+
+              {field.type === "color" && (
+                <Input
+                  id={controlId}
+                  type="color"
+                  className="h-10 w-full cursor-pointer"
+                  value={String(value)}
+                  aria-describedby={helpId}
+                  onChange={(event) => onChange(field.key, event.target.value)}
+                />
+              )}
+
+              {field.type === "checkbox" && (
+                <Checkbox
+                  id={controlId}
+                  checked={Boolean(value)}
+                  aria-describedby={helpId}
+                  onChange={(event) => onChange(field.key, event.target.checked)}
+                >
+                  {field.label}
+                </Checkbox>
+              )}
+
+              {field.type === "position-grid" && (
+                <div className="flex flex-wrap items-center gap-6">
+                  <div
+                    role="group"
+                    aria-label={field.label}
+                    className="grid w-fit grid-cols-3 overflow-hidden rounded-md border border-[var(--border)]"
+                  >
+                    {field.choices?.map((choice) => {
+                      const selected = value === choice.value;
+                      const mosaic = Boolean(values.mosaic ?? fields.find((item) => item.key === "mosaic")?.defaultValue);
+                      return (
+                        <button
+                          key={String(choice.value)}
+                          type="button"
+                          aria-label={choice.label}
+                          aria-pressed={selected}
+                          title={choice.label}
+                          disabled={disabled}
+                          onClick={() => onChange(field.key, choice.value)}
+                          className={`flex h-10 w-10 items-center justify-center border border-dashed border-[var(--border)] transition-colors focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-500 ${selected ? "bg-red-50" : "bg-white hover:bg-[var(--page)]"}`}
+                        >
+                          {(selected || mosaic) && (
+                            <span className={`${mosaic ? "h-2.5 w-2.5" : "h-3 w-3"} rounded-full bg-[#cc4435] ${selected ? "ring-2 ring-red-200" : "opacity-60"}`} />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {fields.some((item) => item.key === "mosaic") && (() => {
+                    const mosaicField = fields.find((item) => item.key === "mosaic")!;
+                    const mosaicChecked = Boolean(values.mosaic ?? mosaicField.defaultValue);
+                    return (
+                      <div>
+                        <Checkbox
+                          id="option-mosaic"
+                          checked={mosaicChecked}
+                          disabled={disabled}
+                          aria-describedby="option-mosaic-help"
+                          onChange={(event) => onChange("mosaic", event.target.checked)}
+                        >
+                          {mosaicField.label}
+                        </Checkbox>
+                        {mosaicField.help && (
+                          <p id="option-mosaic-help" className="mt-1.5 max-w-48 text-xs leading-5 text-[var(--text-muted)]">
+                            {mosaicField.help}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
               )}
 
               {field.type === "number" && (

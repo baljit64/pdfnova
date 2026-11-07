@@ -276,7 +276,7 @@ export const BLOG_POSTS: BlogPost[] = [
         heading: "Match the tool to the sensitivity of the document",
         paragraphs: [
           "Consider what could happen if the file were exposed. Documents containing passwords, private keys, complete financial records, medical details, confidential legal material, or government identifiers deserve the strictest handling.",
-          "Your employer, client, school, or regulator may also prohibit third-party processing. In that case, a convenient consumer tool is not a substitute for an approved workflow, even if the provider has strong security controls.",
+          "Your employer, client, school, or regulator may also prohibit remote processing. In that case, a convenient consumer tool is not a substitute for an approved workflow.",
         ],
         bullets: [
           "Remove pages and fields the recipient does not need.",

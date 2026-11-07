@@ -106,20 +106,30 @@ const RUNNERS: Record<ToolId, ToolRunner> = {
   watermark: async (ctx): Promise<RunResult> => {
     const { watermarkPDF } = await import("./engine/pdf");
     const position = str(ctx, "position", "diagonal");
+    const bool = (key: string, fallback: boolean) =>
+      typeof ctx.options[key] === "boolean" ? (ctx.options[key] as boolean) : fallback;
     return {
       outputs: await watermarkPDF({
         file: ctx.files[0],
         kind: str(ctx, "kind", "text") === "image" ? "image" : "text",
-        text: str(ctx, "text", "DRAFT"),
+        text: str(ctx, "text", "PDFNova"),
         imageFile: selectedFile(ctx, "image"),
         pages: str(ctx, "pages"),
         imageWidthPercent: num(ctx, "imageWidth", 35),
         opacity: Math.min(1, Math.max(0.05, num(ctx, "opacity", 0.3))),
         fontSize: num(ctx, "fontSize", 48),
-        position: (["diagonal", "center", "bottom-right", "top-left"] as const).includes(
+        fontFamily: str(ctx, "fontFamily", "Helvetica"),
+        bold: bool("bold", true),
+        italic: bool("italic", false),
+        underline: bool("underline", false),
+        color: str(ctx, "color", "#737373"),
+        mosaic: bool("mosaic", false),
+        rotation: num(ctx, "rotation", 45),
+        layer: str(ctx, "layer", "over") === "under" ? "under" : "over",
+        position: (["diagonal", "top-left", "top-center", "top-right", "middle-left", "center", "middle-right", "bottom-left", "bottom-center", "bottom-right"] as const).includes(
           position as "diagonal"
         )
-          ? (position as "diagonal" | "center" | "bottom-right" | "top-left")
+          ? (position as "diagonal" | "top-left" | "top-center" | "top-right" | "middle-left" | "center" | "middle-right" | "bottom-left" | "bottom-center" | "bottom-right")
           : "diagonal",
         signal: ctx.signal,
         onProgress: ctx.onProgress,
