@@ -584,7 +584,7 @@ export default function ToolWorkspace({ tool, page, variation }: Props) {
       <div aria-live="polite" aria-atomic="true" className={running ? "mt-6" : "sr-only"}>
         {running && (
           <>
-            <Progress percent={percent} status="active" strokeColor="#cc4435" trailColor="#eaecf0" />
+            <Progress percent={percent} status="active" strokeColor="#cc4435" railColor="#eaecf0" />
             <p className="mt-1 text-sm font-medium text-[var(--text-secondary)]">{status || "Working…"}</p>
           </>
         )}

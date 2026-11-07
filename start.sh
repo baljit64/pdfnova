@@ -31,9 +31,16 @@ if [[ ! -d "$ROOT_DIR/node_modules" ]]; then
 fi
 
 if [[ ! -x "$VENV_DIR/bin/uvicorn" ]]; then
-  echo "Creating the Python environment and installing backend dependencies..."
+  echo "Creating the Python environment..."
   python3 -m venv "$VENV_DIR"
-  "$VENV_DIR/bin/python" -m pip install -r "$PYTHON_DIR/requirements.txt"
+fi
+"$VENV_DIR/bin/python" -m pip install -r "$PYTHON_DIR/requirements.txt"
+
+if ! command -v libreoffice >/dev/null 2>&1 && ! command -v soffice >/dev/null 2>&1; then
+  echo "LibreOffice is not installed; Word-to-PDF conversion will be unavailable locally." >&2
+fi
+if ! command -v tesseract >/dev/null 2>&1 || ! command -v gs >/dev/null 2>&1; then
+  echo "Tesseract and Ghostscript are required for scanned PDF OCR. Install them to use the OCR option." >&2
 fi
 
 cleanup() {

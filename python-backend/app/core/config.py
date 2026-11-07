@@ -16,7 +16,6 @@ class Settings(BaseSettings):
     max_upload_bytes: int = 20 * 1024 * 1024
     max_merge_files: int = 10
     max_merge_pages: int = 500
-    cloudconvert_api_key: str | None = None
     contact_form_endpoint: str | None = None
     supabase_url: str | None = None
     supabase_anon_key: str | None = None

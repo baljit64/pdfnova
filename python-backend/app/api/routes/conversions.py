@@ -1,20 +1,24 @@
 from __future__ import annotations
 
 import asyncio
-import base64
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
-from typing import Any
 
-import httpx
+import ocrmypdf
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
 from fastapi.responses import Response
-
-from app.core.config import get_settings
+from pdf2docx import Converter
+from pypdf import PdfReader
+from pypdf.errors import PdfReadError
 
 router = APIRouter(prefix="/convert", tags=["conversions"])
-CLOUDCONVERT_API = "https://api.cloudconvert.com/v2"
 OCR_LANGUAGES = {"eng", "hin", "spa", "fra", "deu"}
 MAX_FILE_BYTES = 40 * 1024 * 1024
+MAX_PDF_PAGES = 100
+PDF_TO_WORD_MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+conversion_slot = asyncio.Semaphore(1)
 
 
 def _safe_filename(filename: str, suffix: str) -> str:
@@ -35,79 +39,113 @@ async def _read_upload(file: UploadFile, *, allowed_extensions: set[str]) -> byt
     return contents
 
 
-async def _cloudconvert_file(*, source: bytes, filename: str, input_format: str, output_format: str, intermediate_task: dict[str, Any] | None = None) -> bytes:
-    api_key = get_settings().cloudconvert_api_key
-    if not api_key:
-        raise HTTPException(status_code=503, detail="The conversion service is not configured.")
-    tasks: dict[str, dict[str, Any]] = {"import-1": {"operation": "import/base64", "file": base64.b64encode(source).decode("ascii"), "filename": filename}}
-    conversion_input = "import-1"
-    if intermediate_task:
-        conversion_input = "intermediate-1"
-        tasks[conversion_input] = {**intermediate_task, "input": "import-1"}
-    tasks["convert-1"] = {"operation": "convert", "input": conversion_input, "input_format": input_format, "output_format": output_format}
-    tasks["export-1"] = {"operation": "export/url", "input": "convert-1", "inline": False}
-    headers = {"Authorization": f"Bearer {api_key}"}
-    try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(30.0, read=30.0)) as client:
-            created = await client.post(f"{CLOUDCONVERT_API}/jobs", headers=headers, json={"tasks": tasks})
-            if not created.is_success:
-                raise HTTPException(status_code=502, detail="The conversion service did not accept the job.")
-            job_id = created.json().get("data", {}).get("id")
-            if not job_id:
-                raise HTTPException(status_code=502, detail="The conversion service returned an invalid job.")
-            completed: dict[str, Any] | None = None
-            for _ in range(60):
-                job = await client.get(f"{CLOUDCONVERT_API}/jobs/{job_id}", headers=headers)
-                if not job.is_success:
-                    raise HTTPException(status_code=502, detail="Failed to check conversion status.")
-                completed = job.json().get("data")
-                if completed and completed.get("status") == "finished":
-                    break
-                if completed and completed.get("status") == "error":
-                    raise HTTPException(status_code=502, detail="Conversion failed. Please check the file and try again.")
-                await asyncio.sleep(2)
-            else:
-                raise HTTPException(status_code=504, detail="Conversion timed out. Try again.")
-            export = next((task for task in completed.get("tasks", []) if task.get("name") == "export-1"), None)
-            output_url = export and (export.get("result", {}).get("files") or [{}])[0].get("url")
-            if not output_url:
-                raise HTTPException(status_code=502, detail="The conversion service returned no output file.")
-            output = await client.get(output_url)
-            if not output.is_success:
-                raise HTTPException(status_code=502, detail="The converted file could not be downloaded.")
-            return output.content
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail="The conversion service is unavailable.") from exc
+def _convert_pdf_to_docx(source: bytes, *, run_ocr: bool, ocr_language: str) -> bytes:
+    with tempfile.TemporaryDirectory(prefix="pdfnova-pdf-to-word-") as temp_dir:
+        work_dir = Path(temp_dir)
+        input_path = work_dir / "input.pdf"
+        conversion_path = input_path
+        output_path = work_dir / "output.docx"
+        input_path.write_bytes(source)
+
+        try:
+            reader = PdfReader(input_path, strict=True)
+            if reader.is_encrypted:
+                raise HTTPException(status_code=422, detail="Password-protected PDFs are not supported.")
+            if not reader.pages:
+                raise HTTPException(status_code=422, detail="The PDF contains no pages.")
+            if len(reader.pages) > MAX_PDF_PAGES:
+                raise HTTPException(status_code=413, detail=f"PDFs are limited to {MAX_PDF_PAGES} pages per conversion.")
+        except HTTPException:
+            raise
+        except (PdfReadError, ValueError, OSError) as exc:
+            raise HTTPException(status_code=422, detail="Could not read this PDF.") from exc
+
+        if run_ocr:
+            conversion_path = work_dir / "searchable.pdf"
+            try:
+                ocrmypdf.ocr(
+                    input_path,
+                    conversion_path,
+                    language=ocr_language if ocr_language in OCR_LANGUAGES else "eng",
+                    skip_text=True,
+                    progress_bar=False,
+                    output_type="pdf",
+                )
+            except ocrmypdf.exceptions.PriorOcrFoundError:
+                conversion_path = input_path
+            except Exception as exc:
+                raise HTTPException(status_code=422, detail="OCR could not read this PDF. Try another file or turn OCR off.") from exc
+
+        converter: Converter | None = None
+        try:
+            converter = Converter(str(conversion_path))
+            converter.convert(str(output_path), multi_processing=False)
+            return output_path.read_bytes()
+        except HTTPException:
+            raise
+        except Exception as exc:
+            raise HTTPException(status_code=422, detail="Could not convert this PDF to Word.") from exc
+        finally:
+            if converter is not None:
+                converter.close()
 
 
-async def _convert(file: UploadFile, *, allowed_extensions: set[str], output_format: str, media_type: str, intermediate_task: dict[str, Any] | None = None) -> Response:
-    source = await _read_upload(file, allowed_extensions=allowed_extensions)
-    input_format = Path(file.filename or "").suffix.lower().lstrip(".")
-    output = await _cloudconvert_file(source=source, filename=file.filename or f"document.{input_format}", input_format=input_format, output_format=output_format, intermediate_task=intermediate_task)
-    return Response(content=output, media_type=media_type, headers={"Content-Disposition": f'attachment; filename="{_safe_filename(file.filename or "document", f".{output_format}")}"'})
+def _convert_word_to_pdf(source: bytes, filename: str) -> bytes:
+    office = shutil.which("libreoffice") or shutil.which("soffice")
+    if not office:
+        raise HTTPException(status_code=503, detail="The document converter is not installed.")
+
+    with tempfile.TemporaryDirectory(prefix="pdfnova-word-to-pdf-") as temp_dir:
+        work_dir = Path(temp_dir)
+        input_path = work_dir / _safe_filename(filename, Path(filename).suffix.lower())
+        output_path = work_dir / f"{input_path.stem}.pdf"
+        profile_path = work_dir / "lo-profile"
+        input_path.write_bytes(source)
+        command = [
+            office,
+            "--headless",
+            "--nologo",
+            "--nodefault",
+            "--nolockcheck",
+            f"-env:UserInstallation={profile_path.as_uri()}",
+            "--convert-to",
+            "pdf:writer_pdf_Export",
+            "--outdir",
+            str(work_dir),
+            str(input_path),
+        ]
+        try:
+            completed = subprocess.run(command, capture_output=True, check=False, timeout=60)
+        except subprocess.TimeoutExpired as exc:
+            raise HTTPException(status_code=504, detail="Document conversion timed out. Try a smaller file.") from exc
+        if completed.returncode != 0 or not output_path.is_file():
+            raise HTTPException(status_code=422, detail="Could not convert this Word document to PDF.")
+        return output_path.read_bytes()
 
 
 @router.post("/pdf-to-word")
-async def pdf_to_word(file: UploadFile = File(...), ocr: str = Form("off"), ocrLanguage: str = Form("eng")) -> Response:
-    intermediate = {"operation": "pdf/ocr", "language": [ocrLanguage if ocrLanguage in OCR_LANGUAGES else "eng"]} if ocr == "on" else None
-    return await _convert(file, allowed_extensions={".pdf"}, output_format="docx", media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", intermediate_task=intermediate)
+async def pdf_to_word(
+    file: UploadFile = File(...),
+    ocr: str = Form("off"),
+    ocrLanguage: str = Form("eng"),
+) -> Response:
+    source = await _read_upload(file, allowed_extensions={".pdf"})
+    async with conversion_slot:
+        output = await asyncio.to_thread(_convert_pdf_to_docx, source, run_ocr=ocr == "on", ocr_language=ocrLanguage)
+    return Response(
+        content=output,
+        media_type=PDF_TO_WORD_MEDIA_TYPE,
+        headers={"Content-Disposition": f'attachment; filename="{_safe_filename(file.filename or "document.pdf", ".docx")}"'},
+    )
 
 
 @router.post("/word-to-pdf")
 async def word_to_pdf(file: UploadFile = File(...)) -> Response:
-    return await _convert(file, allowed_extensions={".doc", ".docx"}, output_format="pdf", media_type="application/pdf")
-
-
-@router.post("/pdf-to-excel")
-async def pdf_to_excel(file: UploadFile = File(...)) -> Response:
-    return await _convert(file, allowed_extensions={".pdf"}, output_format="xlsx", media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-
-
-@router.post("/pdf-to-powerpoint")
-async def pdf_to_powerpoint(file: UploadFile = File(...)) -> Response:
-    return await _convert(file, allowed_extensions={".pdf"}, output_format="pptx", media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation")
-
-
-@router.post("/powerpoint-to-pdf")
-async def powerpoint_to_pdf(file: UploadFile = File(...)) -> Response:
-    return await _convert(file, allowed_extensions={".ppt", ".pptx"}, output_format="pdf", media_type="application/pdf")
+    source = await _read_upload(file, allowed_extensions={".doc", ".docx"})
+    async with conversion_slot:
+        output = await asyncio.to_thread(_convert_word_to_pdf, source, file.filename or "document.docx")
+    return Response(
+        content=output,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{_safe_filename(file.filename or "document.docx", ".pdf")}"'},
+    )

@@ -49,8 +49,6 @@ To verify the site in Google Search Console, set `GOOGLE_SITE_VERIFICATION` in t
 Keep real values in `.env` locally and in Vercel for deployments. Never commit them to
 `.env.example`.
 
-- `CLOUDCONVERT_API_KEY` — server-only and required for PDF to Word (including OCR) and Word to PDF. Enable it for Production;
-  use separate credentials for Preview or local Development when those environments need the tool.
 - `GOOGLE_SITE_VERIFICATION` — optional, non-secret HTML-tag verification token for Google Search
   Console. Production is sufficient. Copy the tag's `content` value, not an HTML filename.
 - `CONTACT_FORM_ENDPOINT` — server-only HTTPS webhook that accepts the contact form JSON. Enable it

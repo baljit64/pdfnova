@@ -9,7 +9,8 @@ archive operations. Browser-only PDF tools continue to run in the frontend.
 - `GET /healthz` — Railway health check.
 - `POST /api/v1/pdf/merge` — merge 2–10 PDF files.
 - `POST /api/v1/contact` — submit the contact form.
-- `/api/v1/convert/*` — Office and PDF conversions.
+- `POST /api/v1/convert/pdf-to-word` — editable DOCX from PDF, with optional OCR.
+- `POST /api/v1/convert/word-to-pdf` — DOC/DOCX to PDF.
 - `/api/v1/files*` — authenticated saved-file archive operations.
 - Bounded uploads (20 MiB combined by default), 500-page combined limit.
 - Spooled temporary files to reduce memory pressure.
@@ -29,6 +30,11 @@ uvicorn app.main:app --reload --port 8000
 
 Open http://localhost:8000/docs for the API explorer.
 
+For local Word/PDF conversion, install LibreOffice. For the scanned-PDF OCR
+option, also install Tesseract with the eng, hin, spa, fra, and deu language
+data, plus Ghostscript and qpdf. On macOS these are available through Homebrew;
+the Railway Docker image installs the Linux packages automatically.
+
 ## Run tests
 
 ```bash
@@ -44,7 +50,6 @@ python -m pytest -q
 | `MAX_UPLOAD_BYTES` | `20971520` | Maximum combined upload size in bytes. |
 | `MAX_MERGE_FILES` | `10` | Maximum number of files per merge. |
 | `MAX_MERGE_PAGES` | `500` | Maximum combined page count. |
-| `CLOUDCONVERT_API_KEY` | unset | Required for Office conversion endpoints. |
 | `CONTACT_FORM_ENDPOINT` | unset | HTTPS webhook used by the contact form. |
 | `SUPABASE_URL` | unset | Supabase project URL used by the private file archive. |
 | `SUPABASE_ANON_KEY` | unset | Public project key used to validate signed-in user access tokens. |
@@ -120,13 +125,22 @@ curl -X POST http://localhost:8000/api/v1/pdf/merge \
 Current limits are intentionally conservative for Railway's small free
 instance. Encrypted PDFs are not supported in this first version.
 
-### Office conversion API
+### Document conversion API
 
-The Python service provides `POST /api/v1/convert/pdf-to-word`,
-`/word-to-pdf`, `/pdf-to-excel`, `/pdf-to-powerpoint`, and
-`/powerpoint-to-pdf`. Each accepts a multipart `file` field. PDF-to-Word also
-accepts `ocr=on` and `ocrLanguage` (`eng`, `hin`, `spa`, `fra`, or `deu`).
-Set `CLOUDCONVERT_API_KEY` before calling these endpoints.
+The frontend's active document conversion tools use local open-source software
+inside the Python service. Word-to-PDF uses LibreOffice Writer. PDF-to-Word uses
+pdf2docx; scanned PDFs can be OCR'd with OCRmyPDF and Tesseract in English,
+Hindi, Spanish, French, or German. The Railway Docker image installs the required
+LibreOffice, OCR, language data, and font packages. Each endpoint accepts a
+multipart `file` field. PDF-to-Word also accepts `ocr=on` and `ocrLanguage`.
+
+PDF-to-Word reconstructs an editable document from PDF layout, so complex
+columns, forms, and graphics may differ from the source. pdf2docx uses PyMuPDF,
+which is licensed under AGPLv3 (or a commercial license); deployments using it
+must follow the AGPL terms. pdf2docx itself is MIT licensed and is no longer
+actively maintained by its original maintainer. Railway still charges according
+to the service plan and resources used; removing CloudConvert removes its
+per-conversion API charge.
 
 ### Saved file archive API
 
