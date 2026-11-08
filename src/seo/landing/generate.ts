@@ -21,7 +21,7 @@ function privacySection(tool: ToolDefinition): ContentBlock {
       paragraphs: [
         `${tool.name} uses server-assisted document conversion because preserving editable structure and office-document layout is not practical in a browser. Your file is sent to PDFNova's API for processing and returned to you.`,
         "The file is sent over HTTPS to PDFNova's API for conversion and then returned to your browser. The document leaves your device, so review the privacy requirements that apply to it before using this converter.",
-        "If a document must not leave your device, avoid server-assisted tools and use one of the tools explicitly labelled as on-device.",
+        "If a document must not leave your device, avoid server-assisted tools and use an on-device tool while signed out. Signed-in results are automatically uploaded to your private archive, remain downloadable for 30 days, and are not currently deleted from storage on an automatic schedule.",
       ],
     };
   }
@@ -30,9 +30,9 @@ function privacySection(tool: ToolDefinition): ContentBlock {
     heading: "Privacy",
     paragraphs: [
       `When you add a ${tool.acceptLabel} file, your browser reads it into the current tab and the ${tool.name.toLowerCase()} operation runs on your device. The tool's processing code does not upload the selected document to PDFNova's API.`,
-      "The document is held in browser memory while the tool is open. Closing or reloading the page clears that working state; PDFNova does not provide a server-side document history for these local tools.",
-      "The site uses Vercel Analytics for site-usage measurement. That analytics integration is separate from document processing and the tool code does not include file names or file contents in tool events.",
-      "No account is required to use the tool, and processed documents are not attached to a PDFNova profile.",
+      "The document is held in browser memory while the tool is open. Closing or reloading the page clears that working state. When you are signed in, completed results are automatically uploaded to your private account archive; use these tools signed out if results must stay on your device.",
+      "The site uses Google Analytics and Vercel Analytics for site-usage measurement. That analytics integration is separate from document processing and the tool code does not include file names or file contents in tool events.",
+      "No account is required to use the tool. Signed-in results are available from the private archive for 30 days; expired results are hidden, but automatic storage deletion is not currently scheduled.",
     ],
   };
 }
@@ -52,9 +52,9 @@ function securitySection(tool: ToolDefinition): ContentBlock {
   return {
     heading: "Security",
     paragraphs: [
-      "The current implementation performs this document operation in your browser. Because the tool code does not send the selected file to PDFNova's API, there is no PDFNova server-side document copy created by the operation.",
-      "You can verify it in about thirty seconds. Open your browser's developer tools with F12, select the Network tab, and use the tool. You will see the page's scripts load — including the PDF libraries, which are fetched on demand the first time a tool runs — and then nothing further. No request carrying your document is ever made.",
-      "For a stronger test, disconnect from the network once the page has loaded. The tool will keep working exactly as before, which is only possible because nothing is being sent.",
+      "The current implementation performs this document operation in your browser. Because the tool code does not send the selected file to PDFNova's API, the source document is processed on-device. Signed-in users should also account for the automatic upload of completed results to their private archive.",
+      "You can verify it in about thirty seconds. Open your browser's developer tools with F12, select the Network tab, and use the tool. You will see the page's scripts load — including the PDF libraries, which are fetched on demand the first time a tool runs — during processing. If you are signed in, a later archive request uploads the completed result; signed-out visitors do not use that archive.",
+      "PDF libraries load on demand when a tool first needs them. Keep your connection available until those libraries have loaded; loading the page alone does not guarantee offline operation.",
       "Uploaded files are validated in the browser before anything runs: the extension must match what the tool accepts, the file must not be empty, and it must be within the size limit. Malformed documents produce a clear error and a retry option rather than a silent failure.",
     ],
   };

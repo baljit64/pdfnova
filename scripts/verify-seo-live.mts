@@ -3,7 +3,7 @@ import { spawn } from "node:child_process";
 import http from "node:http";
 import net from "node:net";
 import { BLOG_POSTS } from "../src/blog/posts";
-import { INDEXABLE_STATIC_PATHS, ROUTE_META, SITE_URL } from "../src/seo/config";
+import { GOOGLE_SITE_VERIFICATION, INDEXABLE_STATIC_PATHS, ROUTE_META, SITE_URL } from "../src/seo/config";
 import {
   getCanonicalLandingPages,
 } from "../src/seo/landing/generate";
@@ -154,6 +154,9 @@ assert.equal(new Set(indexablePages.map((page) => page.description)).size, index
 
 const noindexPaths = [
   "/login",
+  "/signup",
+  "/forgot-password",
+  "/files",
   "/pdf-to-excel",
   "/pdf-to-powerpoint",
   "/powerpoint-to-pdf",
@@ -189,6 +192,10 @@ try {
     assert.deepEqual(metaContent(html, "description"), [page.description], `${page.path}: description`);
     assert.deepEqual(canonicalHrefs(html), [page.canonical], `${page.path}: canonical`);
     assert.equal(tags(html, "h1").length, 1, `${page.path}: H1 count`);
+    assert.ok(jsonLdTypes(html).includes("WebPage"), `${page.path}: WebPage schema`);
+    for (const tag of tags(html, "img")) assert.notEqual(attribute(tag, "alt"), undefined, `${page.path}: image alt`);
+    assert.equal(metaPropertyContent(html, "og:title").length, 1, `${page.path}: Open Graph`);
+    assert.deepEqual(metaContent(html, "twitter:card"), ["summary_large_image"], `${page.path}: Twitter`);
     assert.equal(metaContent(html, "robots").some((value) => /noindex/i.test(value)), false, `${page.path}: robots`);
   });
   console.log(`ok - ${indexablePages.length} indexable pages have unique metadata, one canonical and one H1`);
@@ -198,9 +205,9 @@ try {
     assert.equal(response.status, 200, path);
     const html = await response.text();
     renderedHtml.set(path, html);
-    assert.equal(metaContent(html, "robots").some((value) => /noindex/i.test(value) && /follow/i.test(value)), true, path);
+    assert.equal(metaContent(html, "robots").some((value) => /noindex/i.test(value)), true, path);
   });
-  console.log(`ok - ${noindexPaths.length} preserved non-SEO routes emit noindex, follow`);
+  console.log(`ok - ${noindexPaths.length} non-SEO routes emit noindex`);
 
   await mapInBatches(LEGACY_TOOL_REDIRECTS, 20, async (redirect) => {
     const response = await fetch(`${origin}/${redirect.slug}`, { redirect: "manual" });
@@ -257,6 +264,7 @@ try {
   const sitemapResponse = await fetch(`${origin}/sitemap.xml`);
   assert.equal(sitemapResponse.status, 200);
   const sitemapXml = await sitemapResponse.text();
+  assert.match(sitemapXml, /<urlset xmlns="http:\/\/www.sitemaps.org\/schemas\/sitemap\/0.9">/);
   const sitemapUrls = [...sitemapXml.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
   assert.deepEqual(new Set(sitemapUrls), new Set(indexablePages.map((page) => absoluteUrl(page.path))));
   assert.equal(sitemapUrls.length, indexablePages.length);
@@ -320,8 +328,31 @@ try {
   legacyHostRedirect.resume();
   console.log("ok - non-www canonical and legacy URLs redirect directly to their preferred HTTPS URL");
 
-  if (process.env.GOOGLE_SITE_VERIFICATION) {
-    assert.deepEqual(metaContent(homeHtml, "google-site-verification"), [process.env.GOOGLE_SITE_VERIFICATION]);
+  for (const path of ["/files", "/forgot-password", "/auth/callback"]) {
+    const response = await fetch(`${origin}${path}`, { redirect: "manual" });
+    assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow", `${path}: indexing header`);
+  }
+  for (const page of canonicalTools) {
+    const html = renderedHtml.get(page.path) ?? "";
+    for (const faq of page.faqs) {
+      assert.ok(html.includes(faq.question.replace(/&/g, "&amp;").replace(/'/g, "&#x27;").replace(/"/g, "&quot;")), `${page.path}: visible FAQ question`);
+    }
+    const response = await fetch(`${origin}${page.path}?utm_source=seo-audit`);
+    assert.deepEqual(canonicalHrefs(await response.text()), [absoluteUrl(page.path)], `${page.path}: query canonical`);
+  }
+  const social = await fetch(`${origin}/opengraph-image`);
+  assert.equal(social.status, 200);
+  assert.match(social.headers.get("content-type") ?? "", /image\/png/);
+  const png = Buffer.from(await social.arrayBuffer());
+  assert.equal(png.readUInt32BE(16), 1200);
+  assert.equal(png.readUInt32BE(20), 630);
+  const slash = await fetch(`${origin}/merge-pdf/`, { redirect: "manual" });
+  assert.equal(slash.status, 308);
+  assert.equal(slash.headers.get("location"), "/merge-pdf");
+  console.log("ok - visible FAQ questions, query canonicals, social image dimensions and trailing-slash redirects");
+
+  if (GOOGLE_SITE_VERIFICATION) {
+    assert.deepEqual(metaContent(homeHtml, "google-site-verification"), [GOOGLE_SITE_VERIFICATION]);
     console.log("ok - Google Search Console verification metadata is present");
   } else {
     console.log("ok - Google Search Console verification hook is ready (set GOOGLE_SITE_VERIFICATION)");

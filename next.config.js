@@ -76,6 +76,10 @@ const nextConfig = {
   reactStrictMode: true,
   async headers() {
     return [
+      ...["/files/:path*", "/auth/:path*", "/forgot-password"].map((source) => ({
+        source,
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      })),
       {
         source: "/pdfjs/:asset*",
         headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],

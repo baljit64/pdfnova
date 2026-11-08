@@ -21,7 +21,7 @@ export function buildMetadata(path: string): Metadata {
       description: meta.description,
       url,
       siteName: "PDFNova",
-      images: [{ url: OG_IMAGE }],
+      images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "PDFNova – Free Online PDF Tools" }],
       locale: "en_US",
     },
     twitter: {
@@ -49,7 +49,7 @@ export function buildLandingMetadata(page: LandingPage): Metadata {
       description: page.description,
       url,
       siteName: "PDFNova",
-      images: [{ url: OG_IMAGE, alt: page.h1 }],
+      images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "PDFNova – Free Online PDF Tools" }],
       locale: "en_US",
     },
     twitter: {

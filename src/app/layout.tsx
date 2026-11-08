@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     description: DEFAULT_DESCRIPTION,
     url: HOME_URL,
     siteName: "PDFNova",
-    images: [{ url: BRAND_ASSETS.socialImage, width: 825, height: 240, alt: "PDFNova" }],
+    images: [{ url: BRAND_ASSETS.socialImage, width: 1200, height: 630, alt: "PDFNova" }],
     locale: "en_US",
   },
   twitter: {

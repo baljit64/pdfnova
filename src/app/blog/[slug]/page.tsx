@@ -1,3 +1,4 @@
+import { webPageSchema } from "../../../seo/schema";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
       publishedTime: `${post.publishedAt}T00:00:00.000Z`,
       modifiedTime: `${post.updatedAt ?? post.publishedAt}T00:00:00.000Z`,
       section: post.category,
-      images: [{ url: BRAND_ASSETS.socialImage, alt: post.title }],
+      images: [{ url: BRAND_ASSETS.socialImage, width: 1200, height: 630, alt: "PDFNova – Free Online PDF Tools" }],
     },
     twitter: {
       card: "summary_large_image",
@@ -62,6 +63,7 @@ export default async function BlogPostPage({ params }: RouteParams) {
   const url = `${SITE_URL}/blog/${post.slug}`;
   const related = getRelatedPosts(post);
   const schemas = [
+    webPageSchema(`/blog/${post.slug}`, post.title, post.excerpt),
     {
       "@context": "https://schema.org",
       "@type": "BlogPosting",

@@ -1,3 +1,4 @@
+import PageSchema from "../../seo/PageSchema";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BLOG_POSTS, formatBlogDate } from "../../blog/posts";
@@ -14,6 +15,7 @@ export default function BlogPage() {
 
   return (
     <div className="bg-[var(--page)]">
+      <PageSchema path="/blog" />
       <section className="border-b border-[var(--border)] bg-[radial-gradient(circle_at_20%_20%,rgba(204,68,53,0.1),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(28,57,141,0.1),transparent_30%)]">
         <Container className="py-16 text-center md:py-24">
           <p className="section-eyebrow">
@@ -29,7 +31,7 @@ export default function BlogPage() {
         </Container>
       </section>
 
-      <Container as="main" className="py-14 md:py-20">
+      <Container as="div" className="py-14 md:py-20">
         <article className="grid overflow-hidden rounded-3xl border border-[var(--border)] bg-white shadow-[var(--shadow-md)] md:grid-cols-2">
           <BlogArtwork visual={featured.visual} className="min-h-72 md:min-h-[430px]" />
           <div className="flex flex-col justify-center p-8 md:p-12">

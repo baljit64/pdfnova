@@ -21,7 +21,7 @@ export const GOOGLE_SITE_VERIFICATION = googleVerificationToken(
 export const BRAND_ASSETS = {
   logo: `${SITE_URL}/assets/pdf-nova-logo-horizontal.png`,
   appIcon: `${SITE_URL}/assets/pdf-nova-app-icon-light.png`,
-  socialImage: `${SITE_URL}/assets/pdf-nova-banner-dark.png`,
+  socialImage: `${SITE_URL}/opengraph-image`,
 } as const;
 
 export const DEFAULT_TITLE =

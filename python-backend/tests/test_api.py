@@ -191,3 +191,12 @@ def test_production_keeps_docs_and_cors_uses_configured_origins(monkeypatch) -> 
         assert "access-control-allow-origin" not in blocked.headers
     finally:
         get_settings.cache_clear()
+
+
+def test_api_responses_are_not_indexable() -> None:
+    for path in ("/healthz", "/docs", "/api/v1/files", "/missing"):
+        response = client.get(path)
+        assert response.headers["X-Robots-Tag"] == "noindex, nofollow"
+    response = client.post("/api/v1/pdf/merge", files=[("files", ("one.pdf", make_pdf(), "application/pdf")), ("files", ("two.pdf", make_pdf(), "application/pdf"))])
+    assert response.status_code == 200
+    assert response.headers["X-Robots-Tag"] == "noindex, nofollow"

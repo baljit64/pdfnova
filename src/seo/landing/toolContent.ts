@@ -997,7 +997,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
   "pdf-to-word": {
     intro: [
       "Getting a PDF back into an editable Word document requires document conversion that can reconstruct headings, columns, tables and lists from the PDF's page layout.",
-      "This tool sends your file to PDFNova's API and returns a DOCX you can open in Word, Google Docs, LibreOffice or Pages. Because it leaves your device, this is the one PDFNova tool where the privacy story is different, and we would rather say so plainly than bury it.",
+      "This tool sends your file to PDFNova's API and returns a DOCX you can open in Word, Google Docs, LibreOffice or Pages. Both this tool and Word to PDF use remote processing, so the selected document leaves your device.",
     ],
     benefits: [
       {
@@ -1175,7 +1175,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
       paragraphs: [
         "The DOC or DOCX file is sent securely to PDFNova's API for conversion to PDF.",
         "The resulting PDF is streamed back to the browser. Text remains selectable, explicit page breaks are respected, and headers, footers and complex document layout are handled by the conversion engine.",
-        "The API validates the filename and file-size limit before creating a conversion job. Requests are rate-limited, the API credential remains on the server, and the converted file is returned directly rather than being attached to a PDFNova account or document history.",
+        "The API validates the filename and file-size limit before creating a conversion job. Requests are rate-limited, the API credential remains on the server, and the converted file is returned to your browser. When signed in, completed results are also uploaded to your private account archive.",
         "Font availability still matters. When a document uses a font unavailable to the conversion engine, a substitute with similar metrics may be selected, which can slightly change line endings. Embedded fonts and common office fonts give the most predictable result, so the preview should always be reviewed before the PDF is distributed as a final record.",
       ],
     },
