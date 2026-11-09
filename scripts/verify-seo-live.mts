@@ -72,17 +72,20 @@ function metaPropertyContent(html: string, property: string): string[] {
     .map((tag) => attribute(tag, "content") ?? "");
 }
 
-function jsonLdTypes(html: string): string[] {
-  const values: string[] = [];
+function jsonLdSchemas(html: string): Record<string, unknown>[] {
+  const values: Record<string, unknown>[] = [];
   for (const match of html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>(.*?)<\/script>/gis)) {
-    const parsed = JSON.parse(decodeHtml(match[1])) as Record<string, unknown> | Record<string, unknown>[];
-    for (const schema of Array.isArray(parsed) ? parsed : [parsed]) {
-      const type = schema["@type"];
-      if (Array.isArray(type)) values.push(...type.map(String));
-      else if (type) values.push(String(type));
-    }
+    const parsed = JSON.parse(match[1]) as Record<string, unknown> | Record<string, unknown>[];
+    values.push(...(Array.isArray(parsed) ? parsed : [parsed]));
   }
   return values;
+}
+
+function jsonLdTypes(html: string): string[] {
+  return jsonLdSchemas(html).flatMap((schema) => {
+    const type = schema["@type"];
+    return Array.isArray(type) ? type.map(String) : type ? [String(type)] : [];
+  });
 }
 
 function canonicalHrefs(html: string): string[] {
@@ -156,6 +159,7 @@ const noindexPaths = [
   "/login",
   "/signup",
   "/forgot-password",
+  "/auth/reset-password",
   "/files",
   "/pdf-to-excel",
   "/pdf-to-powerpoint",
@@ -185,8 +189,14 @@ try {
   await mapInBatches(indexablePages, 12, async (page) => {
     const response = await fetch(`${origin}${page.path}`);
     assert.equal(response.status, 200, page.path);
+    assert.doesNotMatch(response.headers.get("x-robots-tag") ?? "", /noindex|none/i, `${page.path}: indexing header`);
     const html = await response.text();
     renderedHtml.set(page.path, html);
+    const schemas = jsonLdSchemas(html);
+    const ids = schemas.map((schema) => schema["@id"]).filter(Boolean);
+    assert.equal(new Set(ids).size, ids.length, `${page.path}: duplicate schema entity IDs`);
+    const webPage = schemas.find((schema) => schema["@type"] === "WebPage");
+    assert.equal(webPage?.url, absoluteUrl(page.path), `${page.path}: WebPage canonical URL`);
 
     assert.deepEqual(titleContents(html), [page.title], `${page.path}: title`);
     assert.deepEqual(metaContent(html, "description"), [page.description], `${page.path}: description`);
@@ -194,7 +204,10 @@ try {
     assert.equal(tags(html, "h1").length, 1, `${page.path}: H1 count`);
     assert.ok(jsonLdTypes(html).includes("WebPage"), `${page.path}: WebPage schema`);
     for (const tag of tags(html, "img")) assert.notEqual(attribute(tag, "alt"), undefined, `${page.path}: image alt`);
-    assert.equal(metaPropertyContent(html, "og:title").length, 1, `${page.path}: Open Graph`);
+    assert.deepEqual(metaPropertyContent(html, "og:title"), [page.path.startsWith("/blog/") ? page.title.replace(/ \| PDFNova$/, "") : page.title], `${page.path}: Open Graph title`);
+    assert.deepEqual(metaPropertyContent(html, "og:description"), [page.description], `${page.path}: Open Graph description`);
+    assert.deepEqual(metaContent(html, "twitter:description"), [page.description], `${page.path}: Twitter description`);
+    assert.equal(jsonLdTypes(html).filter((type) => type === "WebPage").length, 1, `${page.path}: unique WebPage schema`);
     assert.deepEqual(metaContent(html, "twitter:card"), ["summary_large_image"], `${page.path}: Twitter`);
     assert.equal(metaContent(html, "robots").some((value) => /noindex/i.test(value)), false, `${page.path}: robots`);
   });
@@ -251,14 +264,17 @@ try {
   console.log("ok - representative pages emit Open Graph, Twitter, JSON-LD and contextual guide links");
 
   const knownPagePaths = new Set([...indexablePages.map((page) => page.path), ...noindexPaths]);
+  const linkedPages = new Set<string>();
   for (const [sourcePath, html] of renderedHtml) {
     for (const tag of tags(html, "a")) {
       const href = attribute(tag, "href");
       if (!href?.startsWith("/") || href.startsWith("//")) continue;
       const linkedPath = new URL(href, SITE_URL).pathname.replace(/\/$/, "") || "/";
+      if (linkedPath !== sourcePath) linkedPages.add(linkedPath);
       assert.ok(knownPagePaths.has(linkedPath), `${sourcePath} links to missing ${linkedPath}`);
     }
   }
+  for (const page of indexablePages) assert.ok(linkedPages.has(page.path), `${page.path}: orphan indexable page`);
   console.log(`ok - internal anchors from ${renderedHtml.size} rendered pages target known routes`);
 
   const sitemapResponse = await fetch(`${origin}/sitemap.xml`);
@@ -311,7 +327,7 @@ try {
   );
   console.log("ok - logo, favicons, Apple touch icon and Android manifest icons are rendered");
 
-  for (const path of ["/random-nonexistent-page", "/abc123", "/does-not-exist"]) {
+  for (const path of ["/random-nonexistent-page", "/abc123", "/does-not-exist", "/blog/does-not-exist"]) {
     const response = await fetch(`${origin}${path}`);
     assert.equal(response.status, 404, path);
   }
@@ -334,7 +350,14 @@ try {
   }
   for (const page of canonicalTools) {
     const html = renderedHtml.get(page.path) ?? "";
+    const schemas = jsonLdSchemas(html);
+    const faqSchema = schemas.find((schema) => schema["@type"] === "FAQPage");
+    assert.deepEqual(faqSchema?.mainEntity, page.faqs.map((faq) => ({
+      "@type": "Question", name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })), `${page.path}: FAQ schema matches page content`);
     for (const faq of page.faqs) {
+      assert.ok(decodeHtml(html).includes(faq.answer), `${page.path}: visible FAQ answer`);
       assert.ok(html.includes(faq.question.replace(/&/g, "&amp;").replace(/'/g, "&#x27;").replace(/"/g, "&quot;")), `${page.path}: visible FAQ question`);
     }
     const response = await fetch(`${origin}${page.path}?utm_source=seo-audit`);
