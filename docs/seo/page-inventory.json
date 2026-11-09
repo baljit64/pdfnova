@@ -1,0 +1,340 @@
+[
+  {
+    "path": "/",
+    "title": "PDFNova – Free Online PDF Tools | Merge, Compress, Convert & Edit",
+    "description": "Use PDFNova's free PDF tools to merge PDF files, compress PDF documents, convert PDF to Word, create JPG to PDF files, and edit PDFs online.",
+    "indexable": true
+  },
+  {
+    "path": "/convert-pdf",
+    "title": "Convert PDF Online – PDF to Word, JPG & More | PDFNova",
+    "description": "Choose a PDFNova converter for PDF to Word, PDF to JPG, PDF to PNG, JPG to PDF and other available document formats.",
+    "indexable": true
+  },
+  {
+    "path": "/help",
+    "title": "PDF Tool Help & Frequently Asked Questions | PDFNova",
+    "description": "Find instructions and answers for merging, splitting, compressing and converting files with PDFNova's online PDF tools.",
+    "indexable": true
+  },
+  {
+    "path": "/blog",
+    "title": "PDF Guides, Tips & Tutorials | PDFNova Blog",
+    "description": "Read practical PDF guides about compressing, merging, splitting, converting and handling documents with appropriate care.",
+    "indexable": true
+  },
+  {
+    "path": "/about",
+    "title": "About PDFNova – Online PDF Tools",
+    "description": "Learn about PDFNova and its collection of browser-based tools for merging, splitting, compressing, converting and editing PDFs.",
+    "indexable": true
+  },
+  {
+    "path": "/editorial-policy",
+    "title": "Editorial Policy & Content Standards | PDFNova",
+    "description": "Learn who creates PDFNova's guides, how tool instructions are checked, how limitations are disclosed and how to report a correction.",
+    "indexable": true
+  },
+  {
+    "path": "/privacy",
+    "title": "Privacy Policy | PDFNova",
+    "description": "Read how PDFNova handles site usage data and how local and server-assisted PDF tools process files.",
+    "indexable": true
+  },
+  {
+    "path": "/terms",
+    "title": "Terms of Use | PDFNova",
+    "description": "Read the terms that apply when using PDFNova's online PDF and document tools.",
+    "indexable": true
+  },
+  {
+    "path": "/contact",
+    "title": "Contact PDFNova",
+    "description": "Contact PDFNova with questions, feedback or requests related to its PDF tools and guides.",
+    "indexable": true
+  },
+  {
+    "path": "/login",
+    "title": "Login | PDFNova",
+    "description": "Access the PDFNova login page.",
+    "indexable": false
+  },
+  {
+    "path": "/signup",
+    "title": "Create Your PDFNova Account",
+    "description": "Create an optional PDFNova account using your email address.",
+    "indexable": false
+  },
+  {
+    "path": "/pdf-to-excel",
+    "title": "PDF to Excel Converter – Coming Soon | PDFNova",
+    "description": "PDFNova's PDF to Excel converter is under development. Explore the PDF tools that are currently available.",
+    "indexable": false
+  },
+  {
+    "path": "/pdf-to-powerpoint",
+    "title": "PDF to PowerPoint Converter – Coming Soon | PDFNova",
+    "description": "PDFNova's PDF to PowerPoint converter is under development. Explore the PDF tools that are currently available.",
+    "indexable": false
+  },
+  {
+    "path": "/powerpoint-to-pdf",
+    "title": "PowerPoint to PDF Converter – Coming Soon | PDFNova",
+    "description": "PDFNova's PowerPoint to PDF converter is under development. Explore the PDF tools that are currently available.",
+    "indexable": false
+  },
+  {
+    "path": "/merge-pdf",
+    "title": "Merge PDF Online Free – Combine PDF Files | PDFNova",
+    "description": "Merge multiple PDF files online for free with PDFNova. Arrange pages, combine documents in your chosen order, and download one PDF without a signup.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/split-pdf",
+      "/compress-pdf",
+      "/rotate-pdf",
+      "/jpg-to-pdf"
+    ]
+  },
+  {
+    "path": "/split-pdf",
+    "title": "Split PDF Online Free – Extract PDF Pages | PDFNova",
+    "description": "Split a PDF online for free with PDFNova. Extract selected pages or create separate PDF files with a visual, browser-based PDF splitter.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/merge-pdf",
+      "/rotate-pdf",
+      "/compress-pdf",
+      "/pdf-to-jpg"
+    ]
+  },
+  {
+    "path": "/compress-pdf",
+    "title": "Compress PDF Online Free – Reduce PDF Size | PDFNova",
+    "description": "Compress PDF files online for free and reduce file size with lossless, balanced, strong, or target-size options. Preview the result before downloading.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/merge-pdf",
+      "/split-pdf",
+      "/pdf-to-jpg",
+      "/rotate-pdf"
+    ]
+  },
+  {
+    "path": "/rotate-pdf",
+    "title": "Rotate PDF Online Free – Turn PDF Pages | PDFNova",
+    "description": "Rotate PDF pages online for free with PDFNova. Fix sideways pages, choose specific pages, preview the result, and save the rotation permanently.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/merge-pdf",
+      "/split-pdf",
+      "/edit-pdf",
+      "/compress-pdf"
+    ]
+  },
+  {
+    "path": "/watermark",
+    "title": "Watermark PDF Online Free – Add Text or Logo | PDFNova",
+    "description": "Add a text or image watermark to PDF pages online for free. Control placement, size, opacity, and page selection before downloading your PDF.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/sign-pdf",
+      "/edit-pdf",
+      "/merge-pdf",
+      "/compress-pdf"
+    ]
+  },
+  {
+    "path": "/sign-pdf",
+    "title": "Sign PDF Online Free – Add a Signature | PDFNova",
+    "description": "Sign a PDF online for free with PDFNova. Type, draw, or upload a signature, place it on the page you choose, and download the signed PDF.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/watermark",
+      "/edit-pdf",
+      "/merge-pdf",
+      "/compress-pdf"
+    ]
+  },
+  {
+    "path": "/edit-pdf",
+    "title": "Edit PDF Online Free – Add Text to a PDF | PDFNova",
+    "description": "Edit a PDF online for free by adding text annotations to the page you choose. Set the font, size, color, and position, then preview the result.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/sign-pdf",
+      "/watermark",
+      "/rotate-pdf",
+      "/merge-pdf"
+    ]
+  },
+  {
+    "path": "/pdf-to-jpg",
+    "title": "PDF to JPG Converter Online Free | PDFNova",
+    "description": "Convert PDF pages to JPG images online for free. Choose page ranges and image quality, preview the output, and download one image or a ZIP file.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/pdf-to-image",
+      "/jpg-to-pdf",
+      "/compress-pdf",
+      "/split-pdf"
+    ]
+  },
+  {
+    "path": "/pdf-to-image",
+    "title": "PDF to PNG Converter Online Free | PDFNova",
+    "description": "Convert PDF pages to high-quality PNG images online for free. Choose the pages and resolution, preview each image, and download the results.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/pdf-to-jpg",
+      "/jpg-to-pdf",
+      "/split-pdf",
+      "/compress-pdf"
+    ]
+  },
+  {
+    "path": "/jpg-to-pdf",
+    "title": "JPG to PDF Converter Online Free | PDFNova",
+    "description": "Convert JPG and JPEG images to PDF online for free. Arrange multiple images, choose page size and margins, and download one polished PDF.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/pdf-to-jpg",
+      "/merge-pdf",
+      "/compress-pdf",
+      "/pdf-to-image"
+    ]
+  },
+  {
+    "path": "/pdf-to-word",
+    "title": "PDF to Word Converter Online Free | PDFNova",
+    "description": "Convert PDF files to editable Word documents online with PDFNova. Create a DOCX using server-assisted conversion with clear processing information.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/word-to-pdf",
+      "/pdf-to-jpg",
+      "/compress-pdf",
+      "/merge-pdf"
+    ]
+  },
+  {
+    "path": "/word-to-pdf",
+    "title": "Word to PDF Converter Online Free | PDFNova",
+    "description": "Convert Word documents to PDF online with PDFNova. Turn DOC and DOCX files into shareable PDFs using clearly labelled server-assisted conversion.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/pdf-to-word",
+      "/excel-to-pdf",
+      "/merge-pdf",
+      "/compress-pdf"
+    ]
+  },
+  {
+    "path": "/excel-to-pdf",
+    "title": "Excel to PDF Converter Online Free | PDFNova",
+    "description": "Convert Excel spreadsheets to PDF online for free. Turn XLS, XLSX, or CSV data into readable PDF tables with sheet and orientation controls.",
+    "indexable": true,
+    "inputAndOutput": "See the tool registry and visible technical section",
+    "faqCount": 5,
+    "relatedTools": [
+      "/word-to-pdf",
+      "/pdf-to-word",
+      "/merge-pdf",
+      "/compress-pdf"
+    ]
+  },
+  {
+    "path": "/blog/how-to-reduce-pdf-file-size",
+    "title": "How to reduce PDF file size for email and online forms | PDFNova",
+    "description": "A practical guide to making a PDF smaller while keeping text readable and images clear enough for its destination.",
+    "indexable": true
+  },
+  {
+    "path": "/blog/merge-pdf-files-in-the-right-order",
+    "title": "How to merge PDF files and keep every page in order | PDFNova",
+    "description": "Combine reports, scans, and attachments into one clean PDF without mixing up the sequence or orientation.",
+    "indexable": true
+  },
+  {
+    "path": "/blog/split-pdf-and-extract-pages",
+    "title": "How to split a PDF and extract only the pages you need | PDFNova",
+    "description": "Separate a long PDF into individual pages or pull out selected ranges for faster, cleaner sharing.",
+    "indexable": true
+  },
+  {
+    "path": "/blog/convert-jpg-images-to-one-pdf",
+    "title": "How to turn JPG images into one shareable PDF | PDFNova",
+    "description": "Collect phone scans, receipts, and photos into a single PDF that is easier to upload, print, and review.",
+    "indexable": true
+  },
+  {
+    "path": "/blog/are-online-pdf-tools-safe",
+    "title": "Are online PDF tools safe? What to check before adding a file | PDFNova",
+    "description": "Understand local and server processing, sensitive-document risks, and the checks to make before using any browser PDF tool.",
+    "indexable": true
+  },
+  {
+    "path": "/blog/pdf-workflow-for-students",
+    "title": "A simple PDF workflow for notes, assignments, and study packs | PDFNova",
+    "description": "Organise class material, combine scans, extract chapters, and submit smaller files with a repeatable student workflow.",
+    "indexable": true
+  },
+  {
+    "path": "/blog/convert-pdf-to-word-without-formatting-problems",
+    "title": "How to convert PDF to Word without creating a formatting mess | PDFNova",
+    "description": "Learn what converts cleanly, what usually needs repair, and how to review a new Word document before editing it.",
+    "indexable": true
+  },
+  {
+    "path": "/blog/rotate-pdf-pages-permanently",
+    "title": "How to rotate PDF pages permanently and fix sideways scans | PDFNova",
+    "description": "Correct one page or an entire document so the orientation stays fixed when the PDF is reopened or shared.",
+    "indexable": true
+  },
+  {
+    "path": "/blog/add-watermark-to-pdf-professionally",
+    "title": "How to add a professional watermark to a PDF | PDFNova",
+    "description": "Choose useful watermark text, placement, size, and opacity without making the document difficult to read.",
+    "indexable": true
+  },
+  {
+    "path": "/blog/add-signature-to-pdf-online",
+    "title": "How to add a visible signature to a PDF before sending it | PDFNova",
+    "description": "Prepare the document, place a typed signature carefully, and understand when a basic visible signature is not enough.",
+    "indexable": true
+  },
+  {
+    "path": "/blog/convert-pdf-pages-to-jpg-images",
+    "title": "How to convert PDF pages to JPG images without blurry text | PDFNova",
+    "description": "Export PDF pages for presentations, websites, and sharing while choosing a resolution that keeps details clear.",
+    "indexable": true
+  },
+  {
+    "path": "/blog/prepare-one-pdf-for-job-application",
+    "title": "How to prepare one polished PDF for a job application | PDFNova",
+    "description": "Combine a cover letter, résumé, and supporting documents into a tidy file that recruiters can open and review quickly.",
+    "indexable": true
+  }
+]

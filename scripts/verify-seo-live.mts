@@ -3,7 +3,7 @@ import { spawn } from "node:child_process";
 import http from "node:http";
 import net from "node:net";
 import { BLOG_POSTS } from "../src/blog/posts";
-import { INDEXABLE_STATIC_PATHS, ROUTE_META, SITE_URL } from "../src/seo/config";
+import { GOOGLE_SITE_VERIFICATION, INDEXABLE_STATIC_PATHS, ROUTE_META, SITE_URL } from "../src/seo/config";
 import {
   getCanonicalLandingPages,
 } from "../src/seo/landing/generate";
@@ -72,17 +72,20 @@ function metaPropertyContent(html: string, property: string): string[] {
     .map((tag) => attribute(tag, "content") ?? "");
 }
 
-function jsonLdTypes(html: string): string[] {
-  const values: string[] = [];
+function jsonLdSchemas(html: string): Record<string, unknown>[] {
+  const values: Record<string, unknown>[] = [];
   for (const match of html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>(.*?)<\/script>/gis)) {
-    const parsed = JSON.parse(decodeHtml(match[1])) as Record<string, unknown> | Record<string, unknown>[];
-    for (const schema of Array.isArray(parsed) ? parsed : [parsed]) {
-      const type = schema["@type"];
-      if (Array.isArray(type)) values.push(...type.map(String));
-      else if (type) values.push(String(type));
-    }
+    const parsed = JSON.parse(match[1]) as Record<string, unknown> | Record<string, unknown>[];
+    values.push(...(Array.isArray(parsed) ? parsed : [parsed]));
   }
   return values;
+}
+
+function jsonLdTypes(html: string): string[] {
+  return jsonLdSchemas(html).flatMap((schema) => {
+    const type = schema["@type"];
+    return Array.isArray(type) ? type.map(String) : type ? [String(type)] : [];
+  });
 }
 
 function canonicalHrefs(html: string): string[] {
@@ -154,6 +157,10 @@ assert.equal(new Set(indexablePages.map((page) => page.description)).size, index
 
 const noindexPaths = [
   "/login",
+  "/signup",
+  "/forgot-password",
+  "/auth/reset-password",
+  "/files",
   "/pdf-to-excel",
   "/pdf-to-powerpoint",
   "/powerpoint-to-pdf",
@@ -182,13 +189,26 @@ try {
   await mapInBatches(indexablePages, 12, async (page) => {
     const response = await fetch(`${origin}${page.path}`);
     assert.equal(response.status, 200, page.path);
+    assert.doesNotMatch(response.headers.get("x-robots-tag") ?? "", /noindex|none/i, `${page.path}: indexing header`);
     const html = await response.text();
     renderedHtml.set(page.path, html);
+    const schemas = jsonLdSchemas(html);
+    const ids = schemas.map((schema) => schema["@id"]).filter(Boolean);
+    assert.equal(new Set(ids).size, ids.length, `${page.path}: duplicate schema entity IDs`);
+    const webPage = schemas.find((schema) => schema["@type"] === "WebPage");
+    assert.equal(webPage?.url, absoluteUrl(page.path), `${page.path}: WebPage canonical URL`);
 
     assert.deepEqual(titleContents(html), [page.title], `${page.path}: title`);
     assert.deepEqual(metaContent(html, "description"), [page.description], `${page.path}: description`);
     assert.deepEqual(canonicalHrefs(html), [page.canonical], `${page.path}: canonical`);
     assert.equal(tags(html, "h1").length, 1, `${page.path}: H1 count`);
+    assert.ok(jsonLdTypes(html).includes("WebPage"), `${page.path}: WebPage schema`);
+    for (const tag of tags(html, "img")) assert.notEqual(attribute(tag, "alt"), undefined, `${page.path}: image alt`);
+    assert.deepEqual(metaPropertyContent(html, "og:title"), [page.path.startsWith("/blog/") ? page.title.replace(/ \| PDFNova$/, "") : page.title], `${page.path}: Open Graph title`);
+    assert.deepEqual(metaPropertyContent(html, "og:description"), [page.description], `${page.path}: Open Graph description`);
+    assert.deepEqual(metaContent(html, "twitter:description"), [page.description], `${page.path}: Twitter description`);
+    assert.equal(jsonLdTypes(html).filter((type) => type === "WebPage").length, 1, `${page.path}: unique WebPage schema`);
+    assert.deepEqual(metaContent(html, "twitter:card"), ["summary_large_image"], `${page.path}: Twitter`);
     assert.equal(metaContent(html, "robots").some((value) => /noindex/i.test(value)), false, `${page.path}: robots`);
   });
   console.log(`ok - ${indexablePages.length} indexable pages have unique metadata, one canonical and one H1`);
@@ -198,9 +218,9 @@ try {
     assert.equal(response.status, 200, path);
     const html = await response.text();
     renderedHtml.set(path, html);
-    assert.equal(metaContent(html, "robots").some((value) => /noindex/i.test(value) && /follow/i.test(value)), true, path);
+    assert.equal(metaContent(html, "robots").some((value) => /noindex/i.test(value)), true, path);
   });
-  console.log(`ok - ${noindexPaths.length} preserved non-SEO routes emit noindex, follow`);
+  console.log(`ok - ${noindexPaths.length} non-SEO routes emit noindex`);
 
   await mapInBatches(LEGACY_TOOL_REDIRECTS, 20, async (redirect) => {
     const response = await fetch(`${origin}/${redirect.slug}`, { redirect: "manual" });
@@ -244,19 +264,23 @@ try {
   console.log("ok - representative pages emit Open Graph, Twitter, JSON-LD and contextual guide links");
 
   const knownPagePaths = new Set([...indexablePages.map((page) => page.path), ...noindexPaths]);
+  const linkedPages = new Set<string>();
   for (const [sourcePath, html] of renderedHtml) {
     for (const tag of tags(html, "a")) {
       const href = attribute(tag, "href");
       if (!href?.startsWith("/") || href.startsWith("//")) continue;
       const linkedPath = new URL(href, SITE_URL).pathname.replace(/\/$/, "") || "/";
+      if (linkedPath !== sourcePath) linkedPages.add(linkedPath);
       assert.ok(knownPagePaths.has(linkedPath), `${sourcePath} links to missing ${linkedPath}`);
     }
   }
+  for (const page of indexablePages) assert.ok(linkedPages.has(page.path), `${page.path}: orphan indexable page`);
   console.log(`ok - internal anchors from ${renderedHtml.size} rendered pages target known routes`);
 
   const sitemapResponse = await fetch(`${origin}/sitemap.xml`);
   assert.equal(sitemapResponse.status, 200);
   const sitemapXml = await sitemapResponse.text();
+  assert.match(sitemapXml, /<urlset xmlns="http:\/\/www.sitemaps.org\/schemas\/sitemap\/0.9">/);
   const sitemapUrls = [...sitemapXml.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
   assert.deepEqual(new Set(sitemapUrls), new Set(indexablePages.map((page) => absoluteUrl(page.path))));
   assert.equal(sitemapUrls.length, indexablePages.length);
@@ -303,7 +327,7 @@ try {
   );
   console.log("ok - logo, favicons, Apple touch icon and Android manifest icons are rendered");
 
-  for (const path of ["/random-nonexistent-page", "/abc123", "/does-not-exist"]) {
+  for (const path of ["/random-nonexistent-page", "/abc123", "/does-not-exist", "/blog/does-not-exist"]) {
     const response = await fetch(`${origin}${path}`);
     assert.equal(response.status, 404, path);
   }
@@ -320,8 +344,38 @@ try {
   legacyHostRedirect.resume();
   console.log("ok - non-www canonical and legacy URLs redirect directly to their preferred HTTPS URL");
 
-  if (process.env.GOOGLE_SITE_VERIFICATION) {
-    assert.deepEqual(metaContent(homeHtml, "google-site-verification"), [process.env.GOOGLE_SITE_VERIFICATION]);
+  for (const path of ["/files", "/forgot-password", "/auth/callback"]) {
+    const response = await fetch(`${origin}${path}`, { redirect: "manual" });
+    assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow", `${path}: indexing header`);
+  }
+  for (const page of canonicalTools) {
+    const html = renderedHtml.get(page.path) ?? "";
+    const schemas = jsonLdSchemas(html);
+    const faqSchema = schemas.find((schema) => schema["@type"] === "FAQPage");
+    assert.deepEqual(faqSchema?.mainEntity, page.faqs.map((faq) => ({
+      "@type": "Question", name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })), `${page.path}: FAQ schema matches page content`);
+    for (const faq of page.faqs) {
+      assert.ok(decodeHtml(html).includes(faq.answer), `${page.path}: visible FAQ answer`);
+      assert.ok(html.includes(faq.question.replace(/&/g, "&amp;").replace(/'/g, "&#x27;").replace(/"/g, "&quot;")), `${page.path}: visible FAQ question`);
+    }
+    const response = await fetch(`${origin}${page.path}?utm_source=seo-audit`);
+    assert.deepEqual(canonicalHrefs(await response.text()), [absoluteUrl(page.path)], `${page.path}: query canonical`);
+  }
+  const social = await fetch(`${origin}/opengraph-image`);
+  assert.equal(social.status, 200);
+  assert.match(social.headers.get("content-type") ?? "", /image\/png/);
+  const png = Buffer.from(await social.arrayBuffer());
+  assert.equal(png.readUInt32BE(16), 1200);
+  assert.equal(png.readUInt32BE(20), 630);
+  const slash = await fetch(`${origin}/merge-pdf/`, { redirect: "manual" });
+  assert.equal(slash.status, 308);
+  assert.equal(slash.headers.get("location"), "/merge-pdf");
+  console.log("ok - visible FAQ questions, query canonicals, social image dimensions and trailing-slash redirects");
+
+  if (GOOGLE_SITE_VERIFICATION) {
+    assert.deepEqual(metaContent(homeHtml, "google-site-verification"), [GOOGLE_SITE_VERIFICATION]);
     console.log("ok - Google Search Console verification metadata is present");
   } else {
     console.log("ok - Google Search Console verification hook is ready (set GOOGLE_SITE_VERIFICATION)");

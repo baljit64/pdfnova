@@ -345,7 +345,7 @@ export default function Home() {
           <div className="mt-8 divide-y divide-[var(--border)] overflow-hidden rounded-2xl border border-[var(--border)] bg-white">
             {[
               ["Are PDFNova's PDF tools free?", "Yes. The working public tools can be used without creating an account or entering payment details."],
-              ["Do my files get uploaded?", "Most tools process files in your browser. PDF to Word and Word to PDF send files to PDFNova's API for conversion, and those pages show that before you begin."],
+              ["Do my files get uploaded?", "Most tools process files in your browser. PDF to Word and Word to PDF send files to PDFNova's API for conversion. When you are signed in, completed results from any tool are also uploaded to your private account archive."],
               ["Which PDF tasks can I complete?", "You can merge, split, compress, rotate, watermark, sign, annotate, and convert supported PDF, image, Word, and spreadsheet files."],
               ["Can I use PDFNova on a phone or tablet?", "Yes. The interface works in current mobile browsers, although large files and page-heavy jobs are usually faster on a computer with more memory."],
               ["How do I choose between JPG and PNG?", "JPG is usually smaller and suits photos. PNG preserves sharp edges and text more clearly, but its files are often larger."],

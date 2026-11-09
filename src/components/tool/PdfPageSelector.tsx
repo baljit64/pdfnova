@@ -172,7 +172,6 @@ export default function PdfPageSelector({ file, value, disabled, onChange, water
                 className={`relative w-full overflow-hidden rounded-lg border-2 bg-white p-1 text-left transition ${active ? "border-[var(--primary)]" : "border-transparent opacity-55 hover:opacity-80"}`}
               >
                 {/* Object URLs are local previews and do not benefit from next/image. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <div className="relative mx-auto block aspect-[0.72] w-full overflow-hidden [container-type:inline-size]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={item.url} alt="" className="absolute inset-0 h-full w-full object-contain" />

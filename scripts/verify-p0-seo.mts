@@ -132,7 +132,6 @@ const checks: Array<[string, () => void | Promise<void>]> = [
       "GOOGLE_SITE_VERIFICATION",
       "NEXT_PUBLIC_SUPABASE_URL",
       "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-      "CONTACT_FORM_ENDPOINT",
     ]) {
       assert.match(environment, new RegExp(`^${key}=\\s*$`, "m"), key);
     }

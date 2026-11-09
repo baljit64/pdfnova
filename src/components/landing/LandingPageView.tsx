@@ -52,8 +52,8 @@ export default function LandingPageView({ page }: Props) {
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-[var(--text-secondary)]">{tool.tagline}</p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-semibold text-[var(--text-secondary)]">
             <span className="inline-flex items-center gap-1.5"><UserRoundCheck className="h-4 w-4 text-[var(--success)]" /> No signup required</span>
-            <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-[var(--success)]" /> Secure processing</span>
-            <span className="inline-flex items-center gap-1.5"><MonitorSmartphone className="h-4 w-4 text-[var(--success)]" /> Works on any device</span>
+            <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-[var(--success)]" /> {tool.processingType === "client" ? "Processed in your browser" : "Server-assisted conversion"}</span>
+            <span className="inline-flex items-center gap-1.5"><MonitorSmartphone className="h-4 w-4 text-[var(--success)]" /> Works in modern browsers</span>
           </div>
         </Container>
       </div>

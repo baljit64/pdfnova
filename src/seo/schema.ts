@@ -11,6 +11,21 @@ import type { ToolDefinition } from "../tools/types";
 
 type Schema = Record<string, unknown>;
 
+export function webPageSchema(path: string, name: string, description: string): Schema {
+  const url = path === "/" ? HOME_URL : `${SITE_URL}${path}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${url}#webpage`,
+    url,
+    name,
+    description,
+    inLanguage: "en",
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    publisher: { "@id": `${SITE_URL}/#organization` },
+  };
+}
+
 export function websiteSchema(): Schema {
   return {
     "@context": "https://schema.org",
@@ -79,7 +94,7 @@ export function applicationSchema(page: LandingPage, tool: ToolDefinition): Sche
     browserRequirements: "Requires a modern browser with JavaScript enabled",
     permissions: tool.processingType !== "client"
       ? "Files are sent to a conversion service over an encrypted connection"
-      : "No permissions required — files are processed locally in the browser",
+      : "Source files are processed in your browser; signed-in results are uploaded to your account archive",
     isAccessibleForFree: true,
     offers: {
       "@type": "Offer",
@@ -98,7 +113,6 @@ export function howToSchema(page: LandingPage, tool: ToolDefinition): Schema {
     "@type": "HowTo",
     name: `How to ${tool.verb} a ${tool.acceptLabel} file`,
     description: page.description,
-    totalTime: "PT1M",
     supply: [{ "@type": "HowToSupply", name: `A ${tool.acceptLabel} file` }],
     tool: [{ "@type": "HowToTool", name: "A web browser" }],
     step: page.steps.map((step, position) => ({
@@ -114,6 +128,7 @@ export function howToSchema(page: LandingPage, tool: ToolDefinition): Schema {
 /** Everything a canonical tool page emits, in one array. */
 export function landingPageSchemas(page: LandingPage, tool: ToolDefinition): Schema[] {
   return [
+    webPageSchema(page.path, page.title, page.description),
     breadcrumbSchema(page),
     applicationSchema(page, tool),
     howToSchema(page, tool),

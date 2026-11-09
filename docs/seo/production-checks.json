@@ -1,0 +1,342 @@
+[
+  {
+    "url": "https://www.pdfnova.in/",
+    "status": 200,
+    "final": "https://www.pdfnova.in/",
+    "canonical": [
+      "https://www.pdfnova.in"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/convert-pdf",
+    "status": 200,
+    "final": "https://www.pdfnova.in/convert-pdf",
+    "canonical": [
+      "https://www.pdfnova.in/convert-pdf"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/help",
+    "status": 200,
+    "final": "https://www.pdfnova.in/help",
+    "canonical": [
+      "https://www.pdfnova.in/help"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog",
+    "canonical": [
+      "https://www.pdfnova.in/blog"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/about",
+    "status": 200,
+    "final": "https://www.pdfnova.in/about",
+    "canonical": [
+      "https://www.pdfnova.in/about"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/editorial-policy",
+    "status": 200,
+    "final": "https://www.pdfnova.in/editorial-policy",
+    "canonical": [
+      "https://www.pdfnova.in/editorial-policy"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/privacy",
+    "status": 200,
+    "final": "https://www.pdfnova.in/privacy",
+    "canonical": [
+      "https://www.pdfnova.in/privacy"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/terms",
+    "status": 200,
+    "final": "https://www.pdfnova.in/terms",
+    "canonical": [
+      "https://www.pdfnova.in/terms"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/contact",
+    "status": 200,
+    "final": "https://www.pdfnova.in/contact",
+    "canonical": [
+      "https://www.pdfnova.in/contact"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/merge-pdf",
+    "status": 200,
+    "final": "https://www.pdfnova.in/merge-pdf",
+    "canonical": [
+      "https://www.pdfnova.in/merge-pdf"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/split-pdf",
+    "status": 200,
+    "final": "https://www.pdfnova.in/split-pdf",
+    "canonical": [
+      "https://www.pdfnova.in/split-pdf"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/compress-pdf",
+    "status": 200,
+    "final": "https://www.pdfnova.in/compress-pdf",
+    "canonical": [
+      "https://www.pdfnova.in/compress-pdf"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/rotate-pdf",
+    "status": 200,
+    "final": "https://www.pdfnova.in/rotate-pdf",
+    "canonical": [
+      "https://www.pdfnova.in/rotate-pdf"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/watermark",
+    "status": 200,
+    "final": "https://www.pdfnova.in/watermark",
+    "canonical": [
+      "https://www.pdfnova.in/watermark"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/sign-pdf",
+    "status": 200,
+    "final": "https://www.pdfnova.in/sign-pdf",
+    "canonical": [
+      "https://www.pdfnova.in/sign-pdf"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/edit-pdf",
+    "status": 200,
+    "final": "https://www.pdfnova.in/edit-pdf",
+    "canonical": [
+      "https://www.pdfnova.in/edit-pdf"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/pdf-to-jpg",
+    "status": 200,
+    "final": "https://www.pdfnova.in/pdf-to-jpg",
+    "canonical": [
+      "https://www.pdfnova.in/pdf-to-jpg"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/pdf-to-image",
+    "status": 200,
+    "final": "https://www.pdfnova.in/pdf-to-image",
+    "canonical": [
+      "https://www.pdfnova.in/pdf-to-image"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/jpg-to-pdf",
+    "status": 200,
+    "final": "https://www.pdfnova.in/jpg-to-pdf",
+    "canonical": [
+      "https://www.pdfnova.in/jpg-to-pdf"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/pdf-to-word",
+    "status": 200,
+    "final": "https://www.pdfnova.in/pdf-to-word",
+    "canonical": [
+      "https://www.pdfnova.in/pdf-to-word"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/word-to-pdf",
+    "status": 200,
+    "final": "https://www.pdfnova.in/word-to-pdf",
+    "canonical": [
+      "https://www.pdfnova.in/word-to-pdf"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/excel-to-pdf",
+    "status": 200,
+    "final": "https://www.pdfnova.in/excel-to-pdf",
+    "canonical": [
+      "https://www.pdfnova.in/excel-to-pdf"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog/how-to-reduce-pdf-file-size",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog/how-to-reduce-pdf-file-size",
+    "canonical": [
+      "https://www.pdfnova.in/blog/how-to-reduce-pdf-file-size"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog/merge-pdf-files-in-the-right-order",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog/merge-pdf-files-in-the-right-order",
+    "canonical": [
+      "https://www.pdfnova.in/blog/merge-pdf-files-in-the-right-order"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog/split-pdf-and-extract-pages",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog/split-pdf-and-extract-pages",
+    "canonical": [
+      "https://www.pdfnova.in/blog/split-pdf-and-extract-pages"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog/convert-jpg-images-to-one-pdf",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog/convert-jpg-images-to-one-pdf",
+    "canonical": [
+      "https://www.pdfnova.in/blog/convert-jpg-images-to-one-pdf"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog/are-online-pdf-tools-safe",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog/are-online-pdf-tools-safe",
+    "canonical": [
+      "https://www.pdfnova.in/blog/are-online-pdf-tools-safe"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog/pdf-workflow-for-students",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog/pdf-workflow-for-students",
+    "canonical": [
+      "https://www.pdfnova.in/blog/pdf-workflow-for-students"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog/convert-pdf-to-word-without-formatting-problems",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog/convert-pdf-to-word-without-formatting-problems",
+    "canonical": [
+      "https://www.pdfnova.in/blog/convert-pdf-to-word-without-formatting-problems"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog/rotate-pdf-pages-permanently",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog/rotate-pdf-pages-permanently",
+    "canonical": [
+      "https://www.pdfnova.in/blog/rotate-pdf-pages-permanently"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog/add-watermark-to-pdf-professionally",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog/add-watermark-to-pdf-professionally",
+    "canonical": [
+      "https://www.pdfnova.in/blog/add-watermark-to-pdf-professionally"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog/add-signature-to-pdf-online",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog/add-signature-to-pdf-online",
+    "canonical": [
+      "https://www.pdfnova.in/blog/add-signature-to-pdf-online"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog/convert-pdf-pages-to-jpg-images",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog/convert-pdf-pages-to-jpg-images",
+    "canonical": [
+      "https://www.pdfnova.in/blog/convert-pdf-pages-to-jpg-images"
+    ],
+    "noindex": false,
+    "verification": false
+  },
+  {
+    "url": "https://www.pdfnova.in/blog/prepare-one-pdf-for-job-application",
+    "status": 200,
+    "final": "https://www.pdfnova.in/blog/prepare-one-pdf-for-job-application",
+    "canonical": [
+      "https://www.pdfnova.in/blog/prepare-one-pdf-for-job-application"
+    ],
+    "noindex": false,
+    "verification": false
+  }
+]

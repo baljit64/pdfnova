@@ -56,37 +56,37 @@ export const TOOL_SEO: Record<ToolId, ToolSeo> = {
     h1: "Edit PDF Online",
   },
   "pdf-to-jpg": {
-    title: "PDF to JPG Converter Online Free | PDFNova",
+    title: "PDF to JPG Online Free – Convert Pages to JPG | PDFNova",
     description:
       "Convert PDF pages to JPG images online for free. Choose page ranges and image quality, preview the output, and download one image or a ZIP file.",
     h1: "PDF to JPG Converter",
   },
   "pdf-to-image": {
-    title: "PDF to PNG Converter Online Free | PDFNova",
+    title: "PDF to PNG Online Free – Export PDF Pages | PDFNova",
     description:
       "Convert PDF pages to high-quality PNG images online for free. Choose the pages and resolution, preview each image, and download the results.",
     h1: "PDF to PNG Converter",
   },
   "jpg-to-pdf": {
-    title: "JPG to PDF Converter Online Free | PDFNova",
+    title: "JPG to PDF Online Free – Combine Your Images | PDFNova",
     description:
-      "Convert JPG and JPEG images to PDF online for free. Arrange multiple images, choose page size and margins, and download one polished PDF.",
+      "Convert JPG and JPEG images to PDF online for free with PDFNova. Arrange your photos, choose page size and margins, then download one PDF without signing up.",
     h1: "JPG to PDF Converter",
   },
   "pdf-to-word": {
-    title: "PDF to Word Converter Online Free | PDFNova",
+    title: "PDF to Word Online Free – Convert to DOCX | PDFNova",
     description:
-      "Convert PDF files to editable Word documents online with PDFNova. Create a DOCX using server-assisted conversion with clear processing information.",
+      "Convert a PDF to an editable Word document online for free. Download a DOCX file with PDFNova; this server-assisted converter sends your PDF for processing.",
     h1: "PDF to Word Converter",
   },
   "word-to-pdf": {
-    title: "Word to PDF Converter Online Free | PDFNova",
+    title: "Word to PDF Online Free – Convert DOC & DOCX | PDFNova",
     description:
-      "Convert Word documents to PDF online with PDFNova. Turn DOC and DOCX files into shareable PDFs using clearly labelled server-assisted conversion.",
+      "Convert DOC and DOCX files to PDF online for free with PDFNova. Download a shareable document using server-assisted conversion, with no account required.",
     h1: "Word to PDF Converter",
   },
   "excel-to-pdf": {
-    title: "Excel to PDF Converter Online Free | PDFNova",
+    title: "Excel to PDF Online Free – Convert XLS & XLSX | PDFNova",
     description:
       "Convert Excel spreadsheets to PDF online for free. Turn XLS, XLSX, or CSV data into readable PDF tables with sheet and orientation controls.",
     h1: "Excel to PDF Converter",
