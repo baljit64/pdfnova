@@ -25,7 +25,7 @@ export const BRAND_ASSETS = {
 } as const;
 
 export const DEFAULT_TITLE =
-  "PDFNova – Free Online PDF Tools | Merge, Compress, Convert & Edit";
+  "Free Online PDF Tools – Merge, Compress & Convert | PDFNova";
 export const DEFAULT_DESCRIPTION =
   "Use PDFNova's free PDF tools to merge PDF files, compress PDF documents, convert PDF to Word, create JPG to PDF files, and edit PDFs online.";
 

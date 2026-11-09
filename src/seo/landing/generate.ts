@@ -19,8 +19,7 @@ function privacySection(tool: ToolDefinition): ContentBlock {
     return {
       heading: "Privacy",
       paragraphs: [
-        `${tool.name} uses server-assisted document conversion because preserving editable structure and office-document layout is not practical in a browser. Your file is sent to PDFNova's API for processing and returned to you.`,
-        "The file is sent over HTTPS to PDFNova's API for conversion and then returned to your browser. The document leaves your device, so review the privacy requirements that apply to it before using this converter.",
+        `${tool.name} uses server-assisted conversion. Your file is sent over HTTPS to PDFNova's API for processing and the converted document is returned to your browser.`,
         "If a document must not leave your device, avoid server-assisted tools and use an on-device tool while signed out. Signed-in results are automatically uploaded to your private archive, remain downloadable for 30 days, and are not currently deleted from storage on an automatic schedule.",
       ],
     };
@@ -65,8 +64,7 @@ function limitationsSection(tool: ToolDefinition): ContentBlock {
   return {
     heading: "What this tool does not do",
     paragraphs: [
-      `Being clear about limits is more useful than a feature list that quietly omits them. ${content.limitations}`,
-      `If you need capabilities beyond that — redaction, PDF/A conformance, OCR, or scripted batch processing across thousands of documents — dedicated desktop software genuinely earns its licence fee, and this is not trying to replace it. For the specific job of producing a ${tool.outputNoun}, everything you need is on this page.`,
+      content.limitations,
     ],
   };
 }

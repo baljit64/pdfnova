@@ -94,7 +94,7 @@ export function applicationSchema(page: LandingPage, tool: ToolDefinition): Sche
     browserRequirements: "Requires a modern browser with JavaScript enabled",
     permissions: tool.processingType !== "client"
       ? "Files are sent to a conversion service over an encrypted connection"
-      : "No permissions required — files are processed locally in the browser",
+      : "Source files are processed in your browser; signed-in results are uploaded to your account archive",
     isAccessibleForFree: true,
     offers: {
       "@type": "Offer",

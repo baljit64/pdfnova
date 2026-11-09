@@ -19,6 +19,7 @@ const FOOTER_LINKS = [
       ["PDF to JPG", "/pdf-to-jpg"],
       ["Word to PDF", "/word-to-pdf"],
       ["JPG to PDF", "/jpg-to-pdf"],
+      ["All PDF converters", "/convert-pdf"],
     ],
   },
   {

@@ -119,7 +119,7 @@ export const TOOL_CONTENT: Record<ToolId, ToolContent> = {
     technical: {
       heading: "How the merge actually works",
       paragraphs: [
-        "When you press merge, the files are read in your browser and combined in the order you set on screen. The resulting PDF is created locally and is not uploaded.",
+        "When you press merge, the files are read in your browser and combined in the order you set on screen. The resulting PDF is created locally. When you are signed in, the completed result is automatically uploaded to your account archive; use the tool signed out to keep the result on your device.",
         "Copying at the object level is what preserves quality. A page's text runs, embedded fonts, images and vector instructions are transferred as-is rather than being flattened into a picture. Rotation, when you apply it, is written as a page attribute on top of whatever rotation the page already carried, so a page that was already 90 degrees out and gets another 90 ends up at 180 rather than snapping back to zero.",
       ],
     },
